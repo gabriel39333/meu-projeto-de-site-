@@ -2,1256 +2,1150 @@
 <html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>J.A.R.V.I.S. - Arc Reactor Intelligence System</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus AI - Assistente Pessoal & Central do Desenvolvedor</title>
+    
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Inter & Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        stark: {
-                            cyan: '#00f3ff',
-                            blue: '#00a8ff',
-                            dark: '#020712',
-                            panel: 'rgba(4, 18, 38, 0.75)',
-                            gold: '#ffb700',
-                            orange: '#ff6600',
-                            red: '#ff2a2a',
-                            purple: '#a855f7'
-                        }
-                    },
                     fontFamily: {
-                        hud: ['Orbitron', 'Rajdhani', 'sans-serif'],
-                        tech: ['Rajdhani', 'sans-serif']
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            900: '#0c4a6e',
+                        },
+                        darkbg: '#0b0f19',
+                        darkcard: 'rgba(17, 24, 39, 0.7)',
                     }
                 }
             }
         }
     </script>
 
-    <!-- Google Fonts & FontAwesome Icons -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        /* Custom HUD Scrollbar */
-        ::-webkit-scrollbar {
-            width: 5px;
-            height: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(3, 15, 30, 0.8);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(0, 243, 255, 0.4);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(0, 243, 255, 0.8);
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        /* Grid Background Pattern */
-        .hud-bg {
-            background-color: #020712;
-            background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.08) 0%, transparent 75%),
-                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
-        }
-
-        /* Holographic Glassmorphism */
-        .hud-glass {
-            background: rgba(4, 18, 38, 0.7);
+        /* Glassmorphism Styles */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 243, 255, 0.25);
-            box-shadow: 0 0 25px rgba(0, 243, 255, 0.08), inset 0 0 15px rgba(0, 243, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
 
-        /* Sci-Fi Corner Brackets */
-        .hud-border-corners {
-            position: relative;
-        }
-        .hud-border-corners::before,
-        .hud-border-corners::after {
-            content: '';
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-color: #00f3ff;
-            pointer-events: none;
-            z-index: 5;
-        }
-        .hud-border-corners::before {
-            top: -1px;
-            left: -1px;
-            border-top: 2px solid #00f3ff;
-            border-left: 2px solid #00f3ff;
-        }
-        .hud-border-corners::after {
-            bottom: -1px;
-            right: -1px;
-            border-bottom: 2px solid #00f3ff;
-            border-right: 2px solid #00f3ff;
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* ARC REACTOR SVG & ANIMATIONS */
-        @keyframes spin-cw {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(203, 213, 225, 0.6);
         }
-        @keyframes spin-ccw {
-            from { transform: rotate(360deg); }
-            to { transform: rotate(0deg); }
+
+        .dark .glass-input {
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(75, 85, 99, 0.4);
+        }
+
+        /* Soundwave Voice Animation */
+        .soundwave-bar {
+            animation: soundwave 1.2s infinite ease-in-out alternate;
+        }
+        .soundwave-bar:nth-child(1) { animation-delay: 0.1s; }
+        .soundwave-bar:nth-child(2) { animation-delay: 0.3s; }
+        .soundwave-bar:nth-child(3) { animation-delay: 0.5s; }
+        .soundwave-bar:nth-child(4) { animation-delay: 0.2s; }
+        .soundwave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+        @keyframes soundwave {
+            0% { height: 6px; }
+            100% { height: 28px; }
+        }
+
+        /* Pulse glowing animation */
         @keyframes pulse-glow {
-            0%, 100% { filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.8)) drop-shadow(0 0 30px rgba(0, 243, 255, 0.4)); opacity: 0.9; }
-            50% { filter: drop-shadow(0 0 35px rgba(0, 243, 255, 1)) drop-shadow(0 0 60px rgba(0, 243, 255, 0.7)); opacity: 1; }
+            0%, 100% { box-shadow: 0 0 15px rgba(14, 165, 233, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(14, 165, 233, 0.8); }
         }
-        @keyframes pulse-listening {
-            0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 102, 0, 0.9)) drop-shadow(0 0 45px rgba(255, 183, 0, 0.6)); }
-            50% { filter: drop-shadow(0 0 45px rgba(255, 102, 0, 1)) drop-shadow(0 0 80px rgba(255, 183, 0, 0.9)); }
-        }
-        @keyframes pulse-thinking {
-            0%, 100% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.9)) drop-shadow(0 0 45px rgba(255, 183, 0, 0.6)); }
-            50% { filter: drop-shadow(0 0 45px rgba(168, 85, 247, 1)) drop-shadow(0 0 80px rgba(0, 243, 255, 0.8)); }
-        }
-        @keyframes pulse-speaking {
-            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 25px rgba(0, 243, 255, 0.9)); }
-            50% { transform: scale(1.04); filter: drop-shadow(0 0 55px rgba(0, 243, 255, 1)) drop-shadow(0 0 85px rgba(0, 168, 255, 0.8)); }
+        .listening-active {
+            animation: pulse-glow 1.5s infinite;
         }
 
-        .ring-outer {
-            animation: spin-cw 18s linear infinite;
-            transform-origin: center;
+        /* Typing Dots Animation */
+        .dot-flashing {
+            position: relative;
+            width: 6px;
+            height: 6px;
+            border-radius: 5px;
+            background-color: #38bdf8;
+            color: #38bdf8;
+            animation: dot-flashing 1s infinite linear alternate;
+            animation-delay: 0.5s;
         }
-        .ring-middle {
-            animation: spin-ccw 10s linear infinite;
-            transform-origin: center;
-        }
-        .ring-inner {
-            animation: spin-cw 6s linear infinite;
-            transform-origin: center;
-        }
-
-        /* Arc Reactor Interactive States */
-        .arc-reactor {
-            transition: all 0.5s ease;
-            cursor: pointer;
-        }
-        .arc-reactor.state-idle .core-glow {
-            animation: pulse-glow 3s infinite ease-in-out;
-        }
-        
-        .arc-reactor.state-listening .ring-outer {
-            animation-duration: 4s;
-            stroke: #ff6600 !important;
-        }
-        .arc-reactor.state-listening .ring-middle {
-            animation-duration: 2s;
-            stroke: #ffb700 !important;
-        }
-        .arc-reactor.state-listening .core-glow {
-            animation: pulse-listening 1s infinite ease-in-out;
-            fill: url(#coreGradientListening) !important;
-        }
-
-        .arc-reactor.state-thinking .ring-outer {
-            animation-duration: 2s;
-            stroke: #a855f7 !important;
-        }
-        .arc-reactor.state-thinking .ring-middle {
-            animation-duration: 1.2s;
-            stroke: #00f3ff !important;
-        }
-        .arc-reactor.state-thinking .core-glow {
-            animation: pulse-thinking 0.8s infinite ease-in-out;
-            fill: url(#coreGradientThinking) !important;
-        }
-
-        .arc-reactor.state-speaking {
-            animation: pulse-speaking 0.4s infinite ease-in-out alternate;
-        }
-
-        /* Scanline Overlay */
-        .scanline {
-            width: 100%;
-            height: 100%;
+        .dot-flashing::before, .dot-flashing::after {
+            content: "";
+            display: inline-block;
             position: absolute;
-            top: 0; left: 0;
-            pointer-events: none;
-            background: linear-gradient(
-                to bottom,
-                rgba(255,255,255,0),
-                rgba(255,255,255,0) 50%,
-                rgba(0, 243, 255, 0.03) 50%,
-                rgba(0, 243, 255, 0.03)
-            );
-            background-size: 100% 4px;
-            z-index: 40;
+            top: 0;
+            width: 6px;
+            height: 6px;
+            border-radius: 5px;
+            background-color: #38bdf8;
+            color: #38bdf8;
         }
-
-        /* Equalizer Bar Animation */
-        .eq-bar {
-            transition: height 0.12s ease;
+        .dot-flashing::before {
+            left: -10px;
+            animation: dot-flashing 1s infinite alternate;
+            animation-delay: 0s;
+        }
+        .dot-flashing::after {
+            left: 10px;
+            animation: dot-flashing 1s infinite alternate;
+            animation-delay: 1s;
+        }
+        @keyframes dot-flashing {
+            0% { background-color: #38bdf8; }
+            50%, 100% { background-color: rgba(56, 189, 248, 0.2); }
         }
     </style>
 </head>
-<body class="hud-bg text-stark-cyan font-tech min-h-screen flex flex-col justify-between overflow-x-hidden select-none relative p-2 sm:p-4">
-    <div class="scanline"></div>
+<body class="bg-slate-100 dark:bg-darkbg text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-brand-500 selection:text-white">
 
-    <header class="hud-glass hud-border-corners rounded-lg p-3 mb-3 flex flex-wrap justify-between items-center z-10 gap-2">
-        <div class="flex items-center space-x-3">
-            <div class="relative flex h-3 w-3">
-                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-stark-cyan opacity-75"></span>
-                <span class="relative inline-flex rounded-full h-3 w-3 bg-stark-cyan" id="status-dot"></span>
+    <!-- HEADER NAVBAR -->
+    <header class="sticky top-0 z-50 glass-card border-b border-slate-200 dark:border-slate-800 px-4 py-3 shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-cyan-400 flex items-center justify-center text-white shadow-lg shadow-brand-500/30">
+                    <i class="fa-solid fa-robot text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-brand-500 to-cyan-400 bg-clip-text text-transparent">NEXUS AI</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Assistente Pessoal & Central do Desenvolvedor</p>
+                </div>
             </div>
-            <div>
-                <h1 class="font-hud font-black text-lg sm:text-xl tracking-widest text-white flex items-center gap-2">
-                    J.A.R.V.I.S. <span class="text-xs px-2 py-0.5 rounded bg-stark-cyan/20 text-stark-cyan border border-stark-cyan/40 font-normal">MARK VIII • GEMINI AI</span>
-                </h1>
-                <p class="text-[11px] text-stark-cyan/70 tracking-wider hidden sm:block">STARK INDUSTRIES INTEGRATED ARTIFICIAL INTELLIGENCE</p>
+
+            <!-- View Mode Tabs -->
+            <div class="flex items-center bg-slate-200/70 dark:bg-slate-800/80 p-1 rounded-xl text-xs font-semibold">
+                <button id="tab-assistant" onclick="switchTab('assistant')" class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>Assistente Interativo</span>
+                </button>
+                <button id="tab-developer" onclick="switchTab('developer')" class="flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                    <i class="fa-solid fa-code"></i>
+                    <span>Central do Desenvolvedor</span>
+                </button>
+            </div>
+
+            <!-- Utilities (Voice Output Toggle & Theme Switcher) -->
+            <div class="flex items-center space-x-2">
+                <button id="btn-tts-toggle" onclick="toggleTTS()" title="Ativar/Desativar Voz do Assistente" class="p-2.5 rounded-xl glass-card text-slate-600 dark:text-slate-300 hover:text-brand-500 dark:hover:text-brand-400 transition">
+                    <i id="tts-icon" class="fa-solid fa-volume-high"></i>
+                </button>
+                <button id="btn-theme-toggle" onclick="toggleTheme()" title="Alternar Tema Claro/Escuro" class="p-2.5 rounded-xl glass-card text-slate-600 dark:text-slate-300 hover:text-amber-500 dark:hover:text-amber-400 transition">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
             </div>
         </div>
+    </header>
 
-        <!-- Telemetry, Clock & Settings Toggle -->
-        <div class="flex items-center space-x-3 sm:space-x-4 text-xs sm:text-sm font-hud">
-            <div class="hidden lg:flex space-x-4 border-r border-stark-cyan/30 pr-4 text-stark-cyan/80">
-                <span title="Status da Bateria"><i class="fa-solid fa-battery-three-quarters text-stark-cyan mr-1"></i><span id="bat-val">--%</span></span>
-                <span title="Uso do Processador Nucleador"><i class="fa-solid fa-microchip text-stark-cyan mr-1"></i><span id="cpu-val">14%</span></span>
-                <span title="Latência Gemini"><i class="fa-solid fa-bolt text-stark-cyan mr-1"></i><span id="ping-val">28ms</span></span>
-                <span title="Memória Alocada"><i class="fa-solid fa-memory text-stark-cyan mr-1"></i><span id="ram-val">3.8 GB</span></span>
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 flex flex-col">
+
+        <!-- ==================================================== -->
+        <!-- VIEW 1: INTERACTIVE PERSONAL ASSISTANT               -->
+        <!-- ==================================================== -->
+        <section id="view-assistant" class="flex-1 flex flex-col gap-4">
+            
+            <!-- Quick Chips / Status Bar -->
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-200/50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200/60 dark:border-slate-800">
+                <div class="flex items-center space-x-2 text-xs font-medium text-slate-600 dark:text-slate-400">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span>Status: <strong class="text-emerald-500">Online & Pronto</strong></span>
+                </div>
+                
+                <!-- Quick Command Suggestions -->
+                <div class="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full text-xs">
+                    <span class="text-slate-400 dark:text-slate-500 whitespace-nowrap"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i>Sugestões:</span>
+                    <button onclick="sendQuickCommand('Que horas são?')" class="px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-800 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 transition border border-slate-200 dark:border-slate-700 whitespace-nowrap">🕒 Que horas são?</button>
+                    <button onclick="sendQuickCommand('Qual é a data de hoje?')" class="px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-800 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 transition border border-slate-200 dark:border-slate-700 whitespace-nowrap">📅 Data de hoje</button>
+                    <button onclick="sendQuickCommand('Quanto é 15 * 8?')" class="px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-800 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 transition border border-slate-200 dark:border-slate-700 whitespace-nowrap">🧮 Quanto é 15 * 8?</button>
+                    <button onclick="sendQuickCommand('Conte uma piada')" class="px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-800 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 transition border border-slate-200 dark:border-slate-700 whitespace-nowrap">😄 Piada</button>
+                    <button onclick="sendQuickCommand('ajuda')" class="px-2.5 py-1 rounded-lg bg-white/80 dark:bg-slate-800 hover:bg-brand-500 hover:text-white dark:hover:bg-brand-500 transition border border-slate-200 dark:border-slate-700 whitespace-nowrap">❓ Todos os Comandos</button>
+                </div>
             </div>
-            <div class="text-right">
-                <div class="text-base sm:text-lg font-bold text-white tracking-widest" id="hud-clock">00:00:00</div>
-                <div class="text-[10px] sm:text-xs text-stark-cyan/70 uppercase" id="hud-date">SEG, 01 JAN</div>
+
+            <!-- CHAT MESSAGES DISPLAY BOX -->
+            <div id="chat-container" class="flex-1 glass-card rounded-2xl p-4 sm:p-6 overflow-y-auto max-h-[58vh] min-h-[420px] flex flex-col space-y-4 shadow-inner">
+                <!-- Initial Welcome Message from Assistant -->
+                <div class="flex items-start space-x-3 max-w-[85%] sm:max-w-[75%]">
+                    <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm space-y-2">
+                        <p class="font-semibold text-brand-600 dark:text-brand-400">Nexus AI</p>
+                        <p>Olá! Eu sou seu **Assistente Pessoal Web**. Como posso ajudar você hoje?</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Você pode digitar uma mensagem ou usar o **microfone** para falar comigo por voz!</p>
+                    </div>
+                </div>
             </div>
-            <button id="btn-open-settings" title="Configurações do JARVIS / Chave API" class="bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/40 text-stark-cyan p-2 rounded-lg transition-all">
-                <i class="fa-solid fa-gear text-base"></i>
+
+            <!-- Listening Indicator Bar (Visible during speech recognition) -->
+            <div id="listening-bar" class="hidden glass-card border border-brand-500/40 p-3 rounded-xl flex items-center justify-between bg-brand-500/10 text-brand-600 dark:text-brand-400 text-sm">
+                <div class="flex items-center space-x-3">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-brand-500"></span>
+                    </span>
+                    <span class="font-medium">Ouvindo sua voz... Fale agora!</span>
+                </div>
+                <!-- Soundwave visualization -->
+                <div class="flex items-center space-x-1 h-7">
+                    <div class="w-1 bg-brand-500 rounded-full soundwave-bar"></div>
+                    <div class="w-1 bg-brand-500 rounded-full soundwave-bar"></div>
+                    <div class="w-1 bg-brand-500 rounded-full soundwave-bar"></div>
+                    <div class="w-1 bg-brand-500 rounded-full soundwave-bar"></div>
+                    <div class="w-1 bg-brand-500 rounded-full soundwave-bar"></div>
+                </div>
+            </div>
+
+            <!-- Typing Indicator (Visible while assistant processes response) -->
+            <div id="typing-bar" class="hidden flex items-center space-x-3 px-4 py-2">
+                <div class="w-6 h-6 rounded-full bg-brand-500/80 flex items-center justify-center text-white text-xs shrink-0">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="bg-slate-200/80 dark:bg-slate-800/80 px-4 py-2 rounded-xl flex items-center space-x-3 text-xs text-slate-500">
+                    <span>Nexus está digitando</span>
+                    <div class="dot-flashing ml-3"></div>
+                </div>
+            </div>
+
+            <!-- CHAT INPUT BAR -->
+            <form id="chat-form" onsubmit="handleUserSubmit(event)" class="relative flex items-center gap-2">
+                <div class="relative flex-1">
+                    <input type="text" id="user-input" placeholder="Digite um comando, pergunta ou 'ajuda'..." class="w-full glass-input px-5 py-3.5 pr-12 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500 transition shadow-sm placeholder:text-slate-400 dark:placeholder:text-slate-500" autocomplete="off" />
+                    <button type="button" onclick="clearChat()" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-rose-500 transition p-1.5" title="Limpar conversa">
+                        <i class="fa-solid fa-trash-can text-sm"></i>
+                    </button>
+                </div>
+
+                <!-- Speech Mic Button -->
+                <button type="button" id="btn-mic" onclick="toggleVoiceRecognition()" class="p-3.5 rounded-2xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition shadow-md flex items-center justify-center min-w-[48px]" title="Falar por voz">
+                    <i id="mic-icon" class="fa-solid fa-microphone text-base"></i>
+                </button>
+
+                <!-- Send Button -->
+                <button type="submit" class="px-5 py-3.5 rounded-2xl bg-gradient-to-r from-brand-500 to-cyan-500 hover:from-brand-600 hover:to-cyan-600 text-white font-medium shadow-lg shadow-brand-500/25 transition flex items-center justify-center space-x-2">
+                    <span>Enviar</span>
+                    <i class="fa-solid fa-paper-plane text-xs"></i>
+                </button>
+            </form>
+        </section>
+
+
+        <!-- ==================================================== -->
+        <!-- VIEW 2: DEVELOPER HUB & SOURCE CODE EXPLORER       -->
+        <!-- ==================================================== -->
+        <section id="view-developer" class="hidden flex-1 flex flex-col lg:flex-row gap-6 min-h-[550px]">
+            
+            <!-- Left Sidebar: Project File Directory Tree -->
+            <div class="w-full lg:w-72 glass-card rounded-2xl p-4 flex flex-col space-y-3 shrink-0">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+                    <h3 class="font-bold text-sm text-slate-700 dark:text-slate-200 flex items-center space-x-2">
+                        <i class="fa-solid fa-folder-tree text-brand-500"></i>
+                        <span>Estrutura do Projeto</span>
+                    </h3>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-brand-500/10 text-brand-500 font-semibold">Git Modular</span>
+                </div>
+
+                <!-- Interactive File Tree -->
+                <div class="space-y-1 text-xs font-mono overflow-y-auto flex-1">
+                    <div class="font-bold text-slate-500 dark:text-slate-400 flex items-center py-1">
+                        <i class="fa-solid fa-folder-open text-amber-500 mr-2"></i> meu-assistente-web/
+                    </div>
+                    
+                    <button onclick="selectCodeFile('index.html')" class="file-btn w-full text-left pl-6 py-2 rounded-lg flex items-center justify-between hover:bg-slate-200/60 dark:hover:bg-slate-800 transition active-file" data-file="index.html">
+                        <span class="flex items-center"><i class="fa-brands fa-html5 text-orange-500 mr-2"></i> index.html</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+                    </button>
+
+                    <div class="pl-4 font-bold text-slate-500 dark:text-slate-400 flex items-center py-1">
+                        <i class="fa-solid fa-folder text-amber-500 mr-2"></i> assets/
+                    </div>
+
+                    <div class="pl-8 font-bold text-slate-500 dark:text-slate-400 flex items-center py-1">
+                        <i class="fa-solid fa-folder text-amber-500 mr-2"></i> css/
+                    </div>
+
+                    <button onclick="selectCodeFile('style.css')" class="file-btn w-full text-left pl-12 py-1.5 rounded-lg flex items-center justify-between hover:bg-slate-200/60 dark:hover:bg-slate-800 transition" data-file="style.css">
+                        <span class="flex items-center"><i class="fa-brands fa-css3-alt text-blue-500 mr-2"></i> style.css</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+                    </button>
+
+                    <button onclick="selectCodeFile('responsive.css')" class="file-btn w-full text-left pl-12 py-1.5 rounded-lg flex items-center justify-between hover:bg-slate-200/60 dark:hover:bg-slate-800 transition" data-file="responsive.css">
+                        <span class="flex items-center"><i class="fa-brands fa-css3-alt text-cyan-500 mr-2"></i> responsive.css</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+                    </button>
+
+                    <div class="pl-8 font-bold text-slate-500 dark:text-slate-400 flex items-center py-1">
+                        <i class="fa-solid fa-folder text-amber-500 mr-2"></i> js/
+                    </div>
+
+                    <button onclick="selectCodeFile('main.js')" class="file-btn w-full text-left pl-12 py-1.5 rounded-lg flex items-center justify-between hover:bg-slate-200/60 dark:hover:bg-slate-800 transition" data-file="main.js">
+                        <span class="flex items-center"><i class="fa-brands fa-js text-yellow-400 mr-2"></i> main.js</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+                    </button>
+
+                    <button onclick="selectCodeFile('assistant.js')" class="file-btn w-full text-left pl-12 py-1.5 rounded-lg flex items-center justify-between hover:bg-slate-200/60 dark:hover:bg-slate-800 transition" data-file="assistant.js">
+                        <span class="flex items-center"><i class="fa-brands fa-js text-yellow-400 mr-2"></i> assistant.js</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+                    </button>
+
+                    <button onclick="selectCodeFile('commands.js')" class="file-btn w-full text-left pl-12 py-1.5 rounded-lg flex items-center justify-between hover:bg-slate-200/60 dark:hover:bg-slate-800 transition" data-file="commands.js">
+                        <span class="flex items-center"><i class="fa-brands fa-js text-yellow-400 mr-2"></i> commands.js</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+                    </button>
+
+                    <div class="pt-2"></div>
+
+                    <button onclick="selectCodeFile('README.md')" class="file-btn w-full text-left pl-6 py-2 rounded-lg flex items-center justify-between hover:bg-slate-200/60 dark:hover:bg-slate-800 transition" data-file="README.md">
+                        <span class="flex items-center"><i class="fa-regular fa-file-lines text-emerald-400 mr-2"></i> README.md</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+                    </button>
+
+                    <button onclick="selectCodeFile('git_guide')" class="file-btn w-full text-left pl-6 py-2 rounded-lg flex items-center justify-between hover:bg-slate-200/60 dark:hover:bg-slate-800 transition" data-file="git_guide">
+                        <span class="flex items-center"><i class="fa-brands fa-github text-purple-400 mr-2"></i> Guia Git & GitHub</span>
+                        <i class="fa-solid fa-chevron-right text-[10px] opacity-40"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Content: Code Viewer & Copy Interface -->
+            <div class="flex-1 glass-card rounded-2xl flex flex-col overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800">
+                <!-- Code Header Toolbar -->
+                <div class="bg-slate-200/80 dark:bg-slate-900/90 px-5 py-3 flex items-center justify-between border-b border-slate-300/60 dark:border-slate-800">
+                    <div class="flex items-center space-x-3 font-mono text-xs">
+                        <div class="flex space-x-1.5">
+                            <span class="w-3 h-3 rounded-full bg-rose-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-amber-500 inline-block"></span>
+                            <span class="w-3 h-3 rounded-full bg-emerald-500 inline-block"></span>
+                        </div>
+                        <span id="code-file-title" class="font-bold text-slate-700 dark:text-slate-200 ml-2">index.html</span>
+                    </div>
+
+                    <button onclick="copyCurrentCode()" class="px-3.5 py-1.5 rounded-lg bg-brand-500 hover:bg-brand-600 text-white font-medium text-xs flex items-center space-x-2 transition shadow-md">
+                        <i class="fa-regular fa-copy"></i>
+                        <span id="copy-btn-text">Copiar Código</span>
+                    </button>
+                </div>
+
+                <!-- Code Pre Container -->
+                <div class="flex-1 p-4 bg-slate-950 text-slate-100 font-mono text-xs overflow-auto max-h-[600px] leading-relaxed select-all">
+                    <pre id="code-display_content"><code><!-- O código fonte do arquivo selecionado será carregado aqui --></code></pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
+
+    <!-- FOOTER -->
+    <footer class="glass-card border-t border-slate-200 dark:border-slate-800 py-4 px-6 text-center text-xs text-slate-500 dark:text-slate-400">
+        <p>Nexus AI Personal Assistant &copy; 2026 - Desenvolvido para publicação em GitHub Pages.</p>
+    </footer>
+
+    <!-- ==================================================== -->
+    <!-- JAVASCRIPT APP LOGIC & CODE DATABASE                -->
+    <!-- ==================================================== -->
+    <script>
+        
+        // --- 1. GLOBAL STATE MANAGEMENT ---
+        let currentTheme = 'dark';
+        let isTTSEnabled = true;
+        let isListening = false;
+        let speechRecognition = null;
+        let activeSelectedFile = 'index.html';
+
+        // --- 2. SOURCE CODE DATABASE (Contains production code for all modular files) ---
+        const SOURCE_FILES = {
+            'index.html': `<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Assistente Pessoal Web</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+    <header class="border-b border-slate-800 p-4 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-robot text-brand-500 text-2xl"></i>
+                <h1 class="font-bold text-lg">Nexus AI - Assistente</h1>
+            </div>
+            <button id="btn-theme" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700">
+                <i class="fa-solid fa-moon"></i>
             </button>
         </div>
     </header>
 
-    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 z-10 my-1 items-stretch">
-        
-        <!-- Left / Top Arc Reactor Central Display (5 cols) -->
-        <section class="lg:col-span-5 hud-glass hud-border-corners rounded-lg p-4 flex flex-col items-center justify-between relative overflow-hidden min-h-[380px]">
-            <!-- Top Subtitle Indicator -->
-            <div class="w-full flex justify-between items-center text-xs tracking-widest text-stark-cyan/80 uppercase mb-2">
-                <span class="flex items-center gap-1.5 font-hud"><i class="fa-solid fa-atom text-stark-cyan animate-spin"></i> STARK ARC CORE</span>
-                <span id="reactor-mode-label" class="text-white font-bold bg-stark-cyan/20 px-2 py-0.5 rounded border border-stark-cyan/30">ESPERA</span>
-            </div>
+    <main class="flex-1 max-w-4xl w-full mx-auto p-4 flex flex-col">
+        <!-- Area de Chat -->
+        <div id="chat-box" class="flex-1 bg-slate-800/50 rounded-2xl p-4 overflow-y-auto space-y-4 border border-slate-700/50 min-h-[400px]">
+            <!-- Mensagens são adicionadas dinamicamente via JS -->
+        </div>
 
-            <!-- Central Interactive Arc Reactor SVG -->
-            <div class="relative my-auto flex items-center justify-center p-2">
-                <div id="arc-reactor" class="arc-reactor state-idle w-56 h-56 sm:w-64 sm:h-64 relative flex items-center justify-center" title="Clique no Núcleo Arc para Falar com JARVIS">
-                    <svg viewBox="0 0 300 300" class="w-full h-full filter drop-shadow-[0_0_20px_rgba(0,243,255,0.6)]">
-                        <defs>
-                            <!-- Cyan Arc Glow -->
-                            <radialGradient id="coreGradient" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#ffffff" />
-                                <stop offset="30%" stop-color="#00f3ff" />
-                                <stop offset="70%" stop-color="#0066ff" />
-                                <stop offset="100%" stop-color="#020712" />
-                            </radialGradient>
-                            <!-- Orange Listening Glow -->
-                            <radialGradient id="coreGradientListening" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#ffffff" />
-                                <stop offset="35%" stop-color="#ffb700" />
-                                <stop offset="75%" stop-color="#ff4400" />
-                                <stop offset="100%" stop-color="#020712" />
-                            </radialGradient>
-                            <!-- Purple Thinking Glow -->
-                            <radialGradient id="coreGradientThinking" cx="50%" cy="50%" r="50%">
-                                <stop offset="0%" stop-color="#ffffff" />
-                                <stop offset="35%" stop-color="#c084fc" />
-                                <stop offset="75%" stop-color="#7e22ce" />
-                                <stop offset="100%" stop-color="#020712" />
-                            </radialGradient>
-                        </defs>
-
-                        <!-- Outer Tech Ticks -->
-                        <circle cx="150" cy="150" r="140" fill="none" stroke="#00f3ff" stroke-opacity="0.2" stroke-width="2" />
-                        <circle cx="150" cy="150" r="135" fill="none" stroke="#00f3ff" stroke-opacity="0.4" stroke-width="1" stroke-dasharray="4 8" />
-
-                        <!-- Outer Rotating Segmented Ring -->
-                        <g class="ring-outer">
-                            <circle cx="150" cy="150" r="120" fill="none" stroke="#00f3ff" stroke-opacity="0.8" stroke-width="6" stroke-dasharray="40 10 15 10 70 15" />
-                            <circle cx="150" cy="30" r="5" fill="#e67e22" />
-                            <circle cx="270" cy="150" r="5" fill="#e67e22" />
-                            <circle cx="150" cy="270" r="5" fill="#e67e22" />
-                            <circle cx="30" cy="150" r="5" fill="#e67e22" />
-                        </g>
-
-                        <!-- Middle Counter-Rotating Ring -->
-                        <g class="ring-middle">
-                            <circle cx="150" cy="150" r="95" fill="none" stroke="#00a8ff" stroke-opacity="0.9" stroke-width="8" stroke-dasharray="60 20 30 20" />
-                            <polygon points="150,65 160,80 140,80" fill="#00f3ff" />
-                            <polygon points="235,150 220,160 220,140" fill="#00f3ff" />
-                            <polygon points="150,235 140,220 160,220" fill="#00f3ff" />
-                            <polygon points="65,150 80,140 80,160" fill="#00f3ff" />
-                        </g>
-
-                        <!-- Inner Fast Ring -->
-                        <g class="ring-inner">
-                            <circle cx="150" cy="150" r="70" fill="none" stroke="#00f3ff" stroke-width="3" stroke-dasharray="12 6" />
-                        </g>
-
-                        <!-- Core Glass Ring -->
-                        <circle cx="150" cy="150" r="52" fill="none" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2" />
-                        
-                        <!-- Core Pulsing Glow Center -->
-                        <circle cx="150" cy="150" r="46" class="core-glow" fill="url(#coreGradient)" />
-                        <circle cx="150" cy="150" r="20" fill="#ffffff" opacity="0.9" filter="drop-shadow(0 0 10px #ffffff)" />
-                    </svg>
-                </div>
-            </div>
-
-            <!-- Audio Wave Visualizer & Subtitle -->
-            <div class="w-full text-center space-y-2 mt-2">
-                <div class="flex justify-center items-center gap-1.5 h-7" id="audio-visualizer">
-                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-2"></span>
-                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-4"></span>
-                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-3"></span>
-                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-6"></span>
-                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-2"></span>
-                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-5"></span>
-                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-3"></span>
-                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-2"></span>
-                </div>
-                <p id="system-status-msg" class="text-xs sm:text-sm font-hud text-stark-cyan tracking-wider truncate px-2">
-                    Clique no Núcleo ou diga "JARVIS" para conversar...
-                </p>
-            </div>
-
-            <div class="w-full border-t border-stark-cyan/20 pt-3 mt-3">
-                <div class="text-[10px] text-stark-cyan/60 font-hud tracking-widest uppercase mb-1.5 flex justify-between">
-                    <span>COMANDOS DE DISPOSITIVO / APPS</span>
-                    <span>AUTOMATION HUB</span>
-                </div>
-                <div class="grid grid-cols-4 sm:grid-cols-7 gap-1.5 text-center">
-                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="whatsapp" title="Abrir WhatsApp">
-                        <i class="fa-brands fa-whatsapp text-sm block mb-0.5"></i>
-                        <span class="text-[9px] block">WhatsApp</span>
-                    </button>
-                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="instagram" title="Abrir Instagram">
-                        <i class="fa-brands fa-instagram text-sm block mb-0.5"></i>
-                        <span class="text-[9px] block">Instagram</span>
-                    </button>
-                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="youtube" title="Abrir YouTube">
-                        <i class="fa-brands fa-youtube text-sm block mb-0.5"></i>
-                        <span class="text-[9px] block">YouTube</span>
-                    </button>
-                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="spotify" title="Abrir Spotify">
-                        <i class="fa-brands fa-spotify text-sm block mb-0.5"></i>
-                        <span class="text-[9px] block">Spotify</span>
-                    </button>
-                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="maps" title="Abrir Google Maps">
-                        <i class="fa-solid fa-map-location-dot text-sm block mb-0.5"></i>
-                        <span class="text-[9px] block">Mapas</span>
-                    </button>
-                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="camera" title="Abrir Câmera">
-                        <i class="fa-solid fa-camera text-sm block mb-0.5"></i>
-                        <span class="text-[9px] block">Câmera</span>
-                    </button>
-                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="phone" title="Discador / Ligar">
-                        <i class="fa-solid fa-phone text-sm block mb-0.5"></i>
-                        <span class="text-[9px] block">Ligar</span>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-        <!-- Right / Bottom AI Terminal & Communication Console (7 cols) -->
-        <section class="lg:col-span-7 hud-glass hud-border-corners rounded-lg p-4 flex flex-col justify-between min-h-[420px]">
-            <!-- Terminal Header -->
-            <div class="flex items-center justify-between border-b border-stark-cyan/30 pb-2.5 mb-3">
-                <div class="flex items-center space-x-2 text-xs font-hud tracking-widest text-white">
-                    <i class="fa-solid fa-terminal text-stark-cyan"></i>
-                    <span>TERMINAL DE COMUNICAÇÃO & INTELIGÊNCIA GEMINI</span>
-                </div>
-                <div class="flex items-center space-x-2">
-                    <button id="btn-toggle-tts" class="text-xs px-2 py-1 rounded bg-stark-cyan/10 border border-stark-cyan/40 text-stark-cyan hover:bg-stark-cyan/20 transition-colors flex items-center gap-1" title="Alternar Resposta por Voz">
-                        <i class="fa-solid fa-volume-high" id="tts-icon"></i>
-                        <span id="tts-label" class="hidden sm:inline">Voz Ativa</span>
-                    </button>
-                    <button id="btn-clear-chat" class="text-xs text-stark-cyan/70 hover:text-stark-cyan transition-colors flex items-center gap-1 px-2 py-1">
-                        <i class="fa-solid fa-eraser"></i> Limpar
-                    </button>
-                </div>
-            </div>
-
-            <!-- Chat Message Log -->
-            <div id="chat-history" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-3 max-h-[340px] sm:max-h-[400px]">
-                <!-- Initial Welcome Message -->
-                <div class="flex items-start gap-3">
-                    <div class="w-8 h-8 rounded bg-stark-cyan/20 border border-stark-cyan/50 flex items-center justify-center shrink-0 text-stark-cyan">
-                        <i class="fa-solid fa-robot text-sm"></i>
-                    </div>
-                    <div class="bg-stark-cyan/10 border border-stark-cyan/30 rounded-lg p-3 text-sm text-stark-cyan max-w-[90%] shadow-lg">
-                        <div class="text-[10px] text-stark-cyan/60 font-hud mb-1 flex justify-between">
-                            <span>J.A.R.V.I.S. • NÚCLEO ONLINE</span>
-                            <span class="text-[9px] opacity-75">SISTEMAS PRONTOS</span>
-                        </div>
-                        Olá, Senhor. Todos os protocolos do Núcleo Arc estão operando com 100% de capacidade e integrados ao Gemini AI. Como posso ajudá-lo com suas tarefas ou controle do dispositivo hoje?
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Action Command Chips -->
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 no-scrollbar text-xs">
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Que horas são e qual a data de hoje?">
-                    <i class="fa-regular fa-clock mr-1"></i>Hora e Data
-                </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Executar diagnóstico completo do sistema">
-                    <i class="fa-solid fa-shield-halved mr-1"></i>Diagnóstico
-                </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Abrir WhatsApp">
-                    <i class="fa-brands fa-whatsapp mr-1"></i>WhatsApp
-                </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Abrir YouTube">
-                    <i class="fa-brands fa-youtube mr-1"></i>YouTube
-                </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Abrir Câmera">
-                    <i class="fa-solid fa-camera mr-1"></i>Câmera
-                </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Me dê uma dica de produtividade para hoje">
-                    <i class="fa-solid fa-lightbulb mr-1"></i>Dica do Dia
-                </button>
-            </div>
-
-            <!-- User Text & Voice Input Form -->
-            <form id="chat-form" class="flex items-center gap-2">
-                <div class="relative flex-1">
-                    <input type="text" id="user-input" placeholder="Digite um comando ou fale no microfone..." 
-                        class="w-full bg-stark-dark/90 border border-stark-cyan/40 rounded-lg px-4 py-2.5 text-sm text-white placeholder-stark-cyan/40 focus:outline-none focus:border-stark-cyan focus:ring-1 focus:ring-stark-cyan transition-all">
-                </div>
-                <button type="submit" id="btn-send" class="bg-stark-cyan/20 hover:bg-stark-cyan/40 border border-stark-cyan text-stark-cyan px-4 py-2.5 rounded-lg text-sm transition-all flex items-center gap-1.5 font-hud">
-                    <i class="fa-solid fa-paper-plane"></i>
-                    <span class="hidden sm:inline">ENVIAR</span>
-                </button>
-                <button type="button" id="mic-trigger-btn" title="Ativar Reconhecimento por Voz" class="bg-stark-cyan/20 hover:bg-stark-cyan text-stark-cyan hover:text-stark-dark border border-stark-cyan p-2.5 rounded-lg transition-all flex items-center justify-center w-11 h-11 shrink-0">
-                    <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
-                </button>
-            </form>
-        </section>
+        <!-- Form de Envio -->
+        <form id="chat-form" class="mt-4 flex gap-2">
+            <input type="text" id="user-input" placeholder="Digite seu comando..." class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="button" id="btn-mic" class="px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl hover:bg-slate-700 text-blue-400">
+                <i class="fa-solid fa-microphone"></i>
+            </button>
+            <button type="submit" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 font-medium rounded-xl">Enviar</button>
+        </form>
     </main>
 
-    <!-- HUD Interactive Camera Modal -->
-    <div id="camera-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="hud-glass hud-border-corners max-w-xl w-full rounded-lg p-4 relative flex flex-col space-y-3">
-            <div class="flex justify-between items-center border-b border-stark-cyan/30 pb-2">
-                <h3 class="font-hud text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-video text-stark-cyan"></i> MONITOR DE VISÃO ÓPTICA HUD
-                </h3>
-                <button id="btn-close-camera" class="text-stark-cyan hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div class="relative rounded overflow-hidden bg-black aspect-video border border-stark-cyan/40 flex items-center justify-center">
-                <video id="camera-feed" autoplay playsinline class="w-full h-full object-cover"></video>
-                <canvas id="camera-canvas" class="hidden"></canvas>
-                <!-- HUD Targeting Grid Overlay -->
-                <div class="absolute inset-0 pointer-events-none border border-stark-cyan/20 flex items-center justify-center">
-                    <div class="w-24 h-24 border border-stark-cyan/50 rounded-full flex items-center justify-center animate-ping"></div>
-                    <div class="absolute text-[10px] top-2 left-2 text-stark-cyan/80 font-hud">FEED ID: OPT-8842</div>
-                </div>
-            </div>
-            <div id="snapshot-preview" class="hidden p-2 bg-stark-cyan/10 border border-stark-cyan/30 rounded text-center">
-                <p class="text-xs text-stark-cyan mb-2">Captura realizada com sucesso!</p>
-                <img id="snapshot-img" class="max-h-32 mx-auto rounded border border-stark-cyan/40" alt="Foto">
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button id="btn-take-photo" class="bg-stark-cyan hover:bg-stark-cyan/80 text-stark-dark font-bold px-4 py-2 rounded text-xs font-hud transition-all flex items-center gap-2">
-                    <i class="fa-solid fa-camera"></i> CAPTURAR FOTO
-                </button>
-            </div>
-        </div>
-    </div>
+    <!-- Scripts Modulares -->
+    <script src="assets/js/commands.js"><\/script>
+    <script src="assets/js/assistant.js"><\/script>
+    <script src="assets/js/main.js"><\/script>
+</body>
+</html>`,
 
-    <!-- HUD Settings Modal -->
-    <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
-        <div class="hud-glass hud-border-corners max-w-md w-full rounded-lg p-5 relative flex flex-col space-y-4">
-            <div class="flex justify-between items-center border-b border-stark-cyan/30 pb-2">
-                <h3 class="font-hud text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-stark-cyan"></i> CONFIGURAÇÕES DO SISTEMA
-                </h3>
-                <button id="btn-close-settings" class="text-stark-cyan hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <div class="space-y-3 text-xs">
-                <div>
-                    <label class="block text-stark-cyan/90 font-hud mb-1">Chave da API Gemini (Opcional se já injetada):</label>
-                    <input type="password" id="input-api-key" placeholder="AIzaSy..." class="w-full bg-stark-dark border border-stark-cyan/40 rounded px-3 py-2 text-white focus:outline-none focus:border-stark-cyan">
-                    <p class="text-[10px] text-stark-cyan/60 mt-1">Se deixado em branco, utiliza a conexão direta com o motor Gemini Flash do ambiente.</p>
-                </div>
+            'style.css': `/* assets/css/style.css - Estilos Principais do Assistente */
+:root {
+    --primary-color: #0ea5e9;
+    --bg-dark: #0b0f19;
+    --card-dark: rgba(30, 41, 59, 0.7);
+}
 
-                <div>
-                    <label class="block text-stark-cyan/90 font-hud mb-1">Voz do Sintetizador de Fala:</label>
-                    <select id="select-voice" class="w-full bg-stark-dark border border-stark-cyan/40 rounded px-3 py-2 text-white focus:outline-none focus:border-stark-cyan">
-                        <option value="">Carregando vozes disponíveis...</option>
-                    </select>
-                </div>
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.3s ease;
+}
 
-                <div>
-                    <label class="block text-stark-cyan/90 font-hud mb-1">Velocidade da Voz (<span id="rate-val">1.05</span>x):</label>
-                    <input type="range" id="input-voice-rate" min="0.8" max="1.5" step="0.05" value="1.05" class="w-full accent-stark-cyan">
-                </div>
-            </div>
+/* Balões de Mensagem */
+.message-user {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    color: white;
+    border-radius: 18px 18px 2px 18px;
+    padding: 12px 16px;
+    max-width: 80%;
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+}
 
-            <div class="flex justify-end gap-2 pt-2 border-t border-stark-cyan/30">
-                <button id="btn-save-settings" class="bg-stark-cyan text-stark-dark font-bold px-4 py-2 rounded text-xs font-hud hover:bg-stark-cyan/80 transition-all">
-                    SALVAR ALTERAÇÕES
-                </button>
-            </div>
-        </div>
-    </div>
+.message-assistant {
+    align-self: flex-start;
+    background-color: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+    border-radius: 18px 18px 18px 2px;
+    padding: 12px 16px;
+    max-width: 80%;
+}
 
-    <!-- HUD Footer -->
-    <footer class="hud-glass hud-border-corners rounded-lg p-2.5 mt-2 flex flex-wrap justify-between items-center text-xs text-stark-cyan/70 z-10 gap-2">
-        <div class="flex items-center gap-2">
-            <span class="inline-block w-2 h-2 rounded-full bg-stark-cyan"></span>
-            <span>PROTOCOLO DE SEGURANÇA: <strong class="text-white">ATIVADO</strong></span>
-        </div>
-        <div class="flex items-center gap-4">
-            <span>RESPOSTA DE VOZ: <strong class="text-stark-cyan" id="voice-status">HABILITADA (PT-BR)</strong></span>
-            <span class="hidden sm:inline">STARK INDUSTRIES © 2026</span>
-        </div>
-    </footer>
+/* Animação do Indicador de Voz */
+.mic-listening {
+    animation: pulse 1.2s infinite;
+    color: #ef4444 !important;
+}
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // UI Element References
-            const arcReactor = document.getElementById('arc-reactor');
-            const reactorModeLabel = document.getElementById('reactor-mode-label');
-            const systemStatusMsg = document.getElementById('system-status-msg');
-            const chatHistory = document.getElementById('chat-history');
-            const chatForm = document.getElementById('chat-form');
-            const userInput = document.getElementById('user-input');
-            const btnSend = document.getElementById('btn-send');
-            const micTriggerBtn = document.getElementById('mic-trigger-btn');
-            const micIcon = document.getElementById('mic-icon');
-            const btnClearChat = document.getElementById('btn-clear-chat');
-            const quickBtns = document.querySelectorAll('.quick-btn');
-            const appCmdBtns = document.querySelectorAll('.app-cmd-btn');
-            const audioVisualizer = document.getElementById('audio-visualizer');
-            const hudClock = document.getElementById('hud-clock');
-            const hudDate = document.getElementById('hud-date');
-            const btnToggleTts = document.getElementById('btn-toggle-tts');
-            const ttsIcon = document.getElementById('tts-icon');
-            const ttsLabel = document.getElementById('tts-label');
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}`,
 
-            // Modals & Settings
-            const settingsModal = document.getElementById('settings-modal');
-            const btnOpenSettings = document.getElementById('btn-open-settings');
-            const btnCloseSettings = document.getElementById('btn-close-settings');
-            const btnSaveSettings = document.getElementById('btn-save-settings');
-            const inputApiKey = document.getElementById('input-api-key');
-            const selectVoice = document.getElementById('select-voice');
-            const inputVoiceRate = document.getElementById('input-voice-rate');
-            const rateVal = document.getElementById('rate-val');
+            'responsive.css': `/* assets/css/responsive.css - Responsividade para Celulares */
+@media (max-width: 640px) {
+    #chat-box {
+        min-h-[300px];
+        padding: 10px;
+    }
 
-            // Camera Modal
-            const cameraModal = document.getElementById('camera-modal');
-            const btnCloseCamera = document.getElementById('btn-close-camera');
-            const cameraFeed = document.getElementById('camera-feed');
-            const cameraCanvas = document.getElementById('camera-canvas');
-            const btnTakePhoto = document.getElementById('btn-take-photo');
-            const snapshotPreview = document.getElementById('snapshot-preview');
-            const snapshotImg = document.getElementById('snapshot-img');
+    .message-user, .message-assistant {
+        max-width: 90%;
+        font-size: 14px;
+    }
 
-            // State Variables
-            let isListening = false;
-            let isSpeaking = false;
-            let isProcessing = false;
-            let autoVoiceEnabled = true;
-            let synthVoice = null;
-            let recognition = null;
-            let visualizerInterval = null;
-            let cameraStream = null;
-            
-            // User Preferences
-            let customApiKey = localStorage.getItem('jarvis_api_key') || "";
-            let speechRate = parseFloat(localStorage.getItem('jarvis_speech_rate')) || 1.05;
+    #chat-form {
+        flex-wrap: nowrap;
+    }
+}`,
 
-            // Gemini Conversation Memory
-            let conversationHistory = [];
+            'commands.js': `// assets/js/commands.js - Módulo do Banco de Comandos
+const CommandModule = {
+    // Lista de respostas programadas
+    getHelp() {
+        return "Comandos disponíveis:\\n- 'Que horas são?'\\n- 'Data de hoje'\\n- 'Pesquisar [termo] no Google'\\n- 'Pesquisar [termo] no Youtube'\\n- 'Quanto é [expressão matemática]'\\n- 'Conte uma piada'\\n- 'Lembrete: [seu texto]'";
+    },
 
-            // Web Audio API Synthesizer for Sci-Fi HUD Sounds
-            let audioCtx = null;
-            function getAudioContext() {
-                if (!audioCtx) {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (audioCtx.state === 'suspended') {
-                    audioCtx.resume();
-                }
-                return audioCtx;
+    process(text) {
+        const query = text.toLowerCase().trim();
+
+        // Hora atual
+        if (query.includes('horas') || query.includes('hora')) {
+            const now = new Date();
+            return \`Agora são exatamente \${now.toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}.\`;
+        }
+
+        // Data atual
+        if (query.includes('data') || query.includes('dia')) {
+            const now = new Date();
+            return \`Hoje é \${now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}.\`;
+        }
+
+        // Busca no Google
+        if (query.startsWith('pesquisar no google') || query.startsWith('busca google')) {
+            const term = query.replace('pesquisar no google', '').replace('busca google', '').trim();
+            if(term) {
+                window.open(\`https://www.google.com/search?q=\${encodeURIComponent(term)}\`, '_blank');
+                return \`Abrindo pesquisa no Google para: "\${term}"...\`;
+            }
+        }
+
+        // Busca no YouTube
+        if (query.includes('youtube')) {
+            const term = query.replace('pesquisar no youtube', '').replace('youtube', '').trim();
+            if(term) {
+                window.open(\`https://www.youtube.com/results?search_query=\${encodeURIComponent(term)}\`, '_blank');
+                return \`Buscando no YouTube por: "\${term}"...\`;
+            }
+        }
+
+        // Operações Matemáticas
+        if (query.startsWith('quanto é') || query.startsWith('calculo')) {
+            try {
+                const mathExpr = query.replace('quanto é', '').replace('calculo', '').replace('x', '*').trim();
+                const result = Function(\`'use strict'; return (\${mathExpr})\`)();
+                return \`O resultado do cálculo é: \${result}\`;
+            } catch (e) {
+                return "Não consegui calcular essa expressão. Tente algo como 'quanto é 12 + 8'.";
+            }
+        }
+
+        // Piadas
+        if (query.includes('piada') || query.includes('engraçado')) {
+            const jokes = [
+                "Por que o livro de matemática ficou triste? Porque tinha muitos problemas!",
+                "O que o JavaScript disse para o HTML? 'Você me dá estrutura, eu te dou vida!'",
+                "Existem 10 tipos de pessoas no mundo: as que entendem binário e as que não entendem."
+            ];
+            return jokes[Math.floor(Math.random() * jokes.length)];
+        }
+
+        // Comando de Ajuda
+        if (query === 'ajuda' || query === 'comandos') {
+            return this.getHelp();
+        }
+
+        return null; // Caso não encontre comando direto
+    }
+};`,
+
+            'assistant.js': `// assets/js/assistant.js - Lógica Principal do Assistente
+class PersonalAssistant {
+    constructor() {
+        this.synth = window.speechSynthesis;
+    }
+
+    // Processa a mensagem do usuário e devolve a resposta
+    async reply(userText) {
+        // Tenta encontrar um comando registrado
+        const commandResponse = CommandModule.process(userText);
+        
+        if (commandResponse) {
+            this.speak(commandResponse);
+            return commandResponse;
+        }
+
+        // Resposta genérica de inteligência artificial
+        const defaultResponse = \`Entendi sua mensagem: "\${userText}". Digite 'ajuda' para ver comandos específicos!\`;
+        this.speak(defaultResponse);
+        return defaultResponse;
+    }
+
+    // Síntese de Voz (Falar resposta)
+    speak(text) {
+        if (!this.synth) return;
+        this.synth.cancel(); // Parar fala anterior
+
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'pt-BR';
+        utterance.rate = 1.0;
+        this.synth.speak(utterance);
+    }
+}`,
+
+            'main.js': `// assets/js/main.js - Inicialização e Manipulação do DOM
+document.addEventListener('DOMContentLoaded', () => {
+    const assistant = new PersonalAssistant();
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    const chatBox = document.getElementById('chat-box');
+    const btnMic = document.getElementById('btn-mic');
+
+    // Manipulador do formulário de envio
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const text = userInput.value.trim();
+        if (!text) return;
+
+        appendMessage('você', text, 'user');
+        userInput.value = '';
+
+        const response = await assistant.reply(text);
+        appendMessage('Nexus AI', response, 'assistant');
+    });
+
+    // Função para adicionar balões de mensagens
+    function appendMessage(sender, text, type) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = type === 'user' ? 'message-user' : 'message-assistant';
+        msgDiv.innerHTML = \`<strong>\${sender}:</strong> <p>\${text}</p>\`;
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Reconhecimento de Voz (Web Speech API)
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.lang = 'pt-BR';
+
+        btnMic.addEventListener('click', () => {
+            recognition.start();
+            btnMic.classList.add('mic-listening');
+        });
+
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            userInput.value = transcript;
+            btnMic.classList.remove('mic-listening');
+            chatForm.dispatchEvent(new Event('submit'));
+        };
+
+        recognition.onerror = () => {
+            btnMic.classList.remove('mic-listening');
+        };
+    } else {
+        btnMic.style.display = 'none'; // Esconde botão se não suportado
+    }
+});`,
+
+            'README.md': `# 🤖 Nexus AI - Assistente Pessoal Web
+
+Um assistente pessoal moderno, responsivo e interativo construído em **HTML5, CSS3 e JavaScript Vanilla**.
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Status](https://img.shields.io/badge/status-ativo-emerald.svg)
+
+## 🌟 Funcionalidades
+- 💬 **Interface de Chat**: Balões de mensagens modernos e organizados.
+- 🎙️ **Comando de Voz**: Suporte à Web Speech API para ouvir comandos por microfone.
+- 🔊 **Síntese de Voz (TTS)**: O assistente responde falando com você.
+- 🧮 **Comandos Inteligentes**: Data, hora, cálculos, buscas no Google e YouTube, piadas.
+- 📱 **Totalmente Responsivo**: Funciona em computadores, tablets e smartphones.
+
+## 📁 Estrutura do Projeto
+\`\`\`
+meu-assistente-web/
+├── index.html
+└── assets/
+    ├── css/
+    │   ├── style.css
+    │   └── responsive.css
+    └── js/
+        ├── main.js
+        ├── assistant.js
+        └── commands.js
+\`\`\`
+
+## 🚀 Como Executar Localmente
+1. Baixe os arquivos do repositório.
+2. Abra o arquivo \`index.html\` em qualquer navegador moderno.
+
+## 📄 Licença
+Este projeto é de código aberto sob a licença MIT.`,
+
+            'git_guide': `# 🚀 Guia Passo a Passo: Publicando no GitHub Pages
+
+Siga estes comandos no seu terminal para criar e enviar seu repositório para o GitHub:
+
+### Passo 1: Criar a pasta do projeto no computador
+mkdir meu-assistente-web
+cd meu-assistente-web
+
+### Passo 2: Criar os arquivos
+Crie os arquivos conforme a árvore de diretórios:
+- index.html
+- README.md
+- assets/css/style.css
+- assets/css/responsive.css
+- assets/js/main.js
+- assets/js/assistant.js
+- assets/js/commands.js
+
+### Passo 3: Inicializar o Git e fazer o Commit
+git init
+git add .
+git commit -m "Initial commit - Assistente Pessoal Web v1.0"
+
+### Passo 4: Conectar ao Repositório do GitHub
+(Crie um repositório novo e público no GitHub com o nome 'meu-assistente-web')
+
+git branch -M main
+git remote add origin https://github.com/SEU-USUARIO/meu-assistente-web.git
+git push -u origin main
+
+### Passo 5: Ativar o GitHub Pages
+1. Vá no seu repositório no GitHub.
+2. Clique na aba **Settings** (Configurações).
+3. No menu esquerdo, vá em **Pages**.
+4. Em **Build and deployment** -> **Branch**, escolha \`main\` e a pasta \`/ (root)\`.
+5. Clique em **Save**.
+6. Aguarde 2 minutos e seu site estará online no link:
+   https://SEU-USUARIO.github.io/meu-assistente-web/`
+        };
+
+
+        
+        // --- 3. INTERACTIVE ASSISTANT ENGINE ---
+        class InteractiveAssistant {
+            constructor() {
+                this.synth = window.speechSynthesis;
             }
 
-            function playHudSound(type) {
-                try {
-                    const ctx = getAudioContext();
-                    const osc = ctx.createOscillator();
-                    const gain = ctx.createGain();
-                    osc.connect(gain);
-                    gain.connect(ctx.destination);
+            async processCommand(text) {
+                const trimmed = text.trim();
+                if (!trimmed) return null;
 
-                    const now = ctx.currentTime;
-                    if (type === 'click') {
-                        osc.type = 'sine';
-                        osc.frequency.setValueAtTime(800, now);
-                        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
-                        gain.gain.setValueAtTime(0.15, now);
-                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-                        osc.start(now);
-                        osc.stop(now + 0.05);
-                    } else if (type === 'activate') {
-                        osc.type = 'triangle';
-                        osc.frequency.setValueAtTime(440, now);
-                        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
-                        gain.gain.setValueAtTime(0.2, now);
-                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-                        osc.start(now);
-                        osc.stop(now + 0.15);
-                    } else if (type === 'snap') {
-                        // White noise snapshot simulation
-                        const bufferSize = ctx.sampleRate * 0.1;
-                        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-                        const data = buffer.getChannelData(0);
-                        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
-                        const noise = ctx.createBufferSource();
-                        noise.buffer = buffer;
-                        const noiseGain = ctx.createGain();
-                        noiseGain.gain.setValueAtTime(0.3, now);
-                        noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-                        noise.connect(noiseGain);
-                        noiseGain.connect(ctx.destination);
-                        noise.start(now);
-                    } else if (type === 'error') {
-                        osc.type = 'sawtooth';
-                        osc.frequency.setValueAtTime(220, now);
-                        osc.frequency.setValueAtTime(180, now + 0.1);
-                        gain.gain.setValueAtTime(0.2, now);
-                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-                        osc.start(now);
-                        osc.stop(now + 0.2);
+                // Tenta comandos pré-definidos do modulo commands.js
+                const lower = trimmed.toLowerCase();
+
+                // Hora
+                if (lower.includes('hora') || lower.includes('horas')) {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    return `Agora são exatamente **${timeStr}**.`;
+                }
+
+                // Data
+                if (lower.includes('data') || lower.includes('dia é hoje')) {
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    return `Hoje é **${dateStr}**.`;
+                }
+
+                // Cálculo matemático
+                if (lower.startsWith('quanto é') || lower.includes('calcula') || lower.includes('*') || lower.includes('+')) {
+                    try {
+                        let expr = lower.replace('quanto é', '').replace('calcula', '').replace(/x/g, '*').trim();
+                        // Sanitize arithmetic
+                        if (/^[0-9+\-*/().\s]+$/.test(expr)) {
+                            const result = eval(expr);
+                            return `O resultado de \`${expr}\` é **${result}**.`;
+                        }
+                    } catch (e) {
+                        // ignore error
                     }
-                } catch(e) {}
-            }
-
-            function updateClock() {
-                const now = new Date();
-                hudClock.textContent = now.toLocaleTimeString('pt-BR');
-                const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
-                hudDate.textContent = now.toLocaleDateString('pt-BR', options).toUpperCase();
-            }
-            setInterval(updateClock, 1000);
-            updateClock();
-
-            // Simulate CPU, RAM and Latency Telemetry Fluctuations
-            setInterval(() => {
-                const cpuVal = document.getElementById('cpu-val');
-                const ramVal = document.getElementById('ram-val');
-                const pingVal = document.getElementById('ping-val');
-                if (cpuVal) cpuVal.textContent = Math.floor(Math.random() * 15 + 10) + '%';
-                if (ramVal) ramVal.textContent = (Math.random() * 0.3 + 3.6).toFixed(1) + ' GB';
-                if (pingVal) pingVal.textContent = Math.floor(Math.random() * 12 + 22) + 'ms';
-            }, 3000);
-
-            // Device Battery Meter
-            if ('getBattery' in navigator) {
-                navigator.getBattery().then(battery => {
-                    const batVal = document.getElementById('bat-val');
-                    const updateBattery = () => {
-                        if (batVal) batVal.textContent = Math.round(battery.level * 100) + '%';
-                    };
-                    updateBattery();
-                    battery.addEventListener('levelchange', updateBattery);
-                }).catch(() => {});
-            } else {
-                document.getElementById('bat-val').textContent = '98%';
-            }
-
-            function initSpeechSynthesis() {
-                if (!('speechSynthesis' in window)) {
-                    document.getElementById('voice-status').textContent = 'NÃO SUPORTADO';
-                    return;
                 }
 
-                const loadVoices = () => {
-                    const voices = window.speechSynthesis.getVoices();
-                    selectVoice.innerHTML = '';
-                    
-                    if (voices.length === 0) return;
-
-                    // Filter Portuguese voices first
-                    const ptVoices = voices.filter(v => v.lang.includes('pt'));
-                    const displayVoices = ptVoices.length > 0 ? ptVoices : voices;
-
-                    displayVoices.forEach((v, index) => {
-                        const opt = document.createElement('option');
-                        opt.value = v.name;
-                        opt.textContent = `${v.name} (${v.lang})`;
-                        selectVoice.appendChild(opt);
-                    });
-
-                    // Select preferred natural voice
-                    synthVoice = voices.find(v => v.lang === 'pt-BR' && (v.name.includes('Google') || v.name.includes('Luciana') || v.name.includes('Daniel') || v.name.includes('Felipe')))
-                             || ptVoices[0]
-                             || voices[0];
-
-                    if (synthVoice) {
-                        selectVoice.value = synthVoice.name;
+                // Busca Google
+                if (lower.includes('pesquisar no google') || lower.includes('busca google')) {
+                    const query = lower.replace('pesquisar no google', '').replace('busca google', '').trim();
+                    if (query) {
+                        const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+                        setTimeout(() => window.open(url, '_blank'), 1000);
+                        return `Abris de pesquisa no Google para **"${query}"**. <a href="${url}" target="_blank" class="text-brand-400 underline ml-1">Clique aqui se não abrir</a>.`;
                     }
-                };
-
-                loadVoices();
-                if (speechSynthesis.onvoiceschanged !== undefined) {
-                    speechSynthesis.onvoiceschanged = loadVoices;
                 }
+
+                // Busca YouTube
+                if (lower.includes('youtube')) {
+                    const query = lower.replace('pesquisar no youtube', '').replace('youtube', '').trim();
+                    if (query) {
+                        const url = `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+                        setTimeout(() => window.open(url, '_blank'), 1000);
+                        return `Buscando no YouTube por **"${query}"**. <a href="${url}" target="_blank" class="text-brand-400 underline ml-1">Assistir no YouTube</a>.`;
+                    }
+                }
+
+                // Piadas
+                if (lower.includes('piada') || lower.includes('engraçado')) {
+                    const jokes = [
+                        "Por que o desenvolvedor não gosta de natureza? Porque ela tem muitos 'bugs'!",
+                        "Existem 10 tipos de pessoas no mundo: as que entendem binário e as que não entendem.",
+                        "O que o código falou para o compilador? 'Você me completa!'"
+                    ];
+                    return jokes[Math.floor(Math.random() * jokes.length)];
+                }
+
+                // Ajuda
+                if (lower === 'ajuda' || lower === 'comandos' || lower === 'help') {
+                    return `Aqui estão alguns comandos que você pode testar:<br>
+                    • 🕒 <strong>Que horas são?</strong><br>
+                    • 📅 <strong>Qual é a data de hoje?</strong><br>
+                    • 🧮 <strong>Quanto é 45 * 12?</strong><br>
+                    • 🔍 <strong>Pesquisar no Google [termo]</strong><br>
+                    • ▶️ <strong>Youtube [nome do vídeo]</strong><br>
+                    • 😄 <strong>Conte uma piada</strong>`;
+                }
+
+                // Resposta padrão
+                return `Recebi seu comando: "<strong>${trimmed}</strong>". Para ver todos os comandos programados, digite <code>ajuda</code>!`;
             }
-            initSpeechSynthesis();
 
-            function speak(text) {
-                if (!autoVoiceEnabled || !('speechSynthesis' in window)) {
-                    return;
-                }
-
-                window.speechSynthesis.cancel(); // Stop ongoing speech
-
-                // Clean markdown artifacts for clearer TTS reading
-                const cleanText = text
-                    .replace(/[*#_~`]/g, '')
-                    .replace(/https?:\/\/\S+/g, 'link externo');
+            speak(text) {
+                if (!isTTSEnabled || !this.synth) return;
+                this.synth.cancel(); // Stop current speech
+                
+                // Clean HTML tags from voice output
+                const cleanText = text.replace(/<[^>]*>?/gm, '');
 
                 const utterance = new SpeechSynthesisUtterance(cleanText);
                 utterance.lang = 'pt-BR';
-                utterance.rate = speechRate;
-                utterance.pitch = 0.95;
+                utterance.rate = 1.0;
+                this.synth.speak(utterance);
+            }
+        }
 
-                if (synthVoice) {
-                    utterance.voice = synthVoice;
-                }
+        const assistantEngine = new InteractiveAssistant();
 
-                utterance.onstart = () => {
-                    isSpeaking = true;
-                    setReactorState('speaking');
-                    startAudioVisualizer();
-                    systemStatusMsg.textContent = "JARVIS respondendo...";
-                };
 
-                utterance.onend = utterance.onerror = () => {
-                    isSpeaking = false;
-                    stopAudioVisualizer();
-                    if (!isListening && !isProcessing) {
-                        setReactorState('idle');
-                        systemStatusMsg.textContent = "Aguardando novo comando...";
-                    }
-                };
+        
+        // --- 4. DOM EVENT HANDLERS & CHAT UI ---
+        function handleUserSubmit(e) {
+            e.preventDefault();
+            const inputEl = document.getElementById('user-input');
+            const message = inputEl.value.trim();
+            if (!message) return;
 
-                window.speechSynthesis.speak(utterance);
+            // Render User Message
+            appendChatMessage(message, 'user');
+            inputEl.value = '';
+
+            // Show Typing Indicator
+            showTyping(true);
+
+            // Process Assistant Reply
+            setTimeout(async () => {
+                const reply = await assistantEngine.processCommand(message);
+                showTyping(false);
+                appendChatMessage(reply, 'assistant');
+                assistantEngine.speak(reply);
+            }, 600);
+        }
+
+        function sendQuickCommand(cmd) {
+            document.getElementById('user-input').value = cmd;
+            document.getElementById('chat-form').dispatchEvent(new Event('submit'));
+        }
+
+        function appendChatMessage(text, sender) {
+            const container = document.getElementById('chat-container');
+            const msgRow = document.createElement('div');
+            
+            if (sender === 'user') {
+                msgRow.className = 'flex items-start justify-end space-x-3 max-w-[85%] sm:max-w-[75%] ml-auto';
+                msgRow.innerHTML = `
+                    <div class="bg-brand-600 text-white p-4 rounded-2xl rounded-tr-none shadow-md text-sm">
+                        <p>${text}</p>
+                    </div>
+                    <div class="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                `;
+            } else {
+                msgRow.className = 'flex items-start space-x-3 max-w-[85%] sm:max-w-[75%]';
+                msgRow.innerHTML = `
+                    <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm space-y-1">
+                        <p class="font-semibold text-brand-600 dark:text-brand-400 text-xs">Nexus AI</p>
+                        <div>${text}</div>
+                    </div>
+                `;
             }
 
-            function initSpeechRecognition() {
+            container.appendChild(msgRow);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function showTyping(state) {
+            const typingEl = document.getElementById('typing-bar');
+            if (state) {
+                typingEl.classList.remove('hidden');
+            } else {
+                typingEl.classList.add('hidden');
+            }
+        }
+
+        function clearChat() {
+            const container = document.getElementById('chat-container');
+            container.innerHTML = `
+                <div class="flex items-start space-x-3 max-w-[85%] sm:max-w-[75%]">
+                    <div class="w-8 h-8 rounded-full bg-brand-500 flex items-center justify-center text-white text-xs font-bold shrink-0 shadow-md">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700/80 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm space-y-2">
+                        <p class="font-semibold text-brand-600 dark:text-brand-400">Nexus AI</p>
+                        <p>Histórico de conversa limpo! Como posso ajudar você agora?</p>
+                    </div>
+                </div>
+            `;
+            showToast('Conversa limpa com sucesso!', 'info');
+        }
+
+        // --- 5. SPEECH RECOGNITION (WEB SPEECH API) ---
+        function toggleVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                showToast('Seu navegador não suporta reconhecimento de voz.', 'error');
+                return;
+            }
+
+            if (!speechRecognition) {
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                
-                if (!SpeechRecognition) {
-                    systemStatusMsg.textContent = "Reconhecimento de voz não suportado neste navegador. Digite no terminal.";
-                    micTriggerBtn.classList.add('opacity-50', 'cursor-not-allowed');
-                    return;
-                }
+                speechRecognition = new SpeechRecognition();
+                speechRecognition.lang = 'pt-BR';
+                speechRecognition.continuous = false;
+                speechRecognition.interimResults = false;
 
-                recognition = new SpeechRecognition();
-                recognition.lang = 'pt-BR';
-                recognition.continuous = false;
-                recognition.interimResults = false;
-
-                recognition.onstart = () => {
-                    playHudSound('activate');
+                speechRecognition.onstart = () => {
                     isListening = true;
-                    setReactorState('listening');
-                    startAudioVisualizer();
-                    micTriggerBtn.className = 'bg-stark-orange text-white border border-stark-orange p-2.5 rounded-lg transition-all flex items-center justify-center w-11 h-11 shrink-0 animate-pulse';
-                    micIcon.className = 'fa-solid fa-microphone-lines text-base';
-                    systemStatusMsg.textContent = "Ouvindo... Fale com o JARVIS";
+                    document.getElementById('listening-bar').classList.remove('hidden');
+                    document.getElementById('btn-mic').classList.add('listening-active', 'bg-rose-500', 'text-white');
                 };
 
-                recognition.onresult = (event) => {
+                speechRecognition.onresult = (event) => {
                     const transcript = event.results[0][0].transcript;
-                    if (transcript.trim()) {
-                        addChatMessage('Você', transcript, 'user');
-                        handleUserIntent(transcript);
-                    }
+                    document.getElementById('user-input').value = transcript;
+                    stopVoiceRecognition();
+                    document.getElementById('chat-form').dispatchEvent(new Event('submit'));
                 };
 
-                recognition.onerror = (event) => {
-                    playHudSound('error');
-                    stopListening();
-                    if (event.error === 'not-allowed') {
-                        addChatMessage('J.A.R.V.I.S.', "Permissão de microfone negada. Por favor, permita o acesso para utilizar comandos de voz.", 'jarvis');
-                    } else if (event.error !== 'no-speech') {
-                        systemStatusMsg.textContent = "Comando não compreendido. Tente novamente.";
-                    }
+                speechRecognition.onerror = (event) => {
+                    stopVoiceRecognition();
+                    showToast('Erro no reconhecimento de voz: ' + event.error, 'error');
                 };
 
-                recognition.onend = () => {
-                    stopListening();
+                speechRecognition.onend = () => {
+                    stopVoiceRecognition();
                 };
             }
-            initSpeechRecognition();
 
-            function startListening() {
-                if (!recognition) return;
-                if (isListening) return;
+            if (isListening) {
+                speechRecognition.stop();
+            } else {
+                speechRecognition.start();
+            }
+        }
 
-                if (window.speechSynthesis) window.speechSynthesis.cancel();
+        function stopVoiceRecognition() {
+            isListening = false;
+            document.getElementById('listening-bar').classList.add('hidden');
+            const micBtn = document.getElementById('btn-mic');
+            micBtn.classList.remove('listening-active', 'bg-rose-500', 'text-white');
+        }
+
+
+        
+        // --- 6. DEVELOPER HUB & CODE VIEWER ---
+        function selectCodeFile(filename) {
+            activeSelectedFile = filename;
+            
+            // Update active file buttons in tree
+            document.querySelectorAll('.file-btn').forEach(btn => {
+                if (btn.dataset.file === filename) {
+                    btn.classList.add('bg-brand-500/10', 'text-brand-500', 'font-bold');
+                } else {
+                    btn.classList.remove('bg-brand-500/10', 'text-brand-500', 'font-bold');
+                }
+            });
+
+            // Update title header
+            document.getElementById('code-file-title').innerText = filename;
+
+            // Load Code text
+            const codeContent = SOURCE_FILES[filename] || '// Arquivo não encontrado';
+            const codeEl = document.getElementById('code-display_content');
+            
+            // Escape HTML entities for code preview
+            codeEl.textContent = codeContent;
+        }
+
+        function copyCurrentCode() {
+            const codeText = SOURCE_FILES[activeSelectedFile] || '';
+            
+            if (!codeText) return;
+
+            // Use document.execCommand fallback for iframe safety
+            const textarea = document.createElement('textarea');
+            textarea.value = codeText;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast(`Código de "${activeSelectedFile}" copiado!`, 'success');
                 
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.error("Erro ao iniciar áudio:", e);
-                }
+                // Button feedback animation
+                const copyBtnText = document.getElementById('copy-btn-text');
+                copyBtnText.innerText = 'Copiado!';
+                setTimeout(() => {
+                    copyBtnText.innerText = 'Copiar Código';
+                }, 2000);
+            } catch (err) {
+                showToast('Falha ao copiar código.', 'error');
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        // --- 7. UTILITIES & THEME TOGGLE ---
+        function switchTab(tab) {
+            const assistantView = document.getElementById('view-assistant');
+            const developerView = document.getElementById('view-developer');
+            const tabAssistantBtn = document.getElementById('tab-assistant');
+            const tabDeveloperBtn = document.getElementById('tab-developer');
+
+            if (tab === 'assistant') {
+                assistantView.classList.remove('hidden');
+                developerView.classList.add('hidden');
+
+                tabAssistantBtn.className = 'flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm';
+                tabDeveloperBtn.className = 'flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+            } else {
+                assistantView.classList.add('hidden');
+                developerView.classList.remove('hidden');
+
+                tabDeveloperBtn.className = 'flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 bg-white dark:bg-slate-700 text-brand-600 dark:text-brand-400 shadow-sm';
+                tabAssistantBtn.className = 'flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white';
+
+                // Ensure initial file is rendered
+                selectCodeFile(activeSelectedFile);
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                themeIcon.className = 'fa-solid fa-sun text-amber-500';
+                currentTheme = 'light';
+            } else {
+                html.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-moon';
+                currentTheme = 'dark';
+            }
+        }
+
+        function toggleTTS() {
+            isTTSEnabled = !isTTSEnabled;
+            const ttsIcon = document.getElementById('tts-icon');
+            if (isTTSEnabled) {
+                ttsIcon.className = 'fa-solid fa-volume-high text-brand-500';
+                showToast('Voz do assistente ativada', 'info');
+            } else {
+                ttsIcon.className = 'fa-solid fa-volume-xmark text-slate-400';
+                window.speechSynthesis.cancel();
+                showToast('Voz do assistente silenciada', 'info');
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            let bgClass = 'bg-slate-800 text-white border-slate-700';
+            let icon = 'fa-circle-info text-blue-400';
+
+            if (type === 'success') {
+                bgClass = 'bg-slate-900 text-emerald-400 border-emerald-500/40';
+                icon = 'fa-circle-check text-emerald-400';
+            } else if (type === 'error') {
+                bgClass = 'bg-slate-900 text-rose-400 border-rose-500/40';
+                icon = 'fa-circle-exclamation text-rose-400';
             }
 
-            function stopListening() {
-                isListening = false;
-                stopAudioVisualizer();
-                micTriggerBtn.className = 'bg-stark-cyan/20 hover:bg-stark-cyan text-stark-cyan hover:text-stark-dark border border-stark-cyan p-2.5 rounded-lg transition-all flex items-center justify-center w-11 h-11 shrink-0';
-                micIcon.className = 'fa-solid fa-microphone text-base';
-                
-                if (!isSpeaking && !isProcessing) {
-                    setReactorState('idle');
-                    systemStatusMsg.textContent = "Aguardando novo comando...";
-                }
-            }
+            toast.className = `glass-card border ${bgClass} px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 text-xs font-medium transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-base"></i><span>${message}</span>`;
 
-            function setReactorState(state) {
-                arcReactor.classList.remove('state-idle', 'state-listening', 'state-thinking', 'state-speaking');
-                
-                if (state === 'listening') {
-                    arcReactor.classList.add('state-listening');
-                    reactorModeLabel.textContent = "OUVINDO";
-                    reactorModeLabel.className = "text-white font-bold bg-stark-orange/30 px-2 py-0.5 rounded border border-stark-orange text-stark-orange";
-                } else if (state === 'thinking') {
-                    arcReactor.classList.add('state-thinking');
-                    reactorModeLabel.textContent = "PROCESSANDO";
-                    reactorModeLabel.className = "text-white font-bold bg-stark-purple/30 px-2 py-0.5 rounded border border-stark-purple text-stark-purple";
-                } else if (state === 'speaking') {
-                    arcReactor.classList.add('state-speaking');
-                    reactorModeLabel.textContent = "FALANDO";
-                    reactorModeLabel.className = "text-white font-bold bg-stark-cyan/30 px-2 py-0.5 rounded border border-stark-cyan text-stark-cyan";
-                } else {
-                    arcReactor.classList.add('state-idle');
-                    reactorModeLabel.textContent = "ESPERA";
-                    reactorModeLabel.className = "text-white font-bold bg-stark-cyan/20 px-2 py-0.5 rounded border border-stark-cyan/30 text-stark-cyan";
-                }
-            }
+            toastContainer.appendChild(toast);
 
-            function startAudioVisualizer() {
-                if (visualizerInterval) clearInterval(visualizerInterval);
-                const bars = audioVisualizer.querySelectorAll('.eq-bar');
-                visualizerInterval = setInterval(() => {
-                    bars.forEach(bar => {
-                        const h = Math.floor(Math.random() * 22 + 4);
-                        bar.style.height = `${h}px`;
-                    });
-                }, 80);
-            }
+            // Animate in
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 10);
 
-            function stopAudioVisualizer() {
-                if (visualizerInterval) clearInterval(visualizerInterval);
-                const bars = audioVisualizer.querySelectorAll('.eq-bar');
-                bars.forEach(bar => bar.style.height = '8px');
-            }
+            // Remove after delay
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
 
-            function addChatMessage(sender, text, type) {
-                const msgWrapper = document.createElement('div');
-                msgWrapper.className = `flex items-start gap-3 ${type === 'user' ? 'flex-row-reverse' : ''}`;
-
-                const iconDiv = document.createElement('div');
-                if (type === 'user') {
-                    iconDiv.className = 'w-8 h-8 rounded bg-white/20 border border-white/50 flex items-center justify-center shrink-0 text-white';
-                    iconDiv.innerHTML = '<i class="fa-solid fa-user text-sm"></i>';
-                } else {
-                    iconDiv.className = 'w-8 h-8 rounded bg-stark-cyan/20 border border-stark-cyan/50 flex items-center justify-center shrink-0 text-stark-cyan';
-                    iconDiv.innerHTML = '<i class="fa-solid fa-robot text-sm"></i>';
-                }
-
-                const bubble = document.createElement('div');
-                if (type === 'user') {
-                    bubble.className = 'bg-white/10 border border-white/30 rounded-lg p-3 text-sm text-white max-w-[88%] shadow-lg';
-                    bubble.innerHTML = `<div class="text-[10px] text-white/60 font-hud mb-1 text-right">${sender.toUpperCase()}</div>${escapeHtml(text)}`;
-                } else {
-                    bubble.className = 'bg-stark-cyan/10 border border-stark-cyan/30 rounded-lg p-3 text-sm text-stark-cyan max-w-[88%] shadow-lg';
-                    
-                    // Simple Formatted Markdown display
-                    const formattedText = escapeHtml(text)
-                        .replace(/\n/g, '<br>')
-                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
-                        .replace(/`(.*?)`/g, '<code class="bg-stark-dark px-1 py-0.5 rounded text-white font-mono text-xs">$1</code>');
-
-                    bubble.innerHTML = `<div class="text-[10px] text-stark-cyan/60 font-hud mb-1">${sender.toUpperCase()}</div>${formattedText}`;
-                }
-
-                msgWrapper.appendChild(iconDiv);
-                msgWrapper.appendChild(bubble);
-                chatHistory.appendChild(msgWrapper);
-
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-            }
-
-            function escapeHtml(str) {
-                return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-            }
-
-            function handleUserIntent(rawInput) {
-                const cmd = rawInput.toLowerCase().trim();
-
-                // 1. Local Device App Launch Automation
-                if (cmd.includes('abrir whatsapp') || cmd.includes('whatsapp')) {
-                    executeAppLaunch('whatsapp');
-                    return;
-                }
-                if (cmd.includes('abrir instagram') || cmd.includes('instagram')) {
-                    executeAppLaunch('instagram');
-                    return;
-                }
-                if (cmd.includes('abrir youtube') || cmd.includes('youtube')) {
-                    executeAppLaunch('youtube');
-                    return;
-                }
-                if (cmd.includes('abrir spotify') || cmd.includes('spotify')) {
-                    executeAppLaunch('spotify');
-                    return;
-                }
-                if (cmd.includes('abrir mapa') || cmd.includes('google maps') || cmd.includes('navegar para')) {
-                    let dest = cmd.replace(/abrir mapa|google maps|navegar para|mapas/g, '').trim();
-                    executeAppLaunch('maps', dest);
-                    return;
-                }
-                if (cmd.includes('abrir câmera') || cmd.includes('abrir camera') || cmd.includes('tirar foto') || cmd.includes('câmera') || cmd.includes('camera')) {
-                    executeAppLaunch('camera');
-                    return;
-                }
-                if (cmd.includes('fazer ligação') || cmd.includes('ligar para') || cmd.includes('discador')) {
-                    let number = cmd.replace(/fazer ligação|ligar para|discador/g, '').trim();
-                    executeAppLaunch('phone', number);
-                    return;
-                }
-
-                // 2. System Diagnostic Quick Command
-                if (cmd.includes('diagnóstico') || cmd.includes('diagnostico') || cmd.includes('status do sistema')) {
-                    const response = "Iniciando varredura em todos os subsistemas do Núcleo Arc. Temperatura em 36°C. Conexão neural com o Gemini AI operando nominalmente. Todos os sistemas online, Senhor.";
-                    addChatMessage('J.A.R.V.I.S.', response, 'jarvis');
-                    speak(response);
-                    return;
-                }
-
-                // 3. Web Search Trigger
-                if (cmd.startsWith('pesquisar por') || cmd.startsWith('pesquise por') || cmd.startsWith('google por')) {
-                    const query = cmd.replace(/pesquisar por|pesquise por|google por/g, '').trim();
-                    if (query) {
-                        const response = `Realizando busca por "${query}" no Google, Senhor.`;
-                        addChatMessage('J.A.R.V.I.S.', response, 'jarvis');
-                        speak(response);
-                        setTimeout(() => window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank'), 1200);
-                        return;
-                    }
-                }
-
-                // 4. Send query to Gemini AI API for natural intelligent conversation
-                queryGeminiAI(rawInput);
-            }
-
-            function executeAppLaunch(appKey, param = "") {
-                playHudSound('activate');
-                let msg = "";
-
-                switch(appKey) {
-                    case 'whatsapp':
-                        msg = "Abrindo o WhatsApp, Senhor.";
-                        setTimeout(() => {
-                            window.open('https://web.whatsapp.com', '_blank');
-                        }, 1000);
-                        break;
-                    case 'instagram':
-                        msg = "Conectando ao Instagram.";
-                        setTimeout(() => {
-                            window.open('https://www.instagram.com', '_blank');
-                        }, 1000);
-                        break;
-                    case 'youtube':
-                        msg = "Inicializando o servidor do YouTube.";
-                        setTimeout(() => {
-                            window.open('https://www.youtube.com', '_blank');
-                        }, 1000);
-                        break;
-                    case 'spotify':
-                        msg = "Abrindo a plataforma Spotify.";
-                        setTimeout(() => {
-                            window.open('https://open.spotify.com', '_blank');
-                        }, 1000);
-                        break;
-                    case 'maps':
-                        if (param) {
-                            msg = `Traçando rota para ${param} no Google Maps.`;
-                            setTimeout(() => {
-                                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(param)}`, '_blank');
-                            }, 1000);
-                        } else {
-                            msg = "Abrindo o sistema de navegação e mapas.";
-                            setTimeout(() => {
-                                window.open('https://www.google.com/maps', '_blank');
-                            }, 1000);
-                        }
-                        break;
-                    case 'camera':
-                        msg = "Ativando feeds ópticos da câmera HUD.";
-                        openCameraModal();
-                        break;
-                    case 'phone':
-                        if (param) {
-                            msg = `Iniciando discador para ${param}.`;
-                            setTimeout(() => { window.location.href = `tel:${param.replace(/\s+/g, '')}`; }, 1000);
-                        } else {
-                            msg = "Abrindo o discador de chamadas do dispositivo.";
-                            setTimeout(() => { window.location.href = 'tel:'; }, 1000);
-                        }
-                        break;
-                }
-
-                addChatMessage('J.A.R.V.I.S.', msg, 'jarvis');
-                speak(msg);
-            }
-
-            async function queryGeminiAI(promptText) {
-                isProcessing = true;
-                setReactorState('thinking');
-                systemStatusMsg.textContent = "Processando inteligência Gemini...";
-
-                // Append user turn to conversation history
-                conversationHistory.push({
-                    role: 'user',
-                    parts: [{ text: promptText }]
-                });
-
-                const systemInstructionText = "Você é o J.A.R.V.I.S. (Just A Rather Very Intelligent System), a inteligência artificial pessoal do Tony Stark / Homem de Ferro. Responda em Português do Brasil com tom cortês, extremamente inteligente, refinado, prestativo e com elegância britânica. Trate o usuário respeitosamente como 'Senhor' ou 'Senhora'. Suas respostas devem ser claras, eficientes e adaptadas para leitura em voz alta, sem excesso de código ou símbolos difíceis de ler.";
-
-                const payload = {
-                    contents: conversationHistory,
-                    systemInstruction: {
-                        parts: [{ text: systemInstructionText }]
-                    }
-                };
-
-                const apiKey = customApiKey;
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-
-                let attempts = 0;
-                let success = false;
-                let replyText = "";
-
-                while (attempts < 3 && !success) {
-                    try {
-                        attempts++;
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`Erro na API Gemini (${response.status})`);
-                        }
-
-                        const data = await response.json();
-                        const candidate = data.candidates?.[0];
-
-                        if (candidate && candidate.content?.parts?.[0]?.text) {
-                            replyText = candidate.content.parts[0].text;
-                            success = true;
-                        } else {
-                            throw new Error("Resposta da I.A. vazia ou malformada.");
-                        }
-                    } catch (err) {
-                        console.warn(`Tentativa ${attempts} de consulta ao Gemini falhou:`, err);
-                        if (attempts < 3) {
-                            // Exponential backoff delay
-                            await new Promise(r => setTimeout(r, Math.pow(2, attempts) * 1000));
-                        }
-                    }
-                }
-
-                isProcessing = false;
-
-                if (success && replyText) {
-                    // Record model response in conversation history
-                    conversationHistory.push({
-                        role: 'model',
-                        parts: [{ text: replyText }]
-                    });
-
-                    addChatMessage('J.A.R.V.I.S.', replyText, 'jarvis');
-                    speak(replyText);
-                } else {
-                    playHudSound('error');
-                    const errorMsg = "Desculpe, Senhor. Houve uma oscilação na conexão com os servidores do Gemini AI. Por favor, tente novamente ou verifique suas credenciais nas configurações.";
-                    addChatMessage('J.A.R.V.I.S.', errorMsg, 'jarvis');
-                    speak(errorMsg);
-                    setReactorState('idle');
-                    systemStatusMsg.textContent = "Aguardando novo comando...";
-                }
-            }
-
-            async function openCameraModal() {
-                snapshotPreview.classList.add('hidden');
-                cameraModal.classList.remove('hidden');
-                try {
-                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
-                    cameraFeed.srcObject = cameraStream;
-                } catch (e) {
-                    console.error("Erro ao acessar câmera:", e);
-                    alert("Não foi possível acessar a câmera do dispositivo. Verifique as permissões.");
-                    cameraModal.classList.add('hidden');
-                }
-            }
-
-            function closeCameraModal() {
-                if (cameraStream) {
-                    cameraStream.getTracks().forEach(track => track.stop());
-                    cameraStream = null;
-                }
-                cameraModal.classList.add('hidden');
-            }
-
-            btnTakePhoto.addEventListener('click', () => {
-                if (!cameraStream) return;
-                playHudSound('snap');
-                cameraCanvas.width = cameraFeed.videoWidth || 640;
-                cameraCanvas.height = cameraFeed.videoHeight || 480;
-                const ctx = cameraCanvas.getContext('2d');
-                ctx.drawImage(cameraFeed, 0, 0, cameraCanvas.width, cameraCanvas.height);
-                
-                const dataUrl = cameraCanvas.toDataURL('image/png');
-                snapshotImg.src = dataUrl;
-                snapshotPreview.classList.remove('hidden');
-            });
-
-            btnCloseCamera.addEventListener('click', closeCameraModal);
-
-            btnOpenSettings.addEventListener('click', () => {
-                playHudSound('click');
-                inputApiKey.value = customApiKey;
-                inputVoiceRate.value = speechRate;
-                rateVal.textContent = speechRate;
-                settingsModal.classList.remove('hidden');
-            });
-
-            btnCloseSettings.addEventListener('click', () => {
-                settingsModal.classList.add('hidden');
-            });
-
-            inputVoiceRate.addEventListener('input', (e) => {
-                rateVal.textContent = e.target.value;
-            });
-
-            btnSaveSettings.addEventListener('click', () => {
-                playHudSound('activate');
-                customApiKey = inputApiKey.value.trim();
-                speechRate = parseFloat(inputVoiceRate.value);
-                
-                localStorage.setItem('jarvis_api_key', customApiKey);
-                localStorage.setItem('jarvis_speech_rate', speechRate);
-
-                if (selectVoice.value) {
-                    const voices = window.speechSynthesis.getVoices();
-                    const chosen = voices.find(v => v.name === selectVoice.value);
-                    if (chosen) synthVoice = chosen;
-                }
-
-                settingsModal.classList.add('hidden');
-                addChatMessage('J.A.R.V.I.S.', "Configurações do sistema atualizadas com sucesso, Senhor.", 'jarvis');
-                speak("Configurações do sistema atualizadas com sucesso, Senhor.");
-            });
-
-            arcReactor.addEventListener('click', () => {
-                if (isListening) {
-                    if (recognition) recognition.stop();
-                } else {
-                    startListening();
-                }
-            });
-
-            micTriggerBtn.addEventListener('click', () => {
-                if (isListening) {
-                    if (recognition) recognition.stop();
-                } else {
-                    startListening();
-                }
-            });
-
-            chatForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const text = userInput.value.trim();
-                if (text && !isProcessing) {
-                    playHudSound('click');
-                    addChatMessage('Você', text, 'user');
-                    handleUserIntent(text);
-                    userInput.value = '';
-                }
-            });
-
-            // App Command Bar Buttons
-            appCmdBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const appKey = btn.getAttribute('data-app');
-                    executeAppLaunch(appKey);
-                });
-            });
-
-            // Quick Chips Command Buttons
-            quickBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const cmd = btn.getAttribute('data-cmd');
-                    if (cmd && !isProcessing) {
-                        playHudSound('click');
-                        addChatMessage('Você', cmd, 'user');
-                        handleUserIntent(cmd);
-                    }
-                });
-            });
-
-            // Clear Chat History
-            btnClearChat.addEventListener('click', () => {
-                playHudSound('click');
-                chatHistory.innerHTML = '';
-                conversationHistory = [];
-                const msg = "Memória do terminal limpa, Senhor.";
-                addChatMessage('J.A.R.V.I.S.', msg, 'jarvis');
-                speak(msg);
-            });
-
-            // Toggle Audio TTS Response
-            btnToggleTts.addEventListener('click', () => {
-                playHudSound('click');
-                autoVoiceEnabled = !autoVoiceEnabled;
-                if (autoVoiceEnabled) {
-                    ttsIcon.className = "fa-solid fa-volume-high";
-                    ttsLabel.textContent = "Voz Ativa";
-                    btnToggleTts.className = "text-xs px-2 py-1 rounded bg-stark-cyan/10 border border-stark-cyan/40 text-stark-cyan hover:bg-stark-cyan/20 transition-colors flex items-center gap-1";
-                } else {
-                    if (window.speechSynthesis) window.speechSynthesis.cancel();
-                    ttsIcon.className = "fa-solid fa-volume-xmark";
-                    ttsLabel.textContent = "Voz Mute";
-                    btnToggleTts.className = "text-xs px-2 py-1 rounded bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 transition-colors flex items-center gap-1";
-                }
-            });
+        // Initialize application when DOM loads
+        window.addEventListener('DOMContentLoaded', () => {
+            selectCodeFile('index.html');
         });
     </script>
 </body>
