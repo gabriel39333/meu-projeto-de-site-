@@ -1,0 +1,16 @@
+/* assets/css/responsive.css - Responsividade para Celulares */
+@media (max-width: 640px) {
+    #chat-box {
+        min-h-[300px];
+        padding: 10px;
+    }
+
+    .message-user, .message-assistant {
+        max-width: 90%;
+        font-size: 14px;
+    }
+
+    #chat-form {
+        flex-wrap: nowrap;
+    }
+}
