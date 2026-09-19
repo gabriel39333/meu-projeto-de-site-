@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>J.A.R.V.I.S. - Arc Reactor Interface</title>
+    <title>J.A.R.V.I.S. - Arc Reactor Intelligence System</title>
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,11 +16,12 @@
                         stark: {
                             cyan: '#00f3ff',
                             blue: '#00a8ff',
-                            dark: '#030914',
+                            dark: '#020712',
                             panel: 'rgba(4, 18, 38, 0.75)',
                             gold: '#ffb700',
                             orange: '#ff6600',
-                            red: '#ff2a2a'
+                            red: '#ff2a2a',
+                            purple: '#a855f7'
                         }
                     },
                     fontFamily: {
@@ -35,7 +36,7 @@
     <!-- Google Fonts & FontAwesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -59,7 +60,7 @@
         .hud-bg {
             background-color: #020712;
             background-image: 
-                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.08) 0%, transparent 70%),
+                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.08) 0%, transparent 75%),
                 linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
             background-size: 100% 100%, 30px 30px, 30px 30px;
@@ -67,13 +68,14 @@
 
         /* Holographic Glassmorphism */
         .hud-glass {
-            background: rgba(4, 18, 38, 0.65);
+            background: rgba(4, 18, 38, 0.7);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(0, 243, 255, 0.25);
-            box-shadow: 0 0 20px rgba(0, 243, 255, 0.08), inset 0 0 15px rgba(0, 243, 255, 0.05);
+            box-shadow: 0 0 25px rgba(0, 243, 255, 0.08), inset 0 0 15px rgba(0, 243, 255, 0.05);
         }
 
+        /* Sci-Fi Corner Brackets */
         .hud-border-corners {
             position: relative;
         }
@@ -85,6 +87,7 @@
             height: 8px;
             border-color: #00f3ff;
             pointer-events: none;
+            z-index: 5;
         }
         .hud-border-corners::before {
             top: -1px;
@@ -116,9 +119,13 @@
             0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 102, 0, 0.9)) drop-shadow(0 0 45px rgba(255, 183, 0, 0.6)); }
             50% { filter: drop-shadow(0 0 45px rgba(255, 102, 0, 1)) drop-shadow(0 0 80px rgba(255, 183, 0, 0.9)); }
         }
+        @keyframes pulse-thinking {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.9)) drop-shadow(0 0 45px rgba(255, 183, 0, 0.6)); }
+            50% { filter: drop-shadow(0 0 45px rgba(168, 85, 247, 1)) drop-shadow(0 0 80px rgba(0, 243, 255, 0.8)); }
+        }
         @keyframes pulse-speaking {
             0%, 100% { transform: scale(1); filter: drop-shadow(0 0 25px rgba(0, 243, 255, 0.9)); }
-            50% { transform: scale(1.04); filter: drop-shadow(0 0 50px rgba(0, 243, 255, 1)) drop-shadow(0 0 80px rgba(0, 168, 255, 0.8)); }
+            50% { transform: scale(1.04); filter: drop-shadow(0 0 55px rgba(0, 243, 255, 1)) drop-shadow(0 0 85px rgba(0, 168, 255, 0.8)); }
         }
 
         .ring-outer {
@@ -134,7 +141,7 @@
             transform-origin: center;
         }
 
-        /* Arc Reactor States */
+        /* Arc Reactor Interactive States */
         .arc-reactor {
             transition: all 0.5s ease;
             cursor: pointer;
@@ -148,12 +155,25 @@
             stroke: #ff6600 !important;
         }
         .arc-reactor.state-listening .ring-middle {
-            animation-duration: 2.5s;
+            animation-duration: 2s;
             stroke: #ffb700 !important;
         }
         .arc-reactor.state-listening .core-glow {
             animation: pulse-listening 1s infinite ease-in-out;
             fill: url(#coreGradientListening) !important;
+        }
+
+        .arc-reactor.state-thinking .ring-outer {
+            animation-duration: 2s;
+            stroke: #a855f7 !important;
+        }
+        .arc-reactor.state-thinking .ring-middle {
+            animation-duration: 1.2s;
+            stroke: #00f3ff !important;
+        }
+        .arc-reactor.state-thinking .core-glow {
+            animation: pulse-thinking 0.8s infinite ease-in-out;
+            fill: url(#coreGradientThinking) !important;
         }
 
         .arc-reactor.state-speaking {
@@ -177,6 +197,11 @@
             background-size: 100% 4px;
             z-index: 40;
         }
+
+        /* Equalizer Bar Animation */
+        .eq-bar {
+            transition: height 0.12s ease;
+        }
     </style>
 </head>
 <body class="hud-bg text-stark-cyan font-tech min-h-screen flex flex-col justify-between overflow-x-hidden select-none relative p-2 sm:p-4">
@@ -190,39 +215,42 @@
             </div>
             <div>
                 <h1 class="font-hud font-black text-lg sm:text-xl tracking-widest text-white flex items-center gap-2">
-                    J.A.R.V.I.S. <span class="text-xs px-2 py-0.5 rounded bg-stark-cyan/20 text-stark-cyan border border-stark-cyan/40 font-normal">v4.2 MARK VII</span>
+                    J.A.R.V.I.S. <span class="text-xs px-2 py-0.5 rounded bg-stark-cyan/20 text-stark-cyan border border-stark-cyan/40 font-normal">MARK VIII • GEMINI AI</span>
                 </h1>
-                <p class="text-xs text-stark-cyan/70 tracking-wider hidden sm:block">SISTEMA OPERACIONAL NÚCLEO ARC STARK</p>
+                <p class="text-[11px] text-stark-cyan/70 tracking-wider hidden sm:block">STARK INDUSTRIES INTEGRATED ARTIFICIAL INTELLIGENCE</p>
             </div>
         </div>
 
-        <!-- Telemetry & Clock -->
-        <div class="flex items-center space-x-4 text-xs sm:text-sm font-hud">
-            <div class="hidden md:flex space-x-4 border-r border-stark-cyan/30 pr-4 text-stark-cyan/80">
-                <span title="Status da Bateria"><i class="fa-solid fa-battery-half text-stark-cyan mr-1"></i><span id="bat-val">98%</span></span>
-                <span title="Uso do Processador"><i class="fa-solid fa-microchip text-stark-cyan mr-1"></i><span id="cpu-val">12%</span></span>
-                <span title="Memória RAM"><i class="fa-solid fa-memory text-stark-cyan mr-1"></i><span id="ram-val">3.4 GB</span></span>
+        <!-- Telemetry, Clock & Settings Toggle -->
+        <div class="flex items-center space-x-3 sm:space-x-4 text-xs sm:text-sm font-hud">
+            <div class="hidden lg:flex space-x-4 border-r border-stark-cyan/30 pr-4 text-stark-cyan/80">
+                <span title="Status da Bateria"><i class="fa-solid fa-battery-three-quarters text-stark-cyan mr-1"></i><span id="bat-val">--%</span></span>
+                <span title="Uso do Processador Nucleador"><i class="fa-solid fa-microchip text-stark-cyan mr-1"></i><span id="cpu-val">14%</span></span>
+                <span title="Latência Gemini"><i class="fa-solid fa-bolt text-stark-cyan mr-1"></i><span id="ping-val">28ms</span></span>
+                <span title="Memória Alocada"><i class="fa-solid fa-memory text-stark-cyan mr-1"></i><span id="ram-val">3.8 GB</span></span>
             </div>
             <div class="text-right">
                 <div class="text-base sm:text-lg font-bold text-white tracking-widest" id="hud-clock">00:00:00</div>
                 <div class="text-[10px] sm:text-xs text-stark-cyan/70 uppercase" id="hud-date">SEG, 01 JAN</div>
             </div>
+            <button id="btn-open-settings" title="Configurações do JARVIS / Chave API" class="bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/40 text-stark-cyan p-2 rounded-lg transition-all">
+                <i class="fa-solid fa-gear text-base"></i>
+            </button>
         </div>
     </header>
 
     <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 z-10 my-1 items-stretch">
         
-        <!-- Left / Top Arc Reactor Central Display (Lg: 5 cols) -->
-        <section class="lg:col-span-5 hud-glass hud-border-corners rounded-lg p-4 flex flex-col items-center justify-between relative overflow-hidden min-h-[320px]">
+        <!-- Left / Top Arc Reactor Central Display (5 cols) -->
+        <section class="lg:col-span-5 hud-glass hud-border-corners rounded-lg p-4 flex flex-col items-center justify-between relative overflow-hidden min-h-[380px]">
             <!-- Top Subtitle Indicator -->
             <div class="w-full flex justify-between items-center text-xs tracking-widest text-stark-cyan/80 uppercase mb-2">
-                <span class="flex items-center gap-1"><i class="fa-solid fa-atom"></i> STARK ARC CORE</span>
+                <span class="flex items-center gap-1.5 font-hud"><i class="fa-solid fa-atom text-stark-cyan animate-spin"></i> STARK ARC CORE</span>
                 <span id="reactor-mode-label" class="text-white font-bold bg-stark-cyan/20 px-2 py-0.5 rounded border border-stark-cyan/30">ESPERA</span>
             </div>
 
-            <!-- Central Interactive Arc Reactor -->
+            <!-- Central Interactive Arc Reactor SVG -->
             <div class="relative my-auto flex items-center justify-center p-2">
-                <!-- Outer Interactive Ring Trigger -->
                 <div id="arc-reactor" class="arc-reactor state-idle w-56 h-56 sm:w-64 sm:h-64 relative flex items-center justify-center" title="Clique no Núcleo Arc para Falar com JARVIS">
                     <svg viewBox="0 0 300 300" class="w-full h-full filter drop-shadow-[0_0_20px_rgba(0,243,255,0.6)]">
                         <defs>
@@ -240,6 +268,13 @@
                                 <stop offset="75%" stop-color="#ff4400" />
                                 <stop offset="100%" stop-color="#020712" />
                             </radialGradient>
+                            <!-- Purple Thinking Glow -->
+                            <radialGradient id="coreGradientThinking" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffffff" />
+                                <stop offset="35%" stop-color="#c084fc" />
+                                <stop offset="75%" stop-color="#7e22ce" />
+                                <stop offset="100%" stop-color="#020712" />
+                            </radialGradient>
                         </defs>
 
                         <!-- Outer Tech Ticks -->
@@ -249,7 +284,6 @@
                         <!-- Outer Rotating Segmented Ring -->
                         <g class="ring-outer">
                             <circle cx="150" cy="150" r="120" fill="none" stroke="#00f3ff" stroke-opacity="0.8" stroke-width="6" stroke-dasharray="40 10 15 10 70 15" />
-                            <!-- Metallic Copper Nodes on Outer Ring -->
                             <circle cx="150" cy="30" r="5" fill="#e67e22" />
                             <circle cx="270" cy="150" r="5" fill="#e67e22" />
                             <circle cx="150" cy="270" r="5" fill="#e67e22" />
@@ -259,7 +293,6 @@
                         <!-- Middle Counter-Rotating Ring -->
                         <g class="ring-middle">
                             <circle cx="150" cy="150" r="95" fill="none" stroke="#00a8ff" stroke-opacity="0.9" stroke-width="8" stroke-dasharray="60 20 30 20" />
-                            <!-- Triangular Core Cutouts Simulation -->
                             <polygon points="150,65 160,80 140,80" fill="#00f3ff" />
                             <polygon points="235,150 220,160 220,140" fill="#00f3ff" />
                             <polygon points="150,235 140,220 160,220" fill="#00f3ff" />
@@ -281,94 +314,209 @@
                 </div>
             </div>
 
-            <!-- Voice Visualizer Audio Wave & Subtitle -->
+            <!-- Audio Wave Visualizer & Subtitle -->
             <div class="w-full text-center space-y-2 mt-2">
-                <div class="flex justify-center items-center gap-1 h-6" id="audio-visualizer">
-                    <span class="w-1 bg-stark-cyan rounded-full h-2 transition-all duration-150"></span>
-                    <span class="w-1 bg-stark-cyan rounded-full h-4 transition-all duration-150"></span>
-                    <span class="w-1 bg-stark-cyan rounded-full h-3 transition-all duration-150"></span>
-                    <span class="w-1 bg-stark-cyan rounded-full h-6 transition-all duration-150"></span>
-                    <span class="w-1 bg-stark-cyan rounded-full h-2 transition-all duration-150"></span>
-                    <span class="w-1 bg-stark-cyan rounded-full h-5 transition-all duration-150"></span>
-                    <span class="w-1 bg-stark-cyan rounded-full h-2 transition-all duration-150"></span>
+                <div class="flex justify-center items-center gap-1.5 h-7" id="audio-visualizer">
+                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-2"></span>
+                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-4"></span>
+                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-3"></span>
+                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-6"></span>
+                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-2"></span>
+                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-5"></span>
+                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-3"></span>
+                    <span class="eq-bar w-1.5 bg-stark-cyan rounded-full h-2"></span>
                 </div>
                 <p id="system-status-msg" class="text-xs sm:text-sm font-hud text-stark-cyan tracking-wider truncate px-2">
-                    Clique no Núcleo ou diga "JARVIS" para iniciar...
+                    Clique no Núcleo ou diga "JARVIS" para conversar...
                 </p>
+            </div>
+
+            <div class="w-full border-t border-stark-cyan/20 pt-3 mt-3">
+                <div class="text-[10px] text-stark-cyan/60 font-hud tracking-widest uppercase mb-1.5 flex justify-between">
+                    <span>COMANDOS DE DISPOSITIVO / APPS</span>
+                    <span>AUTOMATION HUB</span>
+                </div>
+                <div class="grid grid-cols-4 sm:grid-cols-7 gap-1.5 text-center">
+                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="whatsapp" title="Abrir WhatsApp">
+                        <i class="fa-brands fa-whatsapp text-sm block mb-0.5"></i>
+                        <span class="text-[9px] block">WhatsApp</span>
+                    </button>
+                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="instagram" title="Abrir Instagram">
+                        <i class="fa-brands fa-instagram text-sm block mb-0.5"></i>
+                        <span class="text-[9px] block">Instagram</span>
+                    </button>
+                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="youtube" title="Abrir YouTube">
+                        <i class="fa-brands fa-youtube text-sm block mb-0.5"></i>
+                        <span class="text-[9px] block">YouTube</span>
+                    </button>
+                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="spotify" title="Abrir Spotify">
+                        <i class="fa-brands fa-spotify text-sm block mb-0.5"></i>
+                        <span class="text-[9px] block">Spotify</span>
+                    </button>
+                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="maps" title="Abrir Google Maps">
+                        <i class="fa-solid fa-map-location-dot text-sm block mb-0.5"></i>
+                        <span class="text-[9px] block">Mapas</span>
+                    </button>
+                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="camera" title="Abrir Câmera">
+                        <i class="fa-solid fa-camera text-sm block mb-0.5"></i>
+                        <span class="text-[9px] block">Câmera</span>
+                    </button>
+                    <button class="app-cmd-btn bg-stark-cyan/10 hover:bg-stark-cyan/30 border border-stark-cyan/30 rounded p-1.5 text-stark-cyan hover:text-white transition-all text-xs" data-app="phone" title="Discador / Ligar">
+                        <i class="fa-solid fa-phone text-sm block mb-0.5"></i>
+                        <span class="text-[9px] block">Ligar</span>
+                    </button>
+                </div>
             </div>
         </section>
 
-        <!-- Right / Bottom Terminal & Chat Display (Lg: 7 cols) -->
-        <section class="lg:col-span-7 hud-glass hud-border-corners rounded-lg p-4 flex flex-col justify-between min-h-[380px]">
+        <!-- Right / Bottom AI Terminal & Communication Console (7 cols) -->
+        <section class="lg:col-span-7 hud-glass hud-border-corners rounded-lg p-4 flex flex-col justify-between min-h-[420px]">
             <!-- Terminal Header -->
-            <div class="flex items-center justify-between border-b border-stark-cyan/30 pb-2 mb-3">
+            <div class="flex items-center justify-between border-b border-stark-cyan/30 pb-2.5 mb-3">
                 <div class="flex items-center space-x-2 text-xs font-hud tracking-widest text-white">
                     <i class="fa-solid fa-terminal text-stark-cyan"></i>
-                    <span>TERMINAL DE COMANDO & COMUNICAÇÃO</span>
+                    <span>TERMINAL DE COMUNICAÇÃO & INTELIGÊNCIA GEMINI</span>
                 </div>
-                <button id="btn-clear-chat" class="text-xs text-stark-cyan/70 hover:text-stark-cyan transition-colors flex items-center gap-1">
-                    <i class="fa-solid fa-eraser"></i> Limpar Log
-                </button>
+                <div class="flex items-center space-x-2">
+                    <button id="btn-toggle-tts" class="text-xs px-2 py-1 rounded bg-stark-cyan/10 border border-stark-cyan/40 text-stark-cyan hover:bg-stark-cyan/20 transition-colors flex items-center gap-1" title="Alternar Resposta por Voz">
+                        <i class="fa-solid fa-volume-high" id="tts-icon"></i>
+                        <span id="tts-label" class="hidden sm:inline">Voz Ativa</span>
+                    </button>
+                    <button id="btn-clear-chat" class="text-xs text-stark-cyan/70 hover:text-stark-cyan transition-colors flex items-center gap-1 px-2 py-1">
+                        <i class="fa-solid fa-eraser"></i> Limpar
+                    </button>
+                </div>
             </div>
 
-            <!-- Chat History Log -->
-            <div id="chat-history" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-3 max-h-[320px] sm:max-h-[380px]">
-                <!-- Initial Welcome Message from JARVIS -->
+            <!-- Chat Message Log -->
+            <div id="chat-history" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-3 max-h-[340px] sm:max-h-[400px]">
+                <!-- Initial Welcome Message -->
                 <div class="flex items-start gap-3">
                     <div class="w-8 h-8 rounded bg-stark-cyan/20 border border-stark-cyan/50 flex items-center justify-center shrink-0 text-stark-cyan">
                         <i class="fa-solid fa-robot text-sm"></i>
                     </div>
-                    <div class="bg-stark-cyan/10 border border-stark-cyan/30 rounded-lg p-3 text-sm text-stark-cyan max-w-[88%] shadow-lg">
-                        <div class="text-[10px] text-stark-cyan/60 font-hud mb-1">J.A.R.V.I.S. • SISTEMA ON</div>
-                        Olá, Senhor. Todos os sistemas do Núcleo Arc estão operando com 100% de capacidade. Como posso ajudá-lo hoje?
+                    <div class="bg-stark-cyan/10 border border-stark-cyan/30 rounded-lg p-3 text-sm text-stark-cyan max-w-[90%] shadow-lg">
+                        <div class="text-[10px] text-stark-cyan/60 font-hud mb-1 flex justify-between">
+                            <span>J.A.R.V.I.S. • NÚCLEO ONLINE</span>
+                            <span class="text-[9px] opacity-75">SISTEMAS PRONTOS</span>
+                        </div>
+                        Olá, Senhor. Todos os protocolos do Núcleo Arc estão operando com 100% de capacidade e integrados ao Gemini AI. Como posso ajudá-lo com suas tarefas ou controle do dispositivo hoje?
                     </div>
                 </div>
             </div>
 
-            <!-- Quick Command Chips -->
+            <!-- Quick Action Command Chips -->
             <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 no-scrollbar text-xs">
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Que horas são?">
-                    <i class="fa-regular fa-clock mr-1"></i>Hora
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Que horas são e qual a data de hoje?">
+                    <i class="fa-regular fa-clock mr-1"></i>Hora e Data
                 </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Qual a data de hoje?">
-                    <i class="fa-regular fa-calendar-days mr-1"></i>Data
-                </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Diagnóstico do sistema">
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Executar diagnóstico completo do sistema">
                     <i class="fa-solid fa-shield-halved mr-1"></i>Diagnóstico
                 </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Abrir YouTube">
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Abrir WhatsApp">
+                    <i class="fa-brands fa-whatsapp mr-1"></i>WhatsApp
+                </button>
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Abrir YouTube">
                     <i class="fa-brands fa-youtube mr-1"></i>YouTube
                 </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Como está o clima?">
-                    <i class="fa-solid fa-cloud-sun mr-1"></i>Clima
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Abrir Câmera">
+                    <i class="fa-solid fa-camera mr-1"></i>Câmera
                 </button>
-                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Conte uma piada">
-                    <i class="fa-solid fa-face-laugh mr-1"></i>Piada
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/25 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Me dê uma dica de produtividade para hoje">
+                    <i class="fa-solid fa-lightbulb mr-1"></i>Dica do Dia
                 </button>
             </div>
 
-            <!-- Text Input Bar -->
+            <!-- User Text & Voice Input Form -->
             <form id="chat-form" class="flex items-center gap-2">
                 <div class="relative flex-1">
-                    <input type="text" id="user-input" placeholder="Digite um comando ou clique no microfone..." 
-                        class="w-full bg-stark-dark/80 border border-stark-cyan/40 rounded-lg px-4 py-2.5 text-sm text-white placeholder-stark-cyan/40 focus:outline-none focus:border-stark-cyan focus:ring-1 focus:ring-stark-cyan transition-all">
+                    <input type="text" id="user-input" placeholder="Digite um comando ou fale no microfone..." 
+                        class="w-full bg-stark-dark/90 border border-stark-cyan/40 rounded-lg px-4 py-2.5 text-sm text-white placeholder-stark-cyan/40 focus:outline-none focus:border-stark-cyan focus:ring-1 focus:ring-stark-cyan transition-all">
                 </div>
-                <button type="submit" class="bg-stark-cyan/20 hover:bg-stark-cyan/40 border border-stark-cyan text-stark-cyan px-4 py-2.5 rounded-lg text-sm transition-all flex items-center gap-1 font-hud">
+                <button type="submit" id="btn-send" class="bg-stark-cyan/20 hover:bg-stark-cyan/40 border border-stark-cyan text-stark-cyan px-4 py-2.5 rounded-lg text-sm transition-all flex items-center gap-1.5 font-hud">
                     <i class="fa-solid fa-paper-plane"></i>
                     <span class="hidden sm:inline">ENVIAR</span>
                 </button>
-                <button type="button" id="mic-trigger-btn" title="Ativar Microfone" class="bg-stark-cyan/20 hover:bg-stark-cyan text-stark-cyan hover:text-stark-dark border border-stark-cyan p-2.5 rounded-lg transition-all flex items-center justify-center w-11 h-11 shrink-0">
+                <button type="button" id="mic-trigger-btn" title="Ativar Reconhecimento por Voz" class="bg-stark-cyan/20 hover:bg-stark-cyan text-stark-cyan hover:text-stark-dark border border-stark-cyan p-2.5 rounded-lg transition-all flex items-center justify-center w-11 h-11 shrink-0">
                     <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
                 </button>
             </form>
         </section>
     </main>
 
+    <!-- HUD Interactive Camera Modal -->
+    <div id="camera-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="hud-glass hud-border-corners max-w-xl w-full rounded-lg p-4 relative flex flex-col space-y-3">
+            <div class="flex justify-between items-center border-b border-stark-cyan/30 pb-2">
+                <h3 class="font-hud text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-video text-stark-cyan"></i> MONITOR DE VISÃO ÓPTICA HUD
+                </h3>
+                <button id="btn-close-camera" class="text-stark-cyan hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="relative rounded overflow-hidden bg-black aspect-video border border-stark-cyan/40 flex items-center justify-center">
+                <video id="camera-feed" autoplay playsinline class="w-full h-full object-cover"></video>
+                <canvas id="camera-canvas" class="hidden"></canvas>
+                <!-- HUD Targeting Grid Overlay -->
+                <div class="absolute inset-0 pointer-events-none border border-stark-cyan/20 flex items-center justify-center">
+                    <div class="w-24 h-24 border border-stark-cyan/50 rounded-full flex items-center justify-center animate-ping"></div>
+                    <div class="absolute text-[10px] top-2 left-2 text-stark-cyan/80 font-hud">FEED ID: OPT-8842</div>
+                </div>
+            </div>
+            <div id="snapshot-preview" class="hidden p-2 bg-stark-cyan/10 border border-stark-cyan/30 rounded text-center">
+                <p class="text-xs text-stark-cyan mb-2">Captura realizada com sucesso!</p>
+                <img id="snapshot-img" class="max-h-32 mx-auto rounded border border-stark-cyan/40" alt="Foto">
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button id="btn-take-photo" class="bg-stark-cyan hover:bg-stark-cyan/80 text-stark-dark font-bold px-4 py-2 rounded text-xs font-hud transition-all flex items-center gap-2">
+                    <i class="fa-solid fa-camera"></i> CAPTURAR FOTO
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- HUD Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="hud-glass hud-border-corners max-w-md w-full rounded-lg p-5 relative flex flex-col space-y-4">
+            <div class="flex justify-between items-center border-b border-stark-cyan/30 pb-2">
+                <h3 class="font-hud text-base font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-stark-cyan"></i> CONFIGURAÇÕES DO SISTEMA
+                </h3>
+                <button id="btn-close-settings" class="text-stark-cyan hover:text-white text-lg px-2"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-stark-cyan/90 font-hud mb-1">Chave da API Gemini (Opcional se já injetada):</label>
+                    <input type="password" id="input-api-key" placeholder="AIzaSy..." class="w-full bg-stark-dark border border-stark-cyan/40 rounded px-3 py-2 text-white focus:outline-none focus:border-stark-cyan">
+                    <p class="text-[10px] text-stark-cyan/60 mt-1">Se deixado em branco, utiliza a conexão direta com o motor Gemini Flash do ambiente.</p>
+                </div>
+
+                <div>
+                    <label class="block text-stark-cyan/90 font-hud mb-1">Voz do Sintetizador de Fala:</label>
+                    <select id="select-voice" class="w-full bg-stark-dark border border-stark-cyan/40 rounded px-3 py-2 text-white focus:outline-none focus:border-stark-cyan">
+                        <option value="">Carregando vozes disponíveis...</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-stark-cyan/90 font-hud mb-1">Velocidade da Voz (<span id="rate-val">1.05</span>x):</label>
+                    <input type="range" id="input-voice-rate" min="0.8" max="1.5" step="0.05" value="1.05" class="w-full accent-stark-cyan">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-stark-cyan/30">
+                <button id="btn-save-settings" class="bg-stark-cyan text-stark-dark font-bold px-4 py-2 rounded text-xs font-hud hover:bg-stark-cyan/80 transition-all">
+                    SALVAR ALTERAÇÕES
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- HUD Footer -->
     <footer class="hud-glass hud-border-corners rounded-lg p-2.5 mt-2 flex flex-wrap justify-between items-center text-xs text-stark-cyan/70 z-10 gap-2">
         <div class="flex items-center gap-2">
             <span class="inline-block w-2 h-2 rounded-full bg-stark-cyan"></span>
-            <span>PROTOCOLO DE DEFESA: <strong class="text-white">ATIVO</strong></span>
+            <span>PROTOCOLO DE SEGURANÇA: <strong class="text-white">ATIVADO</strong></span>
         </div>
         <div class="flex items-center gap-4">
             <span>RESPOSTA DE VOZ: <strong class="text-stark-cyan" id="voice-status">HABILITADA (PT-BR)</strong></span>
@@ -378,45 +526,145 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // UI Element References
             const arcReactor = document.getElementById('arc-reactor');
             const reactorModeLabel = document.getElementById('reactor-mode-label');
             const systemStatusMsg = document.getElementById('system-status-msg');
             const chatHistory = document.getElementById('chat-history');
             const chatForm = document.getElementById('chat-form');
             const userInput = document.getElementById('user-input');
+            const btnSend = document.getElementById('btn-send');
             const micTriggerBtn = document.getElementById('mic-trigger-btn');
             const micIcon = document.getElementById('mic-icon');
             const btnClearChat = document.getElementById('btn-clear-chat');
             const quickBtns = document.querySelectorAll('.quick-btn');
+            const appCmdBtns = document.querySelectorAll('.app-cmd-btn');
             const audioVisualizer = document.getElementById('audio-visualizer');
             const hudClock = document.getElementById('hud-clock');
             const hudDate = document.getElementById('hud-date');
+            const btnToggleTts = document.getElementById('btn-toggle-tts');
+            const ttsIcon = document.getElementById('tts-icon');
+            const ttsLabel = document.getElementById('tts-label');
 
+            // Modals & Settings
+            const settingsModal = document.getElementById('settings-modal');
+            const btnOpenSettings = document.getElementById('btn-open-settings');
+            const btnCloseSettings = document.getElementById('btn-close-settings');
+            const btnSaveSettings = document.getElementById('btn-save-settings');
+            const inputApiKey = document.getElementById('input-api-key');
+            const selectVoice = document.getElementById('select-voice');
+            const inputVoiceRate = document.getElementById('input-voice-rate');
+            const rateVal = document.getElementById('rate-val');
+
+            // Camera Modal
+            const cameraModal = document.getElementById('camera-modal');
+            const btnCloseCamera = document.getElementById('btn-close-camera');
+            const cameraFeed = document.getElementById('camera-feed');
+            const cameraCanvas = document.getElementById('camera-canvas');
+            const btnTakePhoto = document.getElementById('btn-take-photo');
+            const snapshotPreview = document.getElementById('snapshot-preview');
+            const snapshotImg = document.getElementById('snapshot-img');
+
+            // State Variables
             let isListening = false;
             let isSpeaking = false;
+            let isProcessing = false;
+            let autoVoiceEnabled = true;
             let synthVoice = null;
             let recognition = null;
             let visualizerInterval = null;
+            let cameraStream = null;
+            
+            // User Preferences
+            let customApiKey = localStorage.getItem('jarvis_api_key') || "";
+            let speechRate = parseFloat(localStorage.getItem('jarvis_speech_rate')) || 1.05;
+
+            // Gemini Conversation Memory
+            let conversationHistory = [];
+
+            // Web Audio API Synthesizer for Sci-Fi HUD Sounds
+            let audioCtx = null;
+            function getAudioContext() {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+                return audioCtx;
+            }
+
+            function playHudSound(type) {
+                try {
+                    const ctx = getAudioContext();
+                    const osc = ctx.createOscillator();
+                    const gain = ctx.createGain();
+                    osc.connect(gain);
+                    gain.connect(ctx.destination);
+
+                    const now = ctx.currentTime;
+                    if (type === 'click') {
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(800, now);
+                        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.05);
+                        gain.gain.setValueAtTime(0.15, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+                        osc.start(now);
+                        osc.stop(now + 0.05);
+                    } else if (type === 'activate') {
+                        osc.type = 'triangle';
+                        osc.frequency.setValueAtTime(440, now);
+                        osc.frequency.exponentialRampToValueAtTime(880, now + 0.15);
+                        gain.gain.setValueAtTime(0.2, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+                        osc.start(now);
+                        osc.stop(now + 0.15);
+                    } else if (type === 'snap') {
+                        // White noise snapshot simulation
+                        const bufferSize = ctx.sampleRate * 0.1;
+                        const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                        const data = buffer.getChannelData(0);
+                        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                        const noise = ctx.createBufferSource();
+                        noise.buffer = buffer;
+                        const noiseGain = ctx.createGain();
+                        noiseGain.gain.setValueAtTime(0.3, now);
+                        noiseGain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                        noise.connect(noiseGain);
+                        noiseGain.connect(ctx.destination);
+                        noise.start(now);
+                    } else if (type === 'error') {
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(220, now);
+                        osc.frequency.setValueAtTime(180, now + 0.1);
+                        gain.gain.setValueAtTime(0.2, now);
+                        gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                        osc.start(now);
+                        osc.stop(now + 0.2);
+                    }
+                } catch(e) {}
+            }
 
             function updateClock() {
                 const now = new Date();
                 hudClock.textContent = now.toLocaleTimeString('pt-BR');
-                
                 const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
                 hudDate.textContent = now.toLocaleDateString('pt-BR', options).toUpperCase();
             }
             setInterval(updateClock, 1000);
             updateClock();
 
-            // Simulate CPU and Memory Fluctuations
+            // Simulate CPU, RAM and Latency Telemetry Fluctuations
             setInterval(() => {
                 const cpuVal = document.getElementById('cpu-val');
                 const ramVal = document.getElementById('ram-val');
-                if (cpuVal) cpuVal.textContent = Math.floor(Math.random() * 18 + 8) + '%';
-                if (ramVal) ramVal.textContent = (Math.random() * 0.4 + 3.2).toFixed(1) + ' GB';
+                const pingVal = document.getElementById('ping-val');
+                if (cpuVal) cpuVal.textContent = Math.floor(Math.random() * 15 + 10) + '%';
+                if (ramVal) ramVal.textContent = (Math.random() * 0.3 + 3.6).toFixed(1) + ' GB';
+                if (pingVal) pingVal.textContent = Math.floor(Math.random() * 12 + 22) + 'ms';
             }, 3000);
 
-            // Battery Status if browser supports Navigator.getBattery
+            // Device Battery Meter
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(battery => {
                     const batVal = document.getElementById('bat-val');
@@ -426,6 +674,8 @@
                     updateBattery();
                     battery.addEventListener('levelchange', updateBattery);
                 }).catch(() => {});
+            } else {
+                document.getElementById('bat-val').textContent = '98%';
             }
 
             function initSpeechSynthesis() {
@@ -436,11 +686,29 @@
 
                 const loadVoices = () => {
                     const voices = window.speechSynthesis.getVoices();
-                    // Search for Portuguese voice (preferably natural male or standard pt-BR / pt-PT)
+                    selectVoice.innerHTML = '';
+                    
+                    if (voices.length === 0) return;
+
+                    // Filter Portuguese voices first
+                    const ptVoices = voices.filter(v => v.lang.includes('pt'));
+                    const displayVoices = ptVoices.length > 0 ? ptVoices : voices;
+
+                    displayVoices.forEach((v, index) => {
+                        const opt = document.createElement('option');
+                        opt.value = v.name;
+                        opt.textContent = `${v.name} (${v.lang})`;
+                        selectVoice.appendChild(opt);
+                    });
+
+                    // Select preferred natural voice
                     synthVoice = voices.find(v => v.lang === 'pt-BR' && (v.name.includes('Google') || v.name.includes('Luciana') || v.name.includes('Daniel') || v.name.includes('Felipe')))
-                             || voices.find(v => v.lang.includes('pt-BR'))
-                             || voices.find(v => v.lang.includes('pt'))
+                             || ptVoices[0]
                              || voices[0];
+
+                    if (synthVoice) {
+                        selectVoice.value = synthVoice.name;
+                    }
                 };
 
                 loadVoices();
@@ -451,16 +719,20 @@
             initSpeechSynthesis();
 
             function speak(text) {
-                if (!('speechSynthesis' in window)) {
-                    addChatMessage('J.A.R.V.I.S.', text, 'jarvis');
+                if (!autoVoiceEnabled || !('speechSynthesis' in window)) {
                     return;
                 }
 
                 window.speechSynthesis.cancel(); // Stop ongoing speech
 
-                const utterance = new SpeechSynthesisUtterance(text);
+                // Clean markdown artifacts for clearer TTS reading
+                const cleanText = text
+                    .replace(/[*#_~`]/g, '')
+                    .replace(/https?:\/\/\S+/g, 'link externo');
+
+                const utterance = new SpeechSynthesisUtterance(cleanText);
                 utterance.lang = 'pt-BR';
-                utterance.rate = 1.05;
+                utterance.rate = speechRate;
                 utterance.pitch = 0.95;
 
                 if (synthVoice) {
@@ -477,13 +749,12 @@
                 utterance.onend = utterance.onerror = () => {
                     isSpeaking = false;
                     stopAudioVisualizer();
-                    if (!isListening) {
+                    if (!isListening && !isProcessing) {
                         setReactorState('idle');
                         systemStatusMsg.textContent = "Aguardando novo comando...";
                     }
                 };
 
-                addChatMessage('J.A.R.V.I.S.', text, 'jarvis');
                 window.speechSynthesis.speak(utterance);
             }
 
@@ -491,7 +762,7 @@
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 
                 if (!SpeechRecognition) {
-                    systemStatusMsg.textContent = "Reconhecimento de voz não suportado neste navegador. Digite abaixo.";
+                    systemStatusMsg.textContent = "Reconhecimento de voz não suportado neste navegador. Digite no terminal.";
                     micTriggerBtn.classList.add('opacity-50', 'cursor-not-allowed');
                     return;
                 }
@@ -502,10 +773,11 @@
                 recognition.interimResults = false;
 
                 recognition.onstart = () => {
+                    playHudSound('activate');
                     isListening = true;
                     setReactorState('listening');
                     startAudioVisualizer();
-                    micTriggerBtn.classList.add('bg-stark-orange', 'border-stark-orange', 'text-white', 'animate-pulse');
+                    micTriggerBtn.className = 'bg-stark-orange text-white border border-stark-orange p-2.5 rounded-lg transition-all flex items-center justify-center w-11 h-11 shrink-0 animate-pulse';
                     micIcon.className = 'fa-solid fa-microphone-lines text-base';
                     systemStatusMsg.textContent = "Ouvindo... Fale com o JARVIS";
                 };
@@ -514,17 +786,17 @@
                     const transcript = event.results[0][0].transcript;
                     if (transcript.trim()) {
                         addChatMessage('Você', transcript, 'user');
-                        processCommand(transcript);
+                        handleUserIntent(transcript);
                     }
                 };
 
                 recognition.onerror = (event) => {
-                    console.warn('Erro no reconhecimento de voz:', event.error);
+                    playHudSound('error');
                     stopListening();
                     if (event.error === 'not-allowed') {
-                        speak("Acesso ao microfone negado. Por favor, libere a permissão no seu navegador.");
+                        addChatMessage('J.A.R.V.I.S.', "Permissão de microfone negada. Por favor, permita o acesso para utilizar comandos de voz.", 'jarvis');
                     } else if (event.error !== 'no-speech') {
-                        systemStatusMsg.textContent = "Não entendi o áudio. Tente novamente ou digite.";
+                        systemStatusMsg.textContent = "Comando não compreendido. Tente novamente.";
                     }
                 };
 
@@ -535,10 +807,7 @@
             initSpeechRecognition();
 
             function startListening() {
-                if (!recognition) {
-                    alert("Reconhecimento de voz não suportado pelo seu navegador.");
-                    return;
-                }
+                if (!recognition) return;
                 if (isListening) return;
 
                 if (window.speechSynthesis) window.speechSynthesis.cancel();
@@ -546,7 +815,7 @@
                 try {
                     recognition.start();
                 } catch (e) {
-                    console.error("Erro ao iniciar microfone:", e);
+                    console.error("Erro ao iniciar áudio:", e);
                 }
             }
 
@@ -556,19 +825,23 @@
                 micTriggerBtn.className = 'bg-stark-cyan/20 hover:bg-stark-cyan text-stark-cyan hover:text-stark-dark border border-stark-cyan p-2.5 rounded-lg transition-all flex items-center justify-center w-11 h-11 shrink-0';
                 micIcon.className = 'fa-solid fa-microphone text-base';
                 
-                if (!isSpeaking) {
+                if (!isSpeaking && !isProcessing) {
                     setReactorState('idle');
                     systemStatusMsg.textContent = "Aguardando novo comando...";
                 }
             }
 
             function setReactorState(state) {
-                arcReactor.classList.remove('state-idle', 'state-listening', 'state-speaking');
+                arcReactor.classList.remove('state-idle', 'state-listening', 'state-thinking', 'state-speaking');
                 
                 if (state === 'listening') {
                     arcReactor.classList.add('state-listening');
                     reactorModeLabel.textContent = "OUVINDO";
                     reactorModeLabel.className = "text-white font-bold bg-stark-orange/30 px-2 py-0.5 rounded border border-stark-orange text-stark-orange";
+                } else if (state === 'thinking') {
+                    arcReactor.classList.add('state-thinking');
+                    reactorModeLabel.textContent = "PROCESSANDO";
+                    reactorModeLabel.className = "text-white font-bold bg-stark-purple/30 px-2 py-0.5 rounded border border-stark-purple text-stark-purple";
                 } else if (state === 'speaking') {
                     arcReactor.classList.add('state-speaking');
                     reactorModeLabel.textContent = "FALANDO";
@@ -582,18 +855,18 @@
 
             function startAudioVisualizer() {
                 if (visualizerInterval) clearInterval(visualizerInterval);
-                const bars = audioVisualizer.querySelectorAll('span');
+                const bars = audioVisualizer.querySelectorAll('.eq-bar');
                 visualizerInterval = setInterval(() => {
                     bars.forEach(bar => {
-                        const h = Math.floor(Math.random() * 20 + 4);
+                        const h = Math.floor(Math.random() * 22 + 4);
                         bar.style.height = `${h}px`;
                     });
-                }, 100);
+                }, 80);
             }
 
             function stopAudioVisualizer() {
                 if (visualizerInterval) clearInterval(visualizerInterval);
-                const bars = audioVisualizer.querySelectorAll('span');
+                const bars = audioVisualizer.querySelectorAll('.eq-bar');
                 bars.forEach(bar => bar.style.height = '8px');
             }
 
@@ -616,7 +889,14 @@
                     bubble.innerHTML = `<div class="text-[10px] text-white/60 font-hud mb-1 text-right">${sender.toUpperCase()}</div>${escapeHtml(text)}`;
                 } else {
                     bubble.className = 'bg-stark-cyan/10 border border-stark-cyan/30 rounded-lg p-3 text-sm text-stark-cyan max-w-[88%] shadow-lg';
-                    bubble.innerHTML = `<div class="text-[10px] text-stark-cyan/60 font-hud mb-1">${sender.toUpperCase()}</div>${escapeHtml(text)}`;
+                    
+                    // Simple Formatted Markdown display
+                    const formattedText = escapeHtml(text)
+                        .replace(/\n/g, '<br>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong class="text-white font-bold">$1</strong>')
+                        .replace(/`(.*?)`/g, '<code class="bg-stark-dark px-1 py-0.5 rounded text-white font-mono text-xs">$1</code>');
+
+                    bubble.innerHTML = `<div class="text-[10px] text-stark-cyan/60 font-hud mb-1">${sender.toUpperCase()}</div>${formattedText}`;
                 }
 
                 msgWrapper.appendChild(iconDiv);
@@ -630,148 +910,276 @@
                 return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
             }
 
-            function processCommand(rawInput) {
+            function handleUserIntent(rawInput) {
                 const cmd = rawInput.toLowerCase().trim();
 
-                // 1. Time Command
-                if (cmd.includes('hora') || cmd.includes('horas') || cmd.includes('que horas')) {
-                    const now = new Date();
-                    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                    speak(`Agora são exatamente ${timeStr}, Senhor.`);
-                    return;
-                }
-
-                // 2. Date Command
-                if (cmd.includes('data') || cmd.includes('dia é hoje') || cmd.includes('que dia')) {
-                    const now = new Date();
-                    const dateStr = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
-                    speak(`Hoje é ${dateStr}.`);
-                    return;
-                }
-
-                // 3. System Diagnostic Protocol
-                if (cmd.includes('diagnostico') || cmd.includes('diagnóstico') || cmd.includes('status do sistema') || cmd.includes('checar sistema')) {
-                    speak("Iniciando varredura nos componentes do Núcleo Arc. Temperatura em 36 graus Celsius. Protocolos de defesa ativos. Todos os sistemas operando nominalmente, Senhor.");
-                    return;
-                }
-
-                // 4. Web Search
-                if (cmd.includes('pesquisar por') || cmd.includes('pesquise por') || cmd.includes('busca por') || cmd.includes('google por') || cmd.includes('procure por')) {
-                    let query = cmd.replace(/pesquisar por|pesquise por|busca por|google por|procure por/g, '').trim();
-                    if (query) {
-                        speak(`Pesquisando por ${query} no Google, Senhor.`);
-                        setTimeout(() => {
-                            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
-                        }, 1200);
-                    } else {
-                        speak("O que exatamente o Senhor deseja que eu pesquise?");
-                    }
-                    return;
-                }
-
-                // 5. Open Applications / Sites
-                if (cmd.includes('abrir youtube') || cmd.includes('abre o youtube')) {
-                    speak("Abrindo o YouTube para o Senhor.");
-                    setTimeout(() => window.open('https://www.youtube.com', '_blank'), 1000);
-                    return;
-                }
-                if (cmd.includes('abrir google') || cmd.includes('abre o google')) {
-                    speak("Abrindo o Google.");
-                    setTimeout(() => window.open('https://www.google.com', '_blank'), 1000);
-                    return;
-                }
+                // 1. Local Device App Launch Automation
                 if (cmd.includes('abrir whatsapp') || cmd.includes('whatsapp')) {
-                    speak("Abrindo o WhatsApp Web.");
-                    setTimeout(() => window.open('https://web.whatsapp.com', '_blank'), 1000);
+                    executeAppLaunch('whatsapp');
                     return;
                 }
-                if (cmd.includes('abrir wikipedia') || cmd.includes('wikipédia')) {
-                    speak("Conectando à Wikipédia.");
-                    setTimeout(() => window.open('https://pt.wikipedia.org', '_blank'), 1000);
+                if (cmd.includes('abrir instagram') || cmd.includes('instagram')) {
+                    executeAppLaunch('instagram');
+                    return;
+                }
+                if (cmd.includes('abrir youtube') || cmd.includes('youtube')) {
+                    executeAppLaunch('youtube');
+                    return;
+                }
+                if (cmd.includes('abrir spotify') || cmd.includes('spotify')) {
+                    executeAppLaunch('spotify');
+                    return;
+                }
+                if (cmd.includes('abrir mapa') || cmd.includes('google maps') || cmd.includes('navegar para')) {
+                    let dest = cmd.replace(/abrir mapa|google maps|navegar para|mapas/g, '').trim();
+                    executeAppLaunch('maps', dest);
+                    return;
+                }
+                if (cmd.includes('abrir câmera') || cmd.includes('abrir camera') || cmd.includes('tirar foto') || cmd.includes('câmera') || cmd.includes('camera')) {
+                    executeAppLaunch('camera');
+                    return;
+                }
+                if (cmd.includes('fazer ligação') || cmd.includes('ligar para') || cmd.includes('discador')) {
+                    let number = cmd.replace(/fazer ligação|ligar para|discador/g, '').trim();
+                    executeAppLaunch('phone', number);
                     return;
                 }
 
-                // 6. Math Math Calculations ("quanto é X mais Y", etc.)
-                if (cmd.includes('quanto é') || cmd.includes('calcule') || cmd.includes('quanto fica')) {
-                    const mathResult = evaluateSimpleMath(cmd);
-                    if (mathResult !== null) {
-                        speak(`O resultado do cálculo é ${mathResult}.`);
+                // 2. System Diagnostic Quick Command
+                if (cmd.includes('diagnóstico') || cmd.includes('diagnostico') || cmd.includes('status do sistema')) {
+                    const response = "Iniciando varredura em todos os subsistemas do Núcleo Arc. Temperatura em 36°C. Conexão neural com o Gemini AI operando nominalmente. Todos os sistemas online, Senhor.";
+                    addChatMessage('J.A.R.V.I.S.', response, 'jarvis');
+                    speak(response);
+                    return;
+                }
+
+                // 3. Web Search Trigger
+                if (cmd.startsWith('pesquisar por') || cmd.startsWith('pesquise por') || cmd.startsWith('google por')) {
+                    const query = cmd.replace(/pesquisar por|pesquise por|google por/g, '').trim();
+                    if (query) {
+                        const response = `Realizando busca por "${query}" no Google, Senhor.`;
+                        addChatMessage('J.A.R.V.I.S.', response, 'jarvis');
+                        speak(response);
+                        setTimeout(() => window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank'), 1200);
                         return;
                     }
                 }
 
-                // 7. Weather Info
-                if (cmd.includes('clima') || cmd.includes('tempo') || cmd.includes('temperatura')) {
-                    speak("Consultando sensores meteorológicos. O clima atual apresenta ótimas condições de voo. Abrindo a previsão completa.");
-                    setTimeout(() => {
-                        window.open('https://www.google.com/search?q=clima+tempo+hoje', '_blank');
-                    }, 1500);
-                    return;
-                }
-
-                // 8. Jokes & Trivia
-                if (cmd.includes('piada') || cmd.includes('engraçado') || cmd.includes('conte algo')) {
-                    const jokes = [
-                        "Por que o Homem de Ferro dorme sempre de armadura? Para não ter pesadelos enferrujados!",
-                        "Eu perguntei ao Senhor Stark se ele queria ajuda com a Mark 85. Ele disse que meu auxílio era 'inestimável', mas desligou minha tomada no minuto seguinte.",
-                        "Qual é o robô preferido dos vegetarianos? O robô-dô de salada!"
-                    ];
-                    const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
-                    speak(randomJoke);
-                    return;
-                }
-
-                // 9. Greetings & Identity
-                if (cmd.includes('olá') || cmd.includes('oi') || cmd.includes('bom dia') || cmd.includes('boa tarde') || cmd.includes('boa noite')) {
-                    speak("Olá, Senhor! Como posso ser útil para os seus projetos hoje?");
-                    return;
-                }
-                if (cmd.includes('quem é você') || cmd.includes('qual o seu nome') || cmd.includes('o que você faz')) {
-                    speak("Eu sou o J.A.R.V.I.S., uma inteligência artificial criada para gerenciar os sistemas de Tony Stark e auxiliá-lo em suas tarefas diárias.");
-                    return;
-                }
-                if (cmd.includes('obrigado') || cmd.includes('valeu')) {
-                    speak("Sempre às suas ordens, Senhor.");
-                    return;
-                }
-
-                // Fallback Default
-                speak(`Comando "${rawInput}" recebido. Realizando busca referente no Google.`);
-                setTimeout(() => {
-                    window.open(`https://www.google.com/search?q=${encodeURIComponent(rawInput)}`, '_blank');
-                }, 1500);
+                // 4. Send query to Gemini AI API for natural intelligent conversation
+                queryGeminiAI(rawInput);
             }
 
-            // Simple Math Expression Parsing
-            function evaluateSimpleMath(text) {
-                try {
-                    let expr = text
-                        .replace(/quanto é/g, '')
-                        .replace(/calcule/g, '')
-                        .replace(/quanto fica/g, '')
-                        .replace(/mais/g, '+')
-                        .replace(/menos/g, '-')
-                        .replace(/vezes|multiplicado por/g, '*')
-                        .replace(/dividido por|por/g, '/')
-                        .replace(/x/g, '*')
-                        .replace(/,/g, '.')
-                        .trim();
+            function executeAppLaunch(appKey, param = "") {
+                playHudSound('activate');
+                let msg = "";
 
-                    // Strip any non-math characters
-                    expr = expr.replace(/[^0-9\+\-\*\/\.\(\)]/g, '');
-                    if (!expr) return null;
+                switch(appKey) {
+                    case 'whatsapp':
+                        msg = "Abrindo o WhatsApp, Senhor.";
+                        setTimeout(() => {
+                            window.open('https://web.whatsapp.com', '_blank');
+                        }, 1000);
+                        break;
+                    case 'instagram':
+                        msg = "Conectando ao Instagram.";
+                        setTimeout(() => {
+                            window.open('https://www.instagram.com', '_blank');
+                        }, 1000);
+                        break;
+                    case 'youtube':
+                        msg = "Inicializando o servidor do YouTube.";
+                        setTimeout(() => {
+                            window.open('https://www.youtube.com', '_blank');
+                        }, 1000);
+                        break;
+                    case 'spotify':
+                        msg = "Abrindo a plataforma Spotify.";
+                        setTimeout(() => {
+                            window.open('https://open.spotify.com', '_blank');
+                        }, 1000);
+                        break;
+                    case 'maps':
+                        if (param) {
+                            msg = `Traçando rota para ${param} no Google Maps.`;
+                            setTimeout(() => {
+                                window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(param)}`, '_blank');
+                            }, 1000);
+                        } else {
+                            msg = "Abrindo o sistema de navegação e mapas.";
+                            setTimeout(() => {
+                                window.open('https://www.google.com/maps', '_blank');
+                            }, 1000);
+                        }
+                        break;
+                    case 'camera':
+                        msg = "Ativando feeds ópticos da câmera HUD.";
+                        openCameraModal();
+                        break;
+                    case 'phone':
+                        if (param) {
+                            msg = `Iniciando discador para ${param}.`;
+                            setTimeout(() => { window.location.href = `tel:${param.replace(/\s+/g, '')}`; }, 1000);
+                        } else {
+                            msg = "Abrindo o discador de chamadas do dispositivo.";
+                            setTimeout(() => { window.location.href = 'tel:'; }, 1000);
+                        }
+                        break;
+                }
 
-                    const result = Function(`'use strict'; return (${expr})`)();
-                    if (typeof result === 'number' && !isNaN(result)) {
-                        return Number.isInteger(result) ? result : result.toFixed(2);
+                addChatMessage('J.A.R.V.I.S.', msg, 'jarvis');
+                speak(msg);
+            }
+
+            async function queryGeminiAI(promptText) {
+                isProcessing = true;
+                setReactorState('thinking');
+                systemStatusMsg.textContent = "Processando inteligência Gemini...";
+
+                // Append user turn to conversation history
+                conversationHistory.push({
+                    role: 'user',
+                    parts: [{ text: promptText }]
+                });
+
+                const systemInstructionText = "Você é o J.A.R.V.I.S. (Just A Rather Very Intelligent System), a inteligência artificial pessoal do Tony Stark / Homem de Ferro. Responda em Português do Brasil com tom cortês, extremamente inteligente, refinado, prestativo e com elegância britânica. Trate o usuário respeitosamente como 'Senhor' ou 'Senhora'. Suas respostas devem ser claras, eficientes e adaptadas para leitura em voz alta, sem excesso de código ou símbolos difíceis de ler.";
+
+                const payload = {
+                    contents: conversationHistory,
+                    systemInstruction: {
+                        parts: [{ text: systemInstructionText }]
                     }
-                } catch (e) {
-                    return null;
+                };
+
+                const apiKey = customApiKey;
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+                let attempts = 0;
+                let success = false;
+                let replyText = "";
+
+                while (attempts < 3 && !success) {
+                    try {
+                        attempts++;
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`Erro na API Gemini (${response.status})`);
+                        }
+
+                        const data = await response.json();
+                        const candidate = data.candidates?.[0];
+
+                        if (candidate && candidate.content?.parts?.[0]?.text) {
+                            replyText = candidate.content.parts[0].text;
+                            success = true;
+                        } else {
+                            throw new Error("Resposta da I.A. vazia ou malformada.");
+                        }
+                    } catch (err) {
+                        console.warn(`Tentativa ${attempts} de consulta ao Gemini falhou:`, err);
+                        if (attempts < 3) {
+                            // Exponential backoff delay
+                            await new Promise(r => setTimeout(r, Math.pow(2, attempts) * 1000));
+                        }
+                    }
                 }
-                return null;
+
+                isProcessing = false;
+
+                if (success && replyText) {
+                    // Record model response in conversation history
+                    conversationHistory.push({
+                        role: 'model',
+                        parts: [{ text: replyText }]
+                    });
+
+                    addChatMessage('J.A.R.V.I.S.', replyText, 'jarvis');
+                    speak(replyText);
+                } else {
+                    playHudSound('error');
+                    const errorMsg = "Desculpe, Senhor. Houve uma oscilação na conexão com os servidores do Gemini AI. Por favor, tente novamente ou verifique suas credenciais nas configurações.";
+                    addChatMessage('J.A.R.V.I.S.', errorMsg, 'jarvis');
+                    speak(errorMsg);
+                    setReactorState('idle');
+                    systemStatusMsg.textContent = "Aguardando novo comando...";
+                }
             }
 
-            // Arc Reactor Click Listener
+            async function openCameraModal() {
+                snapshotPreview.classList.add('hidden');
+                cameraModal.classList.remove('hidden');
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+                    cameraFeed.srcObject = cameraStream;
+                } catch (e) {
+                    console.error("Erro ao acessar câmera:", e);
+                    alert("Não foi possível acessar a câmera do dispositivo. Verifique as permissões.");
+                    cameraModal.classList.add('hidden');
+                }
+            }
+
+            function closeCameraModal() {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                    cameraStream = null;
+                }
+                cameraModal.classList.add('hidden');
+            }
+
+            btnTakePhoto.addEventListener('click', () => {
+                if (!cameraStream) return;
+                playHudSound('snap');
+                cameraCanvas.width = cameraFeed.videoWidth || 640;
+                cameraCanvas.height = cameraFeed.videoHeight || 480;
+                const ctx = cameraCanvas.getContext('2d');
+                ctx.drawImage(cameraFeed, 0, 0, cameraCanvas.width, cameraCanvas.height);
+                
+                const dataUrl = cameraCanvas.toDataURL('image/png');
+                snapshotImg.src = dataUrl;
+                snapshotPreview.classList.remove('hidden');
+            });
+
+            btnCloseCamera.addEventListener('click', closeCameraModal);
+
+            btnOpenSettings.addEventListener('click', () => {
+                playHudSound('click');
+                inputApiKey.value = customApiKey;
+                inputVoiceRate.value = speechRate;
+                rateVal.textContent = speechRate;
+                settingsModal.classList.remove('hidden');
+            });
+
+            btnCloseSettings.addEventListener('click', () => {
+                settingsModal.classList.add('hidden');
+            });
+
+            inputVoiceRate.addEventListener('input', (e) => {
+                rateVal.textContent = e.target.value;
+            });
+
+            btnSaveSettings.addEventListener('click', () => {
+                playHudSound('activate');
+                customApiKey = inputApiKey.value.trim();
+                speechRate = parseFloat(inputVoiceRate.value);
+                
+                localStorage.setItem('jarvis_api_key', customApiKey);
+                localStorage.setItem('jarvis_speech_rate', speechRate);
+
+                if (selectVoice.value) {
+                    const voices = window.speechSynthesis.getVoices();
+                    const chosen = voices.find(v => v.name === selectVoice.value);
+                    if (chosen) synthVoice = chosen;
+                }
+
+                settingsModal.classList.add('hidden');
+                addChatMessage('J.A.R.V.I.S.', "Configurações do sistema atualizadas com sucesso, Senhor.", 'jarvis');
+                speak("Configurações do sistema atualizadas com sucesso, Senhor.");
+            });
+
             arcReactor.addEventListener('click', () => {
                 if (isListening) {
                     if (recognition) recognition.stop();
@@ -780,7 +1188,6 @@
                 }
             });
 
-            // Mic Button Trigger
             micTriggerBtn.addEventListener('click', () => {
                 if (isListening) {
                     if (recognition) recognition.stop();
@@ -789,32 +1196,61 @@
                 }
             });
 
-            // Text Form Submit
             chatForm.addEventListener('submit', (e) => {
                 e.preventDefault();
                 const text = userInput.value.trim();
-                if (text) {
+                if (text && !isProcessing) {
+                    playHudSound('click');
                     addChatMessage('Você', text, 'user');
-                    processCommand(text);
+                    handleUserIntent(text);
                     userInput.value = '';
                 }
             });
 
-            // Quick Chips Clicks
+            // App Command Bar Buttons
+            appCmdBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const appKey = btn.getAttribute('data-app');
+                    executeAppLaunch(appKey);
+                });
+            });
+
+            // Quick Chips Command Buttons
             quickBtns.forEach(btn => {
                 btn.addEventListener('click', () => {
                     const cmd = btn.getAttribute('data-cmd');
-                    if (cmd) {
+                    if (cmd && !isProcessing) {
+                        playHudSound('click');
                         addChatMessage('Você', cmd, 'user');
-                        processCommand(cmd);
+                        handleUserIntent(cmd);
                     }
                 });
             });
 
-            // Clear Chat Button
+            // Clear Chat History
             btnClearChat.addEventListener('click', () => {
+                playHudSound('click');
                 chatHistory.innerHTML = '';
-                speak("Terminal de mensagens limpo, Senhor.");
+                conversationHistory = [];
+                const msg = "Memória do terminal limpa, Senhor.";
+                addChatMessage('J.A.R.V.I.S.', msg, 'jarvis');
+                speak(msg);
+            });
+
+            // Toggle Audio TTS Response
+            btnToggleTts.addEventListener('click', () => {
+                playHudSound('click');
+                autoVoiceEnabled = !autoVoiceEnabled;
+                if (autoVoiceEnabled) {
+                    ttsIcon.className = "fa-solid fa-volume-high";
+                    ttsLabel.textContent = "Voz Ativa";
+                    btnToggleTts.className = "text-xs px-2 py-1 rounded bg-stark-cyan/10 border border-stark-cyan/40 text-stark-cyan hover:bg-stark-cyan/20 transition-colors flex items-center gap-1";
+                } else {
+                    if (window.speechSynthesis) window.speechSynthesis.cancel();
+                    ttsIcon.className = "fa-solid fa-volume-xmark";
+                    ttsLabel.textContent = "Voz Mute";
+                    btnToggleTts.className = "text-xs px-2 py-1 rounded bg-red-500/20 border border-red-500/40 text-red-400 hover:bg-red-500/30 transition-colors flex items-center gap-1";
+                }
             });
         });
     </script>
