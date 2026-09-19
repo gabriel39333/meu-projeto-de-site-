@@ -1,28 +1,59 @@
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S. System</title>
+    <title>J.A.R.V.I.S - Assistente Pessoal</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <main class="container">
-        <div class="reactor-outer" id="reactor">
-            <div class="reactor-inner"></div>
-        </div>
-        
-        <h1 id="title">J.A.R.V.I.S.</h1>
-        <p id="status">Status: Aguardando inicialização...</p>
-        
-        <div class="output-box" id="output">
-            "Olá, senhor. Clique no reator para ativar o reconhecimento de voz."
-        </div>
+    <div class="jarvis-container">
+        <!-- Cabeçalho com Status do Sistema -->
+        <header class="hud-header">
+            <div class="system-status">
+                <span class="pulse-dot"></span> SISTEMA ONLINE
+            </div>
+            <h1 class="logo">J.A.R.V.I.S</h1>
+            <div class="clock" id="hud-clock">00:00:00</div>
+        </header>
 
-        <button id="activateBtn" class="btn">Ativar Comando de Voz</button>
-    </main>
+        <!-- Reator Central Glow & Histórico de Diálogo -->
+        <main class="hud-main">
+            <div class="arc-reactor-container">
+                <div class="arc-reactor" id="arc-reactor">
+                    <div class="core"></div>
+                    <div class="ring-1"></div>
+                    <div class="ring-2"></div>
+                </div>
+                <p class="status-text" id="status-text">Aguardando comando...</p>
+            </div>
 
-    <script src="script.js"></script>
+            <div class="chat-display" id="chat-display">
+                <div class="message jarvis-msg">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>Sistemas inicializados. Como posso te ajudar hoje?</span>
+                </div>
+            </div>
+        </main>
+
+        <!-- Botões de Ação Rápida e Controle de Voz -->
+        <footer class="hud-footer">
+            <div class="quick-actions">
+                <button class="btn-action" id="btn-time"><i class="fa-regular fa-clock"></i> Hora</button>
+                <button class="btn-action" id="btn-date"><i class="fa-regular fa-calendar-days"></i> Data</button>
+                <button class="btn-action" id="btn-google"><i class="fa-solid fa-magnifying-glass"></i> Google</button>
+                <button class="btn-action" id="btn-clear"><i class="fa-solid fa-trash"></i> Limpar</button>
+            </div>
+
+            <div class="voice-controls">
+                <button class="mic-btn" id="mic-btn" title="Ativar Microfone">
+                    <i class="fa-solid fa-microphone" id="mic-icon"></i>
+                </button>
+            </div>
+        </footer>
+    </div>
+
+    <script src="main.js"></script>
 </body>
 </html>

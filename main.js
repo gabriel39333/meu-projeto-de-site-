@@ -1,108 +1,161 @@
-// script.js
-const activateBtn = document.getElementById('activateBtn');
-const reactor = document.getElementById('reactor');
-const output = document.getElementById('output');
-const statusText = document.getElementById('status');
+// Relógio Digital em Tempo Real
+function updateClock() {
+    const clockElement = document.getElementById('hud-clock');
+    const now = new Date();
+    clockElement.textContent = now.toLocaleTimeString('pt-BR');
+}
+setInterval(updateClock, 1000);
+updateClock();
 
-// Web Speech API - Reconhecimento de voz
+// Seleção de Elementos DOM
+const micBtn = document.getElementById('mic-btn');
+const statusText = document.getElementById('status-text');
+const arcReactor = document.getElementById('arc-reactor');
+const chatDisplay = document.getElementById('chat-display');
+
+const btnTime = document.getElementById('btn-time');
+const btnDate = document.getElementById('btn-date');
+const btnGoogle = document.getElementById('btn-google');
+const btnClear = document.getElementById('btn-clear');
+
+// Configuração de Reconhecimento de Voz (Web Speech API)
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
 
-if (!SpeechRecognition) {
-    output.innerText = "Seu navegador não suporta reconhecimento de voz. Use o Google Chrome ou Microsoft Edge.";
-} else {
-    const recognition = new SpeechRecognition();
+if (SpeechRecognition) {
+    recognition = new SpeechRecognition();
     recognition.lang = 'pt-BR';
     recognition.continuous = false;
     recognition.interimResults = false;
 
-    // Função para falar
-    function falar(texto) {
-        window.speechSynthesis.cancel(); // Parar falas anteriores
-        const meutexto = new SpeechSynthesisUtterance(texto);
-        meutexto.lang = 'pt-BR';
-        meutexto.rate = 1.0;
-        meutexto.pitch = 0.9;
-        window.speechSynthesis.speak(meutexto);
-    }
-
-    // Processamento de comandos
-    function processarComando(comando) {
-        const cmd = comando.toLowerCase();
-
-        if (cmd.includes('horas') || cmd.includes('horário')) {
-            const agora = new Date();
-            const resposta = `Agora são ${agora.getHours()} horas e ${agora.getMinutes()} minutos, senhor.`;
-            output.innerText = resposta;
-            falar(resposta);
-        } 
-        else if (cmd.includes('data') || cmd.includes('dia')) {
-            const hoje = new Date();
-            const dataExtenso = hoje.toLocaleDateString('pt-BR', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            const resposta = `Hoje é ${dataExtenso}.`;
-            output.innerText = resposta;
-            falar(resposta);
-        }
-        else if (cmd.includes('google')) {
-            const resposta = "Abrindo o Google, senhor.";
-            output.innerText = resposta;
-            falar(resposta);
-            setTimeout(() => window.open('https://www.google.com', '_blank'), 1000);
-        }
-        else if (cmd.includes('youtube')) {
-            const resposta = "Abrindo o YouTube, senhor.";
-            output.innerText = resposta;
-            falar(resposta);
-            setTimeout(() => window.open('https://www.youtube.com', '_blank'), 1000);
-        }
-        else if (cmd.includes('quem é você') || cmd.includes('seu nome')) {
-            const resposta = "Eu sou o J.A.R.V.I.S., sua inteligência artificial assistente.";
-            output.innerText = resposta;
-            falar(resposta);
-        }
-        else if (cmd.includes('status') || cmd.includes('sistemas')) {
-            const resposta = "Todos os sistemas estão operando em 100% de capacidade, senhor.";
-            output.innerText = resposta;
-            falar(resposta);
-        }
-        else {
-            const resposta = `Comando "${comando}" não reconhecido nos meus protocolos atuais, senhor.`;
-            output.innerText = resposta;
-            falar(resposta);
-        }
-    }
-
-    // Eventos de escuta
-    function iniciarEscuta() {
-        try {
-            recognition.start();
-        } catch (e) {
-            console.log("Reconhecimento já ativo.");
-        }
-    }
-
     recognition.onstart = () => {
-        reactor.classList.add('listening');
-        statusText.innerText = "Status: Ouvindo...";
-        output.innerText = "Pode falar, estou ouvindo...";
+        isListening = true;
+        micBtn.classList.add('listening');
+        statusText.textContent = "Ouvindo comando...";
+        arcReactor.classList.add('active');
     };
 
     recognition.onend = () => {
-        reactor.classList.remove('listening');
-        statusText.innerText = "Status: Aguardando comando...";
+        isListening = false;
+        micBtn.classList.remove('listening');
+        statusText.textContent = "Aguardando comando...";
+        arcReactor.classList.remove('active');
     };
 
     recognition.onresult = (event) => {
-        const transcricao = event.results[0][0].transcript;
-        statusText.innerText = `Processando: "${transcricao}"`;
-        processarComando(transcricao);
+        const command = event.results[0][0].transcript;
+        addMessage(command, 'user');
+        processCommand(command);
     };
 
-    recognition.onerror = (event) => {
-        reactor.classList.remove('listening');
-        statusText.innerText = "Status: Erro na leitura de voz";
-        output.innerText = "Não consegui entender a voz ou o microfone foi negado.";
+    recognition.onerror = () => {
+        speak("Desculpe, não consegui entender o comando.");
     };
-
-    activateBtn.addEventListener('click', iniciarEscuta);
-    reactor.addEventListener('click', iniciarEscuta);
+} else {
+    alert("Reconhecimento de voz não suportado neste navegador.");
 }
+
+// Síntese de Voz de I.A (JARVIS Falando)
+function speak(text) {
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'pt-BR';
+    utterance.rate = 1.0;
+    utterance.pitch = 0.9;
+
+    const voices = window.speechSynthesis.getVoices();
+    const ptVoice = voices.find(v => v.lang.includes('pt') && v.name.toLowerCase().includes('male')) 
+                 || voices.find(v => v.lang.includes('pt'));
+    
+    if (ptVoice) utterance.voice = ptVoice;
+
+    utterance.onstart = () => {
+        arcReactor.classList.add('active');
+        statusText.textContent = "JARVIS respondendo...";
+    };
+
+    utterance.onend = () => {
+        arcReactor.classList.remove('active');
+        statusText.textContent = "Aguardando comando...";
+    };
+
+    addMessage(text, 'jarvis');
+    window.speechSynthesis.speak(utterance);
+}
+
+// Adicionar mensagem no chat da interface
+function addMessage(text, sender) {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', sender === 'jarvis' ? 'jarvis-msg' : 'user-msg');
+    
+    const icon = document.createElement('i');
+    icon.className = sender === 'jarvis' ? 'fa-solid fa-robot' : 'fa-solid fa-user';
+
+    const span = document.createElement('span');
+    span.textContent = text;
+
+    msgDiv.appendChild(icon);
+    msgDiv.appendChild(span);
+    chatDisplay.appendChild(msgDiv);
+    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+}
+
+// Interpretação de Comandos Úteis do Dia a Dia
+function processCommand(command) {
+    const cmd = command.toLowerCase();
+
+    if (cmd.includes('hora') || cmd.includes('horas')) {
+        const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+        speak(`Agora são exatamente ${time}.`);
+    } 
+    else if (cmd.includes('data') || cmd.includes('dia')) {
+        const date = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+        speak(`Hoje é ${date}.`);
+    } 
+    else if (cmd.includes('pesquise por') || cmd.includes('pesquisar')) {
+        const query = cmd.replace('pesquise por', '').replace('pesquisar', '').trim();
+        if (query) {
+            speak(`Pesquisando ${query} no Google.`);
+            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+        } else {
+            speak("O que você gostaria de pesquisar?");
+        }
+    } 
+    else if (cmd.includes('youtube')) {
+        speak("Abrindo o YouTube.");
+        window.open('https://www.youtube.com', '_blank');
+    } 
+    else if (cmd.includes('olá') || cmd.includes('oi') || cmd.includes('jarvis')) {
+        speak("Olá! Como posso ajudar você no seu dia a dia?");
+    } 
+    else {
+        speak("Comando não reconhecido. Tente perguntar as horas, a data ou fazer uma pesquisa.");
+    }
+}
+
+// Ouvintes de Eventos dos Botões
+micBtn.addEventListener('click', () => {
+    if (!recognition) return;
+    isListening ? recognition.stop() : recognition.start();
+});
+
+btnTime.addEventListener('click', () => {
+    const time = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    speak(`Agora são ${time}.`);
+});
+
+btnDate.addEventListener('click', () => {
+    const date = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+    speak(`Hoje é ${date}.`);
+});
+
+btnGoogle.addEventListener('click', () => {
+    speak("Abrindo o buscador do Google.");
+    window.open('https://www.google.com', '_blank');
+});
+
+btnClear.addEventListener('click', () => {
+    chatDisplay.innerHTML = '';
+});
