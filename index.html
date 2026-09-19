@@ -1,59 +1,822 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>J.A.R.V.I.S - Assistente Pessoal</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>J.A.R.V.I.S. - Arc Reactor Interface</title>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        stark: {
+                            cyan: '#00f3ff',
+                            blue: '#00a8ff',
+                            dark: '#030914',
+                            panel: 'rgba(4, 18, 38, 0.75)',
+                            gold: '#ffb700',
+                            orange: '#ff6600',
+                            red: '#ff2a2a'
+                        }
+                    },
+                    fontFamily: {
+                        hud: ['Orbitron', 'Rajdhani', 'sans-serif'],
+                        tech: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Custom HUD Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(3, 15, 30, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 243, 255, 0.4);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 243, 255, 0.8);
+        }
+
+        /* Grid Background Pattern */
+        .hud-bg {
+            background-color: #020712;
+            background-image: 
+                radial-gradient(circle at 50% 50%, rgba(0, 243, 255, 0.08) 0%, transparent 70%),
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
+        }
+
+        /* Holographic Glassmorphism */
+        .hud-glass {
+            background: rgba(4, 18, 38, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 243, 255, 0.25);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.08), inset 0 0 15px rgba(0, 243, 255, 0.05);
+        }
+
+        .hud-border-corners {
+            position: relative;
+        }
+        .hud-border-corners::before,
+        .hud-border-corners::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-color: #00f3ff;
+            pointer-events: none;
+        }
+        .hud-border-corners::before {
+            top: -1px;
+            left: -1px;
+            border-top: 2px solid #00f3ff;
+            border-left: 2px solid #00f3ff;
+        }
+        .hud-border-corners::after {
+            bottom: -1px;
+            right: -1px;
+            border-bottom: 2px solid #00f3ff;
+            border-right: 2px solid #00f3ff;
+        }
+
+        /* ARC REACTOR SVG & ANIMATIONS */
+        @keyframes spin-cw {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes spin-ccw {
+            from { transform: rotate(360deg); }
+            to { transform: rotate(0deg); }
+        }
+        @keyframes pulse-glow {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.8)) drop-shadow(0 0 30px rgba(0, 243, 255, 0.4)); opacity: 0.9; }
+            50% { filter: drop-shadow(0 0 35px rgba(0, 243, 255, 1)) drop-shadow(0 0 60px rgba(0, 243, 255, 0.7)); opacity: 1; }
+        }
+        @keyframes pulse-listening {
+            0%, 100% { filter: drop-shadow(0 0 20px rgba(255, 102, 0, 0.9)) drop-shadow(0 0 45px rgba(255, 183, 0, 0.6)); }
+            50% { filter: drop-shadow(0 0 45px rgba(255, 102, 0, 1)) drop-shadow(0 0 80px rgba(255, 183, 0, 0.9)); }
+        }
+        @keyframes pulse-speaking {
+            0%, 100% { transform: scale(1); filter: drop-shadow(0 0 25px rgba(0, 243, 255, 0.9)); }
+            50% { transform: scale(1.04); filter: drop-shadow(0 0 50px rgba(0, 243, 255, 1)) drop-shadow(0 0 80px rgba(0, 168, 255, 0.8)); }
+        }
+
+        .ring-outer {
+            animation: spin-cw 18s linear infinite;
+            transform-origin: center;
+        }
+        .ring-middle {
+            animation: spin-ccw 10s linear infinite;
+            transform-origin: center;
+        }
+        .ring-inner {
+            animation: spin-cw 6s linear infinite;
+            transform-origin: center;
+        }
+
+        /* Arc Reactor States */
+        .arc-reactor {
+            transition: all 0.5s ease;
+            cursor: pointer;
+        }
+        .arc-reactor.state-idle .core-glow {
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+        
+        .arc-reactor.state-listening .ring-outer {
+            animation-duration: 4s;
+            stroke: #ff6600 !important;
+        }
+        .arc-reactor.state-listening .ring-middle {
+            animation-duration: 2.5s;
+            stroke: #ffb700 !important;
+        }
+        .arc-reactor.state-listening .core-glow {
+            animation: pulse-listening 1s infinite ease-in-out;
+            fill: url(#coreGradientListening) !important;
+        }
+
+        .arc-reactor.state-speaking {
+            animation: pulse-speaking 0.4s infinite ease-in-out alternate;
+        }
+
+        /* Scanline Overlay */
+        .scanline {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0; left: 0;
+            pointer-events: none;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 243, 255, 0.03) 50%,
+                rgba(0, 243, 255, 0.03)
+            );
+            background-size: 100% 4px;
+            z-index: 40;
+        }
+    </style>
 </head>
-<body>
-    <div class="jarvis-container">
-        <!-- Cabeçalho com Status do Sistema -->
-        <header class="hud-header">
-            <div class="system-status">
-                <span class="pulse-dot"></span> SISTEMA ONLINE
-            </div>
-            <h1 class="logo">J.A.R.V.I.S</h1>
-            <div class="clock" id="hud-clock">00:00:00</div>
-        </header>
+<body class="hud-bg text-stark-cyan font-tech min-h-screen flex flex-col justify-between overflow-x-hidden select-none relative p-2 sm:p-4">
+    <div class="scanline"></div>
 
-        <!-- Reator Central Glow & Histórico de Diálogo -->
-        <main class="hud-main">
-            <div class="arc-reactor-container">
-                <div class="arc-reactor" id="arc-reactor">
-                    <div class="core"></div>
-                    <div class="ring-1"></div>
-                    <div class="ring-2"></div>
+    <header class="hud-glass hud-border-corners rounded-lg p-3 mb-3 flex flex-wrap justify-between items-center z-10 gap-2">
+        <div class="flex items-center space-x-3">
+            <div class="relative flex h-3 w-3">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-stark-cyan opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-stark-cyan" id="status-dot"></span>
+            </div>
+            <div>
+                <h1 class="font-hud font-black text-lg sm:text-xl tracking-widest text-white flex items-center gap-2">
+                    J.A.R.V.I.S. <span class="text-xs px-2 py-0.5 rounded bg-stark-cyan/20 text-stark-cyan border border-stark-cyan/40 font-normal">v4.2 MARK VII</span>
+                </h1>
+                <p class="text-xs text-stark-cyan/70 tracking-wider hidden sm:block">SISTEMA OPERACIONAL NÚCLEO ARC STARK</p>
+            </div>
+        </div>
+
+        <!-- Telemetry & Clock -->
+        <div class="flex items-center space-x-4 text-xs sm:text-sm font-hud">
+            <div class="hidden md:flex space-x-4 border-r border-stark-cyan/30 pr-4 text-stark-cyan/80">
+                <span title="Status da Bateria"><i class="fa-solid fa-battery-half text-stark-cyan mr-1"></i><span id="bat-val">98%</span></span>
+                <span title="Uso do Processador"><i class="fa-solid fa-microchip text-stark-cyan mr-1"></i><span id="cpu-val">12%</span></span>
+                <span title="Memória RAM"><i class="fa-solid fa-memory text-stark-cyan mr-1"></i><span id="ram-val">3.4 GB</span></span>
+            </div>
+            <div class="text-right">
+                <div class="text-base sm:text-lg font-bold text-white tracking-widest" id="hud-clock">00:00:00</div>
+                <div class="text-[10px] sm:text-xs text-stark-cyan/70 uppercase" id="hud-date">SEG, 01 JAN</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 z-10 my-1 items-stretch">
+        
+        <!-- Left / Top Arc Reactor Central Display (Lg: 5 cols) -->
+        <section class="lg:col-span-5 hud-glass hud-border-corners rounded-lg p-4 flex flex-col items-center justify-between relative overflow-hidden min-h-[320px]">
+            <!-- Top Subtitle Indicator -->
+            <div class="w-full flex justify-between items-center text-xs tracking-widest text-stark-cyan/80 uppercase mb-2">
+                <span class="flex items-center gap-1"><i class="fa-solid fa-atom"></i> STARK ARC CORE</span>
+                <span id="reactor-mode-label" class="text-white font-bold bg-stark-cyan/20 px-2 py-0.5 rounded border border-stark-cyan/30">ESPERA</span>
+            </div>
+
+            <!-- Central Interactive Arc Reactor -->
+            <div class="relative my-auto flex items-center justify-center p-2">
+                <!-- Outer Interactive Ring Trigger -->
+                <div id="arc-reactor" class="arc-reactor state-idle w-56 h-56 sm:w-64 sm:h-64 relative flex items-center justify-center" title="Clique no Núcleo Arc para Falar com JARVIS">
+                    <svg viewBox="0 0 300 300" class="w-full h-full filter drop-shadow-[0_0_20px_rgba(0,243,255,0.6)]">
+                        <defs>
+                            <!-- Cyan Arc Glow -->
+                            <radialGradient id="coreGradient" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffffff" />
+                                <stop offset="30%" stop-color="#00f3ff" />
+                                <stop offset="70%" stop-color="#0066ff" />
+                                <stop offset="100%" stop-color="#020712" />
+                            </radialGradient>
+                            <!-- Orange Listening Glow -->
+                            <radialGradient id="coreGradientListening" cx="50%" cy="50%" r="50%">
+                                <stop offset="0%" stop-color="#ffffff" />
+                                <stop offset="35%" stop-color="#ffb700" />
+                                <stop offset="75%" stop-color="#ff4400" />
+                                <stop offset="100%" stop-color="#020712" />
+                            </radialGradient>
+                        </defs>
+
+                        <!-- Outer Tech Ticks -->
+                        <circle cx="150" cy="150" r="140" fill="none" stroke="#00f3ff" stroke-opacity="0.2" stroke-width="2" />
+                        <circle cx="150" cy="150" r="135" fill="none" stroke="#00f3ff" stroke-opacity="0.4" stroke-width="1" stroke-dasharray="4 8" />
+
+                        <!-- Outer Rotating Segmented Ring -->
+                        <g class="ring-outer">
+                            <circle cx="150" cy="150" r="120" fill="none" stroke="#00f3ff" stroke-opacity="0.8" stroke-width="6" stroke-dasharray="40 10 15 10 70 15" />
+                            <!-- Metallic Copper Nodes on Outer Ring -->
+                            <circle cx="150" cy="30" r="5" fill="#e67e22" />
+                            <circle cx="270" cy="150" r="5" fill="#e67e22" />
+                            <circle cx="150" cy="270" r="5" fill="#e67e22" />
+                            <circle cx="30" cy="150" r="5" fill="#e67e22" />
+                        </g>
+
+                        <!-- Middle Counter-Rotating Ring -->
+                        <g class="ring-middle">
+                            <circle cx="150" cy="150" r="95" fill="none" stroke="#00a8ff" stroke-opacity="0.9" stroke-width="8" stroke-dasharray="60 20 30 20" />
+                            <!-- Triangular Core Cutouts Simulation -->
+                            <polygon points="150,65 160,80 140,80" fill="#00f3ff" />
+                            <polygon points="235,150 220,160 220,140" fill="#00f3ff" />
+                            <polygon points="150,235 140,220 160,220" fill="#00f3ff" />
+                            <polygon points="65,150 80,140 80,160" fill="#00f3ff" />
+                        </g>
+
+                        <!-- Inner Fast Ring -->
+                        <g class="ring-inner">
+                            <circle cx="150" cy="150" r="70" fill="none" stroke="#00f3ff" stroke-width="3" stroke-dasharray="12 6" />
+                        </g>
+
+                        <!-- Core Glass Ring -->
+                        <circle cx="150" cy="150" r="52" fill="none" stroke="#ffffff" stroke-opacity="0.8" stroke-width="2" />
+                        
+                        <!-- Core Pulsing Glow Center -->
+                        <circle cx="150" cy="150" r="46" class="core-glow" fill="url(#coreGradient)" />
+                        <circle cx="150" cy="150" r="20" fill="#ffffff" opacity="0.9" filter="drop-shadow(0 0 10px #ffffff)" />
+                    </svg>
                 </div>
-                <p class="status-text" id="status-text">Aguardando comando...</p>
             </div>
 
-            <div class="chat-display" id="chat-display">
-                <div class="message jarvis-msg">
-                    <i class="fa-solid fa-robot"></i>
-                    <span>Sistemas inicializados. Como posso te ajudar hoje?</span>
+            <!-- Voice Visualizer Audio Wave & Subtitle -->
+            <div class="w-full text-center space-y-2 mt-2">
+                <div class="flex justify-center items-center gap-1 h-6" id="audio-visualizer">
+                    <span class="w-1 bg-stark-cyan rounded-full h-2 transition-all duration-150"></span>
+                    <span class="w-1 bg-stark-cyan rounded-full h-4 transition-all duration-150"></span>
+                    <span class="w-1 bg-stark-cyan rounded-full h-3 transition-all duration-150"></span>
+                    <span class="w-1 bg-stark-cyan rounded-full h-6 transition-all duration-150"></span>
+                    <span class="w-1 bg-stark-cyan rounded-full h-2 transition-all duration-150"></span>
+                    <span class="w-1 bg-stark-cyan rounded-full h-5 transition-all duration-150"></span>
+                    <span class="w-1 bg-stark-cyan rounded-full h-2 transition-all duration-150"></span>
                 </div>
+                <p id="system-status-msg" class="text-xs sm:text-sm font-hud text-stark-cyan tracking-wider truncate px-2">
+                    Clique no Núcleo ou diga "JARVIS" para iniciar...
+                </p>
             </div>
-        </main>
+        </section>
 
-        <!-- Botões de Ação Rápida e Controle de Voz -->
-        <footer class="hud-footer">
-            <div class="quick-actions">
-                <button class="btn-action" id="btn-time"><i class="fa-regular fa-clock"></i> Hora</button>
-                <button class="btn-action" id="btn-date"><i class="fa-regular fa-calendar-days"></i> Data</button>
-                <button class="btn-action" id="btn-google"><i class="fa-solid fa-magnifying-glass"></i> Google</button>
-                <button class="btn-action" id="btn-clear"><i class="fa-solid fa-trash"></i> Limpar</button>
-            </div>
-
-            <div class="voice-controls">
-                <button class="mic-btn" id="mic-btn" title="Ativar Microfone">
-                    <i class="fa-solid fa-microphone" id="mic-icon"></i>
+        <!-- Right / Bottom Terminal & Chat Display (Lg: 7 cols) -->
+        <section class="lg:col-span-7 hud-glass hud-border-corners rounded-lg p-4 flex flex-col justify-between min-h-[380px]">
+            <!-- Terminal Header -->
+            <div class="flex items-center justify-between border-b border-stark-cyan/30 pb-2 mb-3">
+                <div class="flex items-center space-x-2 text-xs font-hud tracking-widest text-white">
+                    <i class="fa-solid fa-terminal text-stark-cyan"></i>
+                    <span>TERMINAL DE COMANDO & COMUNICAÇÃO</span>
+                </div>
+                <button id="btn-clear-chat" class="text-xs text-stark-cyan/70 hover:text-stark-cyan transition-colors flex items-center gap-1">
+                    <i class="fa-solid fa-eraser"></i> Limpar Log
                 </button>
             </div>
-        </footer>
-    </div>
 
-    <script src="main.js"></script>
+            <!-- Chat History Log -->
+            <div id="chat-history" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-3 max-h-[320px] sm:max-h-[380px]">
+                <!-- Initial Welcome Message from JARVIS -->
+                <div class="flex items-start gap-3">
+                    <div class="w-8 h-8 rounded bg-stark-cyan/20 border border-stark-cyan/50 flex items-center justify-center shrink-0 text-stark-cyan">
+                        <i class="fa-solid fa-robot text-sm"></i>
+                    </div>
+                    <div class="bg-stark-cyan/10 border border-stark-cyan/30 rounded-lg p-3 text-sm text-stark-cyan max-w-[88%] shadow-lg">
+                        <div class="text-[10px] text-stark-cyan/60 font-hud mb-1">J.A.R.V.I.S. • SISTEMA ON</div>
+                        Olá, Senhor. Todos os sistemas do Núcleo Arc estão operando com 100% de capacidade. Como posso ajudá-lo hoje?
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Command Chips -->
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-2 mb-2 no-scrollbar text-xs">
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Que horas são?">
+                    <i class="fa-regular fa-clock mr-1"></i>Hora
+                </button>
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Qual a data de hoje?">
+                    <i class="fa-regular fa-calendar-days mr-1"></i>Data
+                </button>
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Diagnóstico do sistema">
+                    <i class="fa-solid fa-shield-halved mr-1"></i>Diagnóstico
+                </button>
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Abrir YouTube">
+                    <i class="fa-brands fa-youtube mr-1"></i>YouTube
+                </button>
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Como está o clima?">
+                    <i class="fa-solid fa-cloud-sun mr-1"></i>Clima
+                </button>
+                <button class="quick-btn shrink-0 bg-stark-cyan/10 hover:bg-stark-cyan/20 border border-stark-cyan/40 text-stark-cyan px-2.5 py-1 rounded-full transition-all" data-cmd="Conte uma piada">
+                    <i class="fa-solid fa-face-laugh mr-1"></i>Piada
+                </button>
+            </div>
+
+            <!-- Text Input Bar -->
+            <form id="chat-form" class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <input type="text" id="user-input" placeholder="Digite um comando ou clique no microfone..." 
+                        class="w-full bg-stark-dark/80 border border-stark-cyan/40 rounded-lg px-4 py-2.5 text-sm text-white placeholder-stark-cyan/40 focus:outline-none focus:border-stark-cyan focus:ring-1 focus:ring-stark-cyan transition-all">
+                </div>
+                <button type="submit" class="bg-stark-cyan/20 hover:bg-stark-cyan/40 border border-stark-cyan text-stark-cyan px-4 py-2.5 rounded-lg text-sm transition-all flex items-center gap-1 font-hud">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span class="hidden sm:inline">ENVIAR</span>
+                </button>
+                <button type="button" id="mic-trigger-btn" title="Ativar Microfone" class="bg-stark-cyan/20 hover:bg-stark-cyan text-stark-cyan hover:text-stark-dark border border-stark-cyan p-2.5 rounded-lg transition-all flex items-center justify-center w-11 h-11 shrink-0">
+                    <i class="fa-solid fa-microphone text-base" id="mic-icon"></i>
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <!-- HUD Footer -->
+    <footer class="hud-glass hud-border-corners rounded-lg p-2.5 mt-2 flex flex-wrap justify-between items-center text-xs text-stark-cyan/70 z-10 gap-2">
+        <div class="flex items-center gap-2">
+            <span class="inline-block w-2 h-2 rounded-full bg-stark-cyan"></span>
+            <span>PROTOCOLO DE DEFESA: <strong class="text-white">ATIVO</strong></span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span>RESPOSTA DE VOZ: <strong class="text-stark-cyan" id="voice-status">HABILITADA (PT-BR)</strong></span>
+            <span class="hidden sm:inline">STARK INDUSTRIES © 2026</span>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const arcReactor = document.getElementById('arc-reactor');
+            const reactorModeLabel = document.getElementById('reactor-mode-label');
+            const systemStatusMsg = document.getElementById('system-status-msg');
+            const chatHistory = document.getElementById('chat-history');
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+            const micTriggerBtn = document.getElementById('mic-trigger-btn');
+            const micIcon = document.getElementById('mic-icon');
+            const btnClearChat = document.getElementById('btn-clear-chat');
+            const quickBtns = document.querySelectorAll('.quick-btn');
+            const audioVisualizer = document.getElementById('audio-visualizer');
+            const hudClock = document.getElementById('hud-clock');
+            const hudDate = document.getElementById('hud-date');
+
+            let isListening = false;
+            let isSpeaking = false;
+            let synthVoice = null;
+            let recognition = null;
+            let visualizerInterval = null;
+
+            function updateClock() {
+                const now = new Date();
+                hudClock.textContent = now.toLocaleTimeString('pt-BR');
+                
+                const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+                hudDate.textContent = now.toLocaleDateString('pt-BR', options).toUpperCase();
+            }
+            setInterval(updateClock, 1000);
+            updateClock();
+
+            // Simulate CPU and Memory Fluctuations
+            setInterval(() => {
+                const cpuVal = document.getElementById('cpu-val');
+                const ramVal = document.getElementById('ram-val');
+                if (cpuVal) cpuVal.textContent = Math.floor(Math.random() * 18 + 8) + '%';
+                if (ramVal) ramVal.textContent = (Math.random() * 0.4 + 3.2).toFixed(1) + ' GB';
+            }, 3000);
+
+            // Battery Status if browser supports Navigator.getBattery
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(battery => {
+                    const batVal = document.getElementById('bat-val');
+                    const updateBattery = () => {
+                        if (batVal) batVal.textContent = Math.round(battery.level * 100) + '%';
+                    };
+                    updateBattery();
+                    battery.addEventListener('levelchange', updateBattery);
+                }).catch(() => {});
+            }
+
+            function initSpeechSynthesis() {
+                if (!('speechSynthesis' in window)) {
+                    document.getElementById('voice-status').textContent = 'NÃO SUPORTADO';
+                    return;
+                }
+
+                const loadVoices = () => {
+                    const voices = window.speechSynthesis.getVoices();
+                    // Search for Portuguese voice (preferably natural male or standard pt-BR / pt-PT)
+                    synthVoice = voices.find(v => v.lang === 'pt-BR' && (v.name.includes('Google') || v.name.includes('Luciana') || v.name.includes('Daniel') || v.name.includes('Felipe')))
+                             || voices.find(v => v.lang.includes('pt-BR'))
+                             || voices.find(v => v.lang.includes('pt'))
+                             || voices[0];
+                };
+
+                loadVoices();
+                if (speechSynthesis.onvoiceschanged !== undefined) {
+                    speechSynthesis.onvoiceschanged = loadVoices;
+                }
+            }
+            initSpeechSynthesis();
+
+            function speak(text) {
+                if (!('speechSynthesis' in window)) {
+                    addChatMessage('J.A.R.V.I.S.', text, 'jarvis');
+                    return;
+                }
+
+                window.speechSynthesis.cancel(); // Stop ongoing speech
+
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'pt-BR';
+                utterance.rate = 1.05;
+                utterance.pitch = 0.95;
+
+                if (synthVoice) {
+                    utterance.voice = synthVoice;
+                }
+
+                utterance.onstart = () => {
+                    isSpeaking = true;
+                    setReactorState('speaking');
+                    startAudioVisualizer();
+                    systemStatusMsg.textContent = "JARVIS respondendo...";
+                };
+
+                utterance.onend = utterance.onerror = () => {
+                    isSpeaking = false;
+                    stopAudioVisualizer();
+                    if (!isListening) {
+                        setReactorState('idle');
+                        systemStatusMsg.textContent = "Aguardando novo comando...";
+                    }
+                };
+
+                addChatMessage('J.A.R.V.I.S.', text, 'jarvis');
+                window.speechSynthesis.speak(utterance);
+            }
+
+            function initSpeechRecognition() {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                
+                if (!SpeechRecognition) {
+                    systemStatusMsg.textContent = "Reconhecimento de voz não suportado neste navegador. Digite abaixo.";
+                    micTriggerBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                    return;
+                }
+
+                recognition = new SpeechRecognition();
+                recognition.lang = 'pt-BR';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+
+                recognition.onstart = () => {
+                    isListening = true;
+                    setReactorState('listening');
+                    startAudioVisualizer();
+                    micTriggerBtn.classList.add('bg-stark-orange', 'border-stark-orange', 'text-white', 'animate-pulse');
+                    micIcon.className = 'fa-solid fa-microphone-lines text-base';
+                    systemStatusMsg.textContent = "Ouvindo... Fale com o JARVIS";
+                };
+
+                recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    if (transcript.trim()) {
+                        addChatMessage('Você', transcript, 'user');
+                        processCommand(transcript);
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    console.warn('Erro no reconhecimento de voz:', event.error);
+                    stopListening();
+                    if (event.error === 'not-allowed') {
+                        speak("Acesso ao microfone negado. Por favor, libere a permissão no seu navegador.");
+                    } else if (event.error !== 'no-speech') {
+                        systemStatusMsg.textContent = "Não entendi o áudio. Tente novamente ou digite.";
+                    }
+                };
+
+                recognition.onend = () => {
+                    stopListening();
+                };
+            }
+            initSpeechRecognition();
+
+            function startListening() {
+                if (!recognition) {
+                    alert("Reconhecimento de voz não suportado pelo seu navegador.");
+                    return;
+                }
+                if (isListening) return;
+
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error("Erro ao iniciar microfone:", e);
+                }
+            }
+
+            function stopListening() {
+                isListening = false;
+                stopAudioVisualizer();
+                micTriggerBtn.className = 'bg-stark-cyan/20 hover:bg-stark-cyan text-stark-cyan hover:text-stark-dark border border-stark-cyan p-2.5 rounded-lg transition-all flex items-center justify-center w-11 h-11 shrink-0';
+                micIcon.className = 'fa-solid fa-microphone text-base';
+                
+                if (!isSpeaking) {
+                    setReactorState('idle');
+                    systemStatusMsg.textContent = "Aguardando novo comando...";
+                }
+            }
+
+            function setReactorState(state) {
+                arcReactor.classList.remove('state-idle', 'state-listening', 'state-speaking');
+                
+                if (state === 'listening') {
+                    arcReactor.classList.add('state-listening');
+                    reactorModeLabel.textContent = "OUVINDO";
+                    reactorModeLabel.className = "text-white font-bold bg-stark-orange/30 px-2 py-0.5 rounded border border-stark-orange text-stark-orange";
+                } else if (state === 'speaking') {
+                    arcReactor.classList.add('state-speaking');
+                    reactorModeLabel.textContent = "FALANDO";
+                    reactorModeLabel.className = "text-white font-bold bg-stark-cyan/30 px-2 py-0.5 rounded border border-stark-cyan text-stark-cyan";
+                } else {
+                    arcReactor.classList.add('state-idle');
+                    reactorModeLabel.textContent = "ESPERA";
+                    reactorModeLabel.className = "text-white font-bold bg-stark-cyan/20 px-2 py-0.5 rounded border border-stark-cyan/30 text-stark-cyan";
+                }
+            }
+
+            function startAudioVisualizer() {
+                if (visualizerInterval) clearInterval(visualizerInterval);
+                const bars = audioVisualizer.querySelectorAll('span');
+                visualizerInterval = setInterval(() => {
+                    bars.forEach(bar => {
+                        const h = Math.floor(Math.random() * 20 + 4);
+                        bar.style.height = `${h}px`;
+                    });
+                }, 100);
+            }
+
+            function stopAudioVisualizer() {
+                if (visualizerInterval) clearInterval(visualizerInterval);
+                const bars = audioVisualizer.querySelectorAll('span');
+                bars.forEach(bar => bar.style.height = '8px');
+            }
+
+            function addChatMessage(sender, text, type) {
+                const msgWrapper = document.createElement('div');
+                msgWrapper.className = `flex items-start gap-3 ${type === 'user' ? 'flex-row-reverse' : ''}`;
+
+                const iconDiv = document.createElement('div');
+                if (type === 'user') {
+                    iconDiv.className = 'w-8 h-8 rounded bg-white/20 border border-white/50 flex items-center justify-center shrink-0 text-white';
+                    iconDiv.innerHTML = '<i class="fa-solid fa-user text-sm"></i>';
+                } else {
+                    iconDiv.className = 'w-8 h-8 rounded bg-stark-cyan/20 border border-stark-cyan/50 flex items-center justify-center shrink-0 text-stark-cyan';
+                    iconDiv.innerHTML = '<i class="fa-solid fa-robot text-sm"></i>';
+                }
+
+                const bubble = document.createElement('div');
+                if (type === 'user') {
+                    bubble.className = 'bg-white/10 border border-white/30 rounded-lg p-3 text-sm text-white max-w-[88%] shadow-lg';
+                    bubble.innerHTML = `<div class="text-[10px] text-white/60 font-hud mb-1 text-right">${sender.toUpperCase()}</div>${escapeHtml(text)}`;
+                } else {
+                    bubble.className = 'bg-stark-cyan/10 border border-stark-cyan/30 rounded-lg p-3 text-sm text-stark-cyan max-w-[88%] shadow-lg';
+                    bubble.innerHTML = `<div class="text-[10px] text-stark-cyan/60 font-hud mb-1">${sender.toUpperCase()}</div>${escapeHtml(text)}`;
+                }
+
+                msgWrapper.appendChild(iconDiv);
+                msgWrapper.appendChild(bubble);
+                chatHistory.appendChild(msgWrapper);
+
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+
+            function escapeHtml(str) {
+                return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+            }
+
+            function processCommand(rawInput) {
+                const cmd = rawInput.toLowerCase().trim();
+
+                // 1. Time Command
+                if (cmd.includes('hora') || cmd.includes('horas') || cmd.includes('que horas')) {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    speak(`Agora são exatamente ${timeStr}, Senhor.`);
+                    return;
+                }
+
+                // 2. Date Command
+                if (cmd.includes('data') || cmd.includes('dia é hoje') || cmd.includes('que dia')) {
+                    const now = new Date();
+                    const dateStr = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+                    speak(`Hoje é ${dateStr}.`);
+                    return;
+                }
+
+                // 3. System Diagnostic Protocol
+                if (cmd.includes('diagnostico') || cmd.includes('diagnóstico') || cmd.includes('status do sistema') || cmd.includes('checar sistema')) {
+                    speak("Iniciando varredura nos componentes do Núcleo Arc. Temperatura em 36 graus Celsius. Protocolos de defesa ativos. Todos os sistemas operando nominalmente, Senhor.");
+                    return;
+                }
+
+                // 4. Web Search
+                if (cmd.includes('pesquisar por') || cmd.includes('pesquise por') || cmd.includes('busca por') || cmd.includes('google por') || cmd.includes('procure por')) {
+                    let query = cmd.replace(/pesquisar por|pesquise por|busca por|google por|procure por/g, '').trim();
+                    if (query) {
+                        speak(`Pesquisando por ${query} no Google, Senhor.`);
+                        setTimeout(() => {
+                            window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+                        }, 1200);
+                    } else {
+                        speak("O que exatamente o Senhor deseja que eu pesquise?");
+                    }
+                    return;
+                }
+
+                // 5. Open Applications / Sites
+                if (cmd.includes('abrir youtube') || cmd.includes('abre o youtube')) {
+                    speak("Abrindo o YouTube para o Senhor.");
+                    setTimeout(() => window.open('https://www.youtube.com', '_blank'), 1000);
+                    return;
+                }
+                if (cmd.includes('abrir google') || cmd.includes('abre o google')) {
+                    speak("Abrindo o Google.");
+                    setTimeout(() => window.open('https://www.google.com', '_blank'), 1000);
+                    return;
+                }
+                if (cmd.includes('abrir whatsapp') || cmd.includes('whatsapp')) {
+                    speak("Abrindo o WhatsApp Web.");
+                    setTimeout(() => window.open('https://web.whatsapp.com', '_blank'), 1000);
+                    return;
+                }
+                if (cmd.includes('abrir wikipedia') || cmd.includes('wikipédia')) {
+                    speak("Conectando à Wikipédia.");
+                    setTimeout(() => window.open('https://pt.wikipedia.org', '_blank'), 1000);
+                    return;
+                }
+
+                // 6. Math Math Calculations ("quanto é X mais Y", etc.)
+                if (cmd.includes('quanto é') || cmd.includes('calcule') || cmd.includes('quanto fica')) {
+                    const mathResult = evaluateSimpleMath(cmd);
+                    if (mathResult !== null) {
+                        speak(`O resultado do cálculo é ${mathResult}.`);
+                        return;
+                    }
+                }
+
+                // 7. Weather Info
+                if (cmd.includes('clima') || cmd.includes('tempo') || cmd.includes('temperatura')) {
+                    speak("Consultando sensores meteorológicos. O clima atual apresenta ótimas condições de voo. Abrindo a previsão completa.");
+                    setTimeout(() => {
+                        window.open('https://www.google.com/search?q=clima+tempo+hoje', '_blank');
+                    }, 1500);
+                    return;
+                }
+
+                // 8. Jokes & Trivia
+                if (cmd.includes('piada') || cmd.includes('engraçado') || cmd.includes('conte algo')) {
+                    const jokes = [
+                        "Por que o Homem de Ferro dorme sempre de armadura? Para não ter pesadelos enferrujados!",
+                        "Eu perguntei ao Senhor Stark se ele queria ajuda com a Mark 85. Ele disse que meu auxílio era 'inestimável', mas desligou minha tomada no minuto seguinte.",
+                        "Qual é o robô preferido dos vegetarianos? O robô-dô de salada!"
+                    ];
+                    const randomJoke = jokes[Math.floor(Math.random() * jokes.length)];
+                    speak(randomJoke);
+                    return;
+                }
+
+                // 9. Greetings & Identity
+                if (cmd.includes('olá') || cmd.includes('oi') || cmd.includes('bom dia') || cmd.includes('boa tarde') || cmd.includes('boa noite')) {
+                    speak("Olá, Senhor! Como posso ser útil para os seus projetos hoje?");
+                    return;
+                }
+                if (cmd.includes('quem é você') || cmd.includes('qual o seu nome') || cmd.includes('o que você faz')) {
+                    speak("Eu sou o J.A.R.V.I.S., uma inteligência artificial criada para gerenciar os sistemas de Tony Stark e auxiliá-lo em suas tarefas diárias.");
+                    return;
+                }
+                if (cmd.includes('obrigado') || cmd.includes('valeu')) {
+                    speak("Sempre às suas ordens, Senhor.");
+                    return;
+                }
+
+                // Fallback Default
+                speak(`Comando "${rawInput}" recebido. Realizando busca referente no Google.`);
+                setTimeout(() => {
+                    window.open(`https://www.google.com/search?q=${encodeURIComponent(rawInput)}`, '_blank');
+                }, 1500);
+            }
+
+            // Simple Math Expression Parsing
+            function evaluateSimpleMath(text) {
+                try {
+                    let expr = text
+                        .replace(/quanto é/g, '')
+                        .replace(/calcule/g, '')
+                        .replace(/quanto fica/g, '')
+                        .replace(/mais/g, '+')
+                        .replace(/menos/g, '-')
+                        .replace(/vezes|multiplicado por/g, '*')
+                        .replace(/dividido por|por/g, '/')
+                        .replace(/x/g, '*')
+                        .replace(/,/g, '.')
+                        .trim();
+
+                    // Strip any non-math characters
+                    expr = expr.replace(/[^0-9\+\-\*\/\.\(\)]/g, '');
+                    if (!expr) return null;
+
+                    const result = Function(`'use strict'; return (${expr})`)();
+                    if (typeof result === 'number' && !isNaN(result)) {
+                        return Number.isInteger(result) ? result : result.toFixed(2);
+                    }
+                } catch (e) {
+                    return null;
+                }
+                return null;
+            }
+
+            // Arc Reactor Click Listener
+            arcReactor.addEventListener('click', () => {
+                if (isListening) {
+                    if (recognition) recognition.stop();
+                } else {
+                    startListening();
+                }
+            });
+
+            // Mic Button Trigger
+            micTriggerBtn.addEventListener('click', () => {
+                if (isListening) {
+                    if (recognition) recognition.stop();
+                } else {
+                    startListening();
+                }
+            });
+
+            // Text Form Submit
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = userInput.value.trim();
+                if (text) {
+                    addChatMessage('Você', text, 'user');
+                    processCommand(text);
+                    userInput.value = '';
+                }
+            });
+
+            // Quick Chips Clicks
+            quickBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const cmd = btn.getAttribute('data-cmd');
+                    if (cmd) {
+                        addChatMessage('Você', cmd, 'user');
+                        processCommand(cmd);
+                    }
+                });
+            });
+
+            // Clear Chat Button
+            btnClearChat.addEventListener('click', () => {
+                chatHistory.innerHTML = '';
+                speak("Terminal de mensagens limpo, Senhor.");
+            });
+        });
+    </script>
 </body>
 </html>
