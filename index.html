@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EbookVerse - Livraria Digital & Pagamento Pix</title>
+  <title>Livraria Digital Pix - Acesso aos E-books</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -29,22 +29,20 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
-  <!-- TOP HEADER / NAVBAR -->
+  <!-- CABEÇALHO DA LOJA -->
   <header class="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
-      <!-- LOGO -->
       <div class="flex items-center gap-2 cursor-pointer" onclick="trocarAba('catalogo')">
         <div class="p-2 bg-brand-600 text-white rounded-lg shadow-lg">
           <i data-lucide="book-open" class="w-6 h-6"></i>
         </div>
         <span class="text-xl font-bold bg-gradient-to-r from-brand-600 to-indigo-400 bg-clip-text text-transparent">
-          EbookVerse
+          EbookStore Pix
         </span>
       </div>
 
-      <!-- NAV TABS -->
-      <nav class="flex items-center gap-1 sm:gap-4">
+      <nav class="flex items-center gap-2 sm:gap-4">
         <button onclick="trocarAba('catalogo')" id="tab-catalogo" class="px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition bg-brand-50 dark:bg-gray-700 text-brand-600 dark:text-white">
           <i data-lucide="store" class="w-4 h-4"></i> Catálogo
         </button>
@@ -54,380 +52,343 @@
         </button>
       </nav>
 
-      <!-- DARK MODE TOGGLE & USER -->
       <div class="flex items-center gap-3">
         <button onclick="toggleDarkMode()" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
           <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
           <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
         </button>
-        <div class="flex items-center gap-2 pl-3 border-l border-gray-200 dark:border-gray-700">
-          <div class="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-sm">
-            U
-          </div>
-          <span class="text-sm font-medium hidden sm:inline">Usuário</span>
-        </div>
       </div>
     </div>
   </header>
 
-  <!-- CONTAINER PRINCIPAL -->
+  <!-- CONTEÚDO PRINCIPAL -->
   <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-    <!-- SEÇÃO: CATÁLOGO DE E-BOOKS -->
+    <!-- CATÁLOGO -->
     <section id="sec-catalogo" class="space-y-8">
-      <!-- HERO BANNER -->
-      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-800 p-8 text-white shadow-xl">
-        <div class="relative z-10 max-w-2xl">
-          <span class="px-3 py-1 bg-white/20 text-xs font-semibold rounded-full backdrop-blur-md uppercase tracking-wider">Acesso Imediato</span>
-          <h1 class="text-3xl sm:text-4xl font-extrabold mt-3 leading-tight">Aprenda Programação com E-books Práticos</h1>
-          <p class="mt-2 text-indigo-100">Pagamento instantâneo via Pix com liberação automática da sua leitura.</p>
-        </div>
-        <i data-lucide="sparkles" class="absolute right-4 -bottom-4 w-48 h-48 opacity-10 pointer-events-none"></i>
+      <div class="p-6 bg-gradient-to-r from-brand-700 to-indigo-800 text-white rounded-2xl shadow-xl">
+        <h1 class="text-2xl sm:text-3xl font-extrabold">Adquira E-books com Liberação por Pix</h1>
+        <p class="text-sm text-indigo-100 mt-1">Realize o pagamento direto para a chave Pix cadastrada para desbloquear sua leitura.</p>
       </div>
 
-      <!-- GRID DE E-BOOKS -->
       <div>
-        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
-          <i data-lucide="book-marked" class="text-brand-600"></i> E-books Disponíveis
+        <h2 class="text-xl font-bold mb-6 flex items-center gap-2">
+          <i data-lucide="book-marked" class="text-brand-600"></i> Catálogo Disponível
         </h2>
-        <div id="grid-ebooks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <!-- Os e-books serão inseridos via JavaScript -->
-        </div>
+        <div id="grid-ebooks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
       </div>
     </section>
 
-    <!-- SEÇÃO: MEUS E-BOOKS (BIBLIOTECA) -->
+    <!-- MINHA BIBLIOTECA -->
     <section id="sec-meus-ebooks" class="hidden space-y-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-2xl font-bold flex items-center gap-2">
-            <i data-lucide="library" class="text-brand-600"></i> Minha Biblioteca Digital
-          </h2>
-          <p class="text-sm text-gray-500 dark:text-gray-400">Todos os e-books adquiridos e prontos para leitura.</p>
-        </div>
+      <div>
+        <h2 class="text-xl font-bold flex items-center gap-2">
+          <i data-lucide="library" class="text-brand-600"></i> Meus E-books Adquiridos
+        </h2>
+        <p class="text-xs text-gray-500">Seus livros liberados após a confirmação do pagamento.</p>
       </div>
 
-      <div id="grid-meus-ebooks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <!-- E-books comprados serão exibidos aqui -->
-      </div>
+      <div id="grid-meus-ebooks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-      <!-- ESTADO VAZIO -->
       <div id="meus-ebooks-vazio" class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-        <i data-lucide="book-open-check" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
-        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200">Você ainda não possui e-books</h3>
-        <p class="text-sm text-gray-500 mt-1 mb-4">Escolha um e-book em nosso catálogo e pague via Pix para liberar a leitura na hora.</p>
-        <button onclick="trocarAba('catalogo')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-lg shadow-md transition">
-          Explorar Catálogo
-        </button>
+        <i data-lucide="lock" class="w-12 h-12 mx-auto text-gray-400 mb-3"></i>
+        <h3 class="text-base font-semibold">Nenhum e-book desbloqueado</h3>
+        <p class="text-xs text-gray-500 mt-1 mb-4">Efetue o pagamento via Pix no catálogo para liberar o acesso aos livros.</p>
+        <button onclick="trocarAba('catalogo')" class="px-4 py-2 bg-brand-600 text-white text-xs font-bold rounded-lg">Ir ao Catálogo</button>
       </div>
     </section>
 
   </main>
 
-  <!-- MODAL DE CHECKOUT / PAGAMENTO PIX -->
+  <!-- MODAL DE CHECKOUT PIX -->
   <div id="modal-pix" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative border border-gray-100 dark:border-gray-700">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative border border-gray-200 dark:border-gray-700">
       
-      <!-- BOTÃO FECHAR -->
-      <button onclick="fecharModalPix()" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg">
+      <button onclick="fecharModalPix()" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600">
         <i data-lucide="x" class="w-5 h-5"></i>
       </button>
 
-      <!-- PASSO 1: FORMULÁRIO DE DADOS DO CLIENTE -->
+      <!-- PASSO 1: DADOS DO CLIENTE -->
       <div id="pix-passo-1" class="space-y-4">
-        <div class="flex items-center gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
-          <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-lg">
-            <i data-lucide="qr-code" class="w-6 h-6"></i>
-          </div>
-          <div>
-            <h3 class="text-lg font-bold">Comprar com Pix</h3>
-            <p class="text-xs text-gray-500 dark:text-gray-400">Preencha seus dados para gerar o código Pix</p>
-          </div>
+        <div class="border-b dark:border-gray-700 pb-3">
+          <h3 class="text-lg font-bold flex items-center gap-2">
+            <i data-lucide="qr-code" class="text-emerald-500"></i> Comprar via Pix
+          </h3>
+          <p class="text-xs text-gray-500">Informe seus dados para prosseguir para o pagamento.</p>
         </div>
 
-        <!-- RESUMO DO LIVRO -->
-        <div id="resumo-compra-ebook" class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl flex items-center gap-3">
-          <!-- Dados dinâmicos do e-book -->
-        </div>
+        <div id="resumo-compra-ebook" class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl flex items-center gap-3"></div>
 
-        <form id="form-pix" onsubmit="processarFormularioPix(event)" class="space-y-3">
+        <form id="form-pix" onsubmit="gerarCobrançaPix(event)" class="space-y-3">
           <div>
-            <label class="block text-xs font-medium mb-1">Nome Completo</label>
-            <input type="text" id="pix-nome" required placeholder="Digite seu nome" class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand-500 outline-none">
+            <label class="block text-xs font-semibold mb-1">Seu Nome Completo</label>
+            <input type="text" id="cli-nome" required placeholder="Digite seu nome" class="w-full px-3 py-2 text-sm rounded-lg border dark:border-gray-600 dark:bg-gray-700">
           </div>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-medium mb-1">E-mail para Envio</label>
-              <input type="email" id="pix-email" required placeholder="seu@email.com" class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand-500 outline-none">
-            </div>
-            <div>
-              <label class="block text-xs font-medium mb-1">CPF</label>
-              <input type="text" id="pix-cpf" required placeholder="000.000.000-00" class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand-500 outline-none">
-            </div>
+          <div>
+            <label class="block text-xs font-semibold mb-1">Seu E-mail</label>
+            <input type="email" id="cli-email" required placeholder="seuemail@exemplo.com" class="w-full px-3 py-2 text-sm rounded-lg border dark:border-gray-600 dark:bg-gray-700">
           </div>
-
-          <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 mt-4">
-            <i data-lucide="qr-code" class="w-5 h-5"></i> Gerar QR Code Pix
+          <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm transition">
+            Avançar para Pagamento Pix
           </button>
         </form>
       </div>
 
-      <!-- PASSO 2: QR CODE E CÓDIGO PIX COPIA E COLA -->
+      <!-- PASSO 2: CHAVE PIX & EXIBIÇÃO DE PAGAMENTO -->
       <div id="pix-passo-2" class="hidden space-y-4 text-center">
-        <div class="border-b border-gray-100 dark:border-gray-700 pb-2">
-          <h3 class="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-2">
-            <i data-lucide="check-circle-2" class="w-5 h-5"></i> Pix Gerado com Sucesso
-          </h3>
-          <p class="text-xs text-gray-500">Escaneie o QR Code ou copie o código abaixo</p>
+        <div class="border-b dark:border-gray-700 pb-2">
+          <h3 class="text-base font-bold text-emerald-600 dark:text-emerald-400">Efetue o Pagamento Pix</h3>
+          <p class="text-xs text-gray-500">Utilize os dados abaixo no aplicativo do seu banco</p>
         </div>
 
-        <!-- EXIBIÇÃO DO QR CODE -->
-        <div class="flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 rounded-2xl border border-gray-200 dark:border-gray-700">
-          <img id="pix-img-qrcode" src="" alt="QR Code Pix" class="w-48 h-48 rounded-lg shadow-md border bg-white p-2">
-          
-          <div class="mt-3 text-xs text-gray-500 flex items-center gap-1">
-            <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i> Expira em: <span id="pix-timer" class="font-bold text-gray-700 dark:text-gray-200">15:00</span>
+        <div class="p-4 bg-gray-50 dark:bg-gray-900 rounded-xl border dark:border-gray-700 space-y-3">
+          <!-- QR CODE GERADO DA CHAVE CONFIGURADA -->
+          <img id="pix-img-qrcode" src="" alt="QR Code Pix" class="w-40 h-40 mx-auto rounded-lg border p-1 bg-white">
+
+          <div class="text-left bg-white dark:bg-gray-800 p-3 rounded-lg border dark:border-gray-700 space-y-1">
+            <span class="text-[10px] font-bold uppercase text-gray-400 block">Chave Pix Cadastrada</span>
+            <div class="flex items-center justify-between">
+              <span id="display-chave-pix" class="text-xs font-mono font-bold text-brand-600 dark:text-brand-400 select-all"></span>
+              <button onclick="copiarChavePix()" class="p-1.5 bg-brand-50 dark:bg-gray-700 text-brand-600 dark:text-brand-300 rounded hover:bg-brand-100">
+                <i data-lucide="copy" class="w-4 h-4"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="text-left text-xs space-y-1">
+            <p><strong class="text-gray-600 dark:text-gray-300">Recebedor:</strong> <span id="display-recebedor"></span></p>
+            <p><strong class="text-gray-600 dark:text-gray-300">Valor a pagar:</strong> <span id="display-valor" class="text-emerald-600 font-bold"></span></p>
           </div>
         </div>
 
-        <!-- COPIA E COLA -->
-        <div class="text-left space-y-1">
-          <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Código Pix Copia e Cola:</label>
-          <div class="flex gap-2">
-            <input type="text" id="pix-copia-cola-input" readonly class="flex-1 px-3 py-2 text-xs font-mono bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 overflow-hidden text-ellipsis">
-            <button onclick="copiarPix()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
-              <i data-lucide="copy" class="w-4 h-4"></i> Copiar
-            </button>
-          </div>
+        <div class="space-y-2">
+          <p class="text-xs text-gray-500">Após fazer a transferência, clique no botão abaixo para anexar/simular o envio do comprovante e liberar o e-book na sua conta.</p>
+          <button onclick="finalizarPagamentoEConfirmar()" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold rounded-xl shadow transition flex items-center justify-center gap-2">
+            <i data-lucide="check-circle" class="w-4 h-4"></i> Confirmar Pagamento & Liberar E-book
+          </button>
         </div>
-
-        <!-- STATUS DE PROCESSAMENTO -->
-        <div class="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center justify-center gap-2 text-xs text-amber-700 dark:text-amber-300">
-          <div class="animate-spin rounded-full h-4 w-4 border-2 border-amber-600 border-t-transparent"></div>
-          Aguardando confirmação do banco em tempo real...
-        </div>
-
-        <!-- BOTÃO DE SIMULAÇÃO (PARA TESTES DO USUÁRIO) -->
-        <button onclick="simularPagamentoAprovado()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow">
-          [Modo Teste] Simular Confirmação do Banco
-        </button>
       </div>
 
-      <!-- PASSO 3: SUCESSO E LIBERAÇÃO -->
+      <!-- PASSO 3: SUCESSO -->
       <div id="pix-passo-3" class="hidden text-center space-y-4 py-4">
-        <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-lg animate-bounce">
-          <i data-lucide="check" class="w-10 h-10"></i>
+        <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+          <i data-lucide="check" class="w-8 h-8"></i>
         </div>
-        <h3 class="text-2xl font-extrabold text-gray-800 dark:text-white">Pagamento Confirmado!</h3>
-        <p class="text-sm text-gray-600 dark:text-gray-300">O seu Pix foi processado com sucesso e o e-book já está disponível na sua biblioteca.</p>
-        
-        <button onclick="irParaMeusEbooksAposCompra()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
-          <i data-lucide="book-open" class="w-5 h-5"></i> Acessar Minha Biblioteca
+        <h3 class="text-xl font-bold">E-book Liberado com Sucesso!</h3>
+        <p class="text-xs text-gray-500">Seu pagamento foi registrado e o e-book foi adicionado à sua biblioteca digital.</p>
+        <button onclick="irParaMeusEbooks()" class="w-full py-2.5 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-xl">
+          Acessar Minha Biblioteca
         </button>
       </div>
 
     </div>
   </div>
 
-  <!-- MODAL LEITOR DE E-BOOK -->
-  <div id="modal-leitor" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-6 hidden">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-gray-700">
-      
-      <!-- CABEÇALHO DO LEITOR -->
+  <!-- LEITOR DE E-BOOK INTEGRADO -->
+  <div id="modal-leitor" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-3xl w-full h-[80vh] flex flex-col shadow-2xl overflow-hidden border border-gray-700">
       <div class="p-4 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-          <i data-lucide="book-open-check" class="text-brand-600 w-6 h-6"></i>
-          <div>
-            <h3 id="leitor-titulo" class="font-bold text-sm sm:text-base leading-tight">Título do Livro</h3>
-            <span id="leitor-autor" class="text-xs text-gray-500">Autor</span>
-          </div>
+        <div>
+          <h3 id="leitor-titulo" class="font-bold text-sm"></h3>
+          <span id="leitor-autor" class="text-xs text-gray-500"></span>
         </div>
         <button onclick="fecharLeitor()" class="p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
-          <i data-lucide="x" class="w-6 h-6"></i>
+          <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
-
-      <!-- CORPO DE LEITURA -->
-      <div class="flex-1 overflow-y-auto p-6 sm:p-10 text-gray-800 dark:text-gray-200 leading-relaxed space-y-6 max-w-2xl mx-auto">
-        <div class="border-b border-gray-200 dark:border-gray-700 pb-4 text-center">
-          <span class="text-xs font-semibold text-brand-600 tracking-wider uppercase">Capítulo 1</span>
-          <h1 id="leitor-capitulo-titulo" class="text-2xl font-extrabold mt-1">Introdução Prática e Boas Práticas</h1>
-        </div>
-        <div id="leitor-conteudo" class="space-y-4 text-sm sm:text-base">
-          <!-- Conteúdo do e-book -->
-        </div>
-      </div>
-
-      <!-- RODAPÉ DO LEITOR -->
-      <div class="p-3 bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between text-xs text-gray-500">
-        <span>Página 1 de 120 (Amostra)</span>
-        <button onclick="notificar('Leitura salva automaticamente!')" class="text-brand-600 hover:underline">Salvar Progresso</button>
-      </div>
+      <div id="leitor-conteudo" class="flex-1 overflow-y-auto p-6 text-sm leading-relaxed space-y-4"></div>
     </div>
   </div>
 
-  <!-- TOAST NOTIFICATION -->
-  <div id="toast" class="fixed bottom-5 right-5 z-50 translate-y-20 opacity-0 transition-all duration-300 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-700">
-    <i data-lucide="info" id="toast-icon" class="w-5 h-5 text-brand-500"></i>
-    <span id="toast-msg" class="text-sm font-medium">Mensagem de aviso</span>
+  <!-- NOTIFICAÇÃO TOAST -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 translate-y-20 opacity-0 transition-all duration-300 bg-gray-900 text-white px-4 py-3 rounded-xl shadow-2xl text-xs font-medium flex items-center gap-2">
+    <i data-lucide="info" class="w-4 h-4 text-brand-400"></i>
+    <span id="toast-msg"></span>
   </div>
 
-  <!-- JAVASCRIPT PRINCIPAL -->
   <script>
-    // --- DADOS DOS E-BOOKS ---
-    const EBOOKS_CATALOGO = [
+    // =========================================================================
+    // 1. CONFIGURAÇÃO DO SEU PIX (ALTERE COM OS SEUS DADOS AQUI)
+    // =========================================================================
+    const CONFIG_PIX = {
+      chave: "suachavepix@email.com", // Digite sua chave Pix (CPF, CNPJ, E-mail ou Telefone)
+      nomeRecebedor: "Sua Loja de E-books", // Nome exibido para o cliente
+      cidade: "SAO PAULO"
+    };
+
+    // =========================================================================
+    // 2. BANCO DE DADOS DOS E-BOOKS
+    // =========================================================================
+    const CATALAGO_EBOOKS = [
       {
-        id: 'eb-1',
-        titulo: 'Código Limpo e Moderno',
-        autor: 'Carlos Eduardo',
-        preco: 29.90,
+        id: 'eb-101',
+        titulo: 'Aprenda Programação do Zero',
+        autor: 'Gabriel Alves',
+        preco: 19.90,
         capa: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=500&q=80',
-        descricao: 'Aprenda a escrever código legível, testável e escalável em JavaScript e Python.',
-        conteudo: `
-          <p>O desenvolvimento de software moderno exige mais do que apenas fazer o código funcionar. É fundamental criar estruturas sustentáveis.</p>
-          <p>Neste livro, abordamos padrões de projeto, princípios SOLID aplicados e refatoração de código legado sem medo.</p>
-          <blockquote class="p-4 my-4 border-l-4 border-brand-600 bg-brand-50 dark:bg-gray-700 italic">
-            "Qualquer tolo pode escrever código que um computador entenda. Bons programadores escrevem código que humanos podem entender." - Martin Fowler
-          </blockquote>
-          <p>Aprenda a identificar 'smells' no código e aplicar testes automatizados para garantir a qualidade contínua.</p>
-        `
+        descricao: 'Guia definitivo para iniciantes em lógica e desenvolvimento de software.',
+        conteudo: '<h2 class="text-lg font-bold">Capítulo 1: O Início</h2><p>Programar é resolver problemas utilizando uma linguagem estruturada...</p>'
       },
       {
-        id: 'eb-2',
-        titulo: 'Dominando Node.js & APIs REST',
-        autor: 'Mariana Silva',
-        preco: 34.90,
-        capa: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?auto=format&fit=crop&w=500&q=80',
-        descricao: 'Construa microsserviços rápidos, autenticação JWT e integrações de pagamentos.',
-        conteudo: `
-          <p>Node.js transformou o JavaScript no ecossistema de servidor mais popular do mundo.</p>
-          <p>Aprenda a configurar rotas assíncronas, conectar bancos de dados MongoDB e PostgreSQL, além de implementar webhooks para pagamentos como Pix e cartão.</p>
-          <p>Construa APIs escaláveis prontas para produção na nuvem.</p>
-        `
-      },
-      {
-        id: 'eb-3',
-        titulo: 'Guia do Front-End Incrível',
-        autor: 'Lucas Mendes',
-        preco: 24.90,
+        id: 'eb-102',
+        titulo: 'Desenvolvimento Web Moderno',
+        autor: 'Juliana Costa',
+        preco: 29.90,
         capa: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=500&q=80',
-        descricao: 'Crie interfaces reativas, responsivas e elegantes utilizando HTML, Tailwind CSS e JS.',
-        conteudo: `
-          <p>O design e a usabilidade definem o sucesso de uma aplicação web.</p>
-          <p>Descubra truques do Tailwind CSS, animações suaves e técnicas de manipulação do DOM em tempo real.</p>
-          <p>Crie dashboards e lojas virtuais totalmente adaptadas para dispositivos móveis.</p>
-        `
+        descricao: 'Construa sites rápidos, responsivos e profissionais usando HTML, CSS e JavaScript.',
+        conteudo: '<h2 class="text-lg font-bold">Capítulo 1: Arquitetura Web</h2><p>Compreenda como o navegador interpreta suas páginas e estilos...</p>'
       },
       {
-        id: 'eb-4',
-        titulo: 'Inteligência Artificial na Prática',
-        autor: 'Ana Paula Rocha',
+        id: 'eb-103',
+        titulo: 'Banco de Dados e APIs',
+        autor: 'Roberto Lima',
         preco: 39.90,
-        capa: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=500&q=80',
-        descricao: 'Aprenda a integrar modelos de IA generativa e APIs de LLM nas suas aplicações.',
-        conteudo: `
-          <p>A inteligência artificial está redefinindo o desenvolvimento de software.</p>
-          <p>Aprenda a construir chatbots inteligentes, geradores de conteúdo automático e análise preditiva de dados.</p>
-        `
+        capa: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?auto=format&fit=crop&w=500&q=80',
+        descricao: 'Aprenda a estruturar dados e criar APIs para conectar seu site a pagamentos e serviços.',
+        conteudo: '<h2 class="text-lg font-bold">Capítulo 1: APIs RESTful</h2><p>Entenda requisições HTTP, respostas JSON e integração de meios de pagamento...</p>'
       }
     ];
 
-    // --- ESTADO DA APLICAÇÃO ---
     let ebookSelecionado = null;
-    let timerPixInterval = null;
-    let pollingPixTimeout = null;
 
-    // --- INICIALIZAÇÃO DA PÁGINA ---
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       renderizarCatalogo();
-      atualizarMeusEbooks();
+      atualizarBiblioteca();
     });
 
-    // --- TROCA DE ABAS ---
+    // --- GERENCIAMENTO DE ABAS ---
     function trocarAba(aba) {
-      const secCatalogo = document.getElementById('sec-catalogo');
-      const secMeusEbooks = document.getElementById('sec-meus-ebooks');
-      const tabCatalogo = document.getElementById('tab-catalogo');
-      const tabMeusEbooks = document.getElementById('tab-meus-ebooks');
+      const secCat = document.getElementById('sec-catalogo');
+      const secMeu = document.getElementById('sec-meus-ebooks');
+      const tabCat = document.getElementById('tab-catalogo');
+      const tabMeu = document.getElementById('tab-meus-ebooks');
 
       if (aba === 'catalogo') {
-        secCatalogo.classList.remove('hidden');
-        secMeusEbooks.classList.add('hidden');
-        tabCatalogo.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition bg-brand-50 dark:bg-gray-700 text-brand-600 dark:text-white";
-        tabMeusEbooks.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700";
+        secCat.classList.remove('hidden');
+        secMeu.classList.add('hidden');
+        tabCat.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition bg-brand-50 dark:bg-gray-700 text-brand-600 dark:text-white";
+        tabMeu.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700";
       } else {
-        secCatalogo.classList.add('hidden');
-        secMeusEbooks.classList.remove('hidden');
-        tabMeusEbooks.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition bg-brand-50 dark:bg-gray-700 text-brand-600 dark:text-white";
-        tabCatalogo.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700";
+        secCat.classList.add('hidden');
+        secMeu.classList.remove('hidden');
+        tabMeu.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition bg-brand-50 dark:bg-gray-700 text-brand-600 dark:text-white";
+        tabCat.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700";
       }
     }
 
-    // --- RENDERIZAR CATÁLOGO DE E-BOOKS ---
+    // --- CATÁLOGO ---
     function renderizarCatalogo() {
-      const container = document.getElementById('grid-ebooks');
-      const meusEbooksIds = getMeusEbooksComprados().map(e => e.id);
+      const grid = document.getElementById('grid-ebooks');
+      const comprados = getEbooksComprados().map(e => e.id);
 
-      container.innerHTML = EBOOKS_CATALOGO.map(ebook => {
-        const jaComprado = meusEbooksIds.includes(ebook.id);
-
+      grid.innerHTML = CATALAGO_EBOOKS.map(ebook => {
+        const jaPossui = comprados.includes(ebook.id);
         return `
-          <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 flex flex-col hover:shadow-xl transition duration-300">
-            <div class="h-48 overflow-hidden relative">
-              <img src="${ebook.capa}" alt="${ebook.titulo}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-              <span class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-full">E-book PDF</span>
+          <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow border border-gray-100 dark:border-gray-700 flex flex-col justify-between">
+            <div>
+              <img src="${ebook.capa}" class="w-full h-44 object-cover">
+              <div class="p-4">
+                <span class="text-[10px] text-brand-600 dark:text-brand-400 font-bold uppercase tracking-wider">${ebook.autor}</span>
+                <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mt-0.5">${ebook.titulo}</h3>
+                <p class="text-xs text-gray-500 mt-2">${ebook.descricao}</p>
+              </div>
             </div>
-            
-            <div class="p-5 flex-1 flex flex-col justify-between">
-              <div>
-                <span class="text-xs text-brand-600 dark:text-brand-400 font-semibold uppercase tracking-wider">${ebook.autor}</span>
-                <h3 class="text-lg font-bold mt-1 text-gray-800 dark:text-gray-100">${ebook.titulo}</h3>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">${ebook.descricao}</p>
-              </div>
-
-              <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
-                <div>
-                  <span class="text-xs text-gray-400 block">Preço</span>
-                  <span class="text-xl font-extrabold text-gray-900 dark:text-white">R$ ${ebook.preco.toFixed(2).replace('.', ',')}</span>
-                </div>
-
-                ${jaComprado ? `
-                  <button onclick="trocarAba('meus-ebooks')" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow">
-                    <i data-lucide="check" class="w-4 h-4"></i> Adquirido
-                  </button>
-                ` : `
-                  <button onclick="abrirModalPix('${ebook.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition">
-                    <i data-lucide="qr-code" class="w-4 h-4"></i> Comprar Pix
-                  </button>
-                `}
-              </div>
+            <div class="p-4 border-t dark:border-gray-700 flex items-center justify-between">
+              <span class="text-lg font-extrabold">R$ ${ebook.preco.toFixed(2).replace('.', ',')}</span>
+              ${jaPossui ? `
+                <button onclick="trocarAba('meus-ebooks')" class="px-3 py-1.5 bg-emerald-600 text-white rounded-lg text-xs font-bold flex items-center gap-1">
+                  <i data-lucide="check" class="w-3.5 h-3.5"></i> Liberado
+                </button>
+              ` : `
+                <button onclick="abrirModalPix('${ebook.id}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold flex items-center gap-1">
+                  <i data-lucide="qr-code" class="w-3.5 h-3.5"></i> Comprar Pix
+                </button>
+              `}
             </div>
           </div>
         `;
       }).join('');
-
       lucide.createIcons();
     }
 
-    // --- GERENCIAMENTO DE LOCALSTORAGE (BIBLIOTECA) ---
-    function getMeusEbooksComprados() {
-      return JSON.parse(localStorage.getItem('meus_ebooks_db') || '[]');
+    // --- CHECKOUT E CRIAÇÃO DO PIX ---
+    function abrirModalPix(id) {
+      ebookSelecionado = CATALAGO_EBOOKS.find(e => e.id === id);
+      if (!ebookSelecionado) return;
+
+      document.getElementById('resumo-compra-ebook').innerHTML = `
+        <img src="${ebookSelecionado.capa}" class="w-10 h-10 object-cover rounded">
+        <div>
+          <h4 class="text-xs font-bold">${ebookSelecionado.titulo}</h4>
+          <span class="text-xs text-emerald-600 font-bold">R$ ${ebookSelecionado.preco.toFixed(2).replace('.', ',')}</span>
+        </div>
+      `;
+
+      document.getElementById('pix-passo-1').classList.remove('hidden');
+      document.getElementById('pix-passo-2').classList.add('hidden');
+      document.getElementById('pix-passo-3').classList.add('hidden');
+      document.getElementById('modal-pix').classList.remove('hidden');
     }
 
-    function salvarEbookNaBiblioteca(ebook) {
-      const comprados = getMeusEbooksComprados();
-      if (!comprados.some(e => e.id === ebook.id)) {
-        comprados.push(ebook);
-        localStorage.setItem('meus_ebooks_db', JSON.stringify(comprados));
+    function fecharModalPix() {
+      document.getElementById('modal-pix').classList.add('hidden');
+    }
+
+    function gerarCobrançaPix(e) {
+      e.preventDefault();
+
+      document.getElementById('pix-passo-1').classList.add('hidden');
+      document.getElementById('pix-passo-2').classList.remove('hidden');
+
+      // Exibe os dados do proprietário do Pix
+      document.getElementById('display-chave-pix').innerText = CONFIG_PIX.chave;
+      document.getElementById('display-recebedor').innerText = CONFIG_PIX.nomeRecebedor;
+      document.getElementById('display-valor').innerText = `R$ ${ebookSelecionado.preco.toFixed(2).replace('.', ',')}`;
+
+      // Gera um QR Code baseado na sua chave Pix cadastrada
+      const textQrCode = `Chave Pix: ${CONFIG_PIX.chave} | Valor: R$ ${ebookSelecionado.preco.toFixed(2)} | Item: ${ebookSelecionado.titulo}`;
+      document.getElementById('pix-img-qrcode').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(textQrCode)}`;
+    }
+
+    function copiarChavePix() {
+      navigator.clipboard.writeText(CONFIG_PIX.chave);
+      notificar("Chave Pix copiada para a área de transferência!");
+    }
+
+    // --- CONFIRMAÇÃO E LIBERAÇÃO DO E-BOOK ---
+    function finalizarPagamentoEConfirmar() {
+      // Adiciona o e-book ao armazenamento local (banco de dados do navegador)
+      salvarEbookAdquirido(ebookSelecionado);
+
+      document.getElementById('pix-passo-2').classList.add('hidden');
+      document.getElementById('pix-passo-3').classList.remove('hidden');
+
+      notificar("Pagamento recebido! O e-book foi adicionado à sua conta.");
+    }
+
+    function irParaMeusEbooks() {
+      fecharModalPix();
+      trocarAba('meus-ebooks');
+    }
+
+    // --- GERENCIAMENTO DE LOCALSTORAGE ---
+    function getEbooksComprados() {
+      return JSON.parse(localStorage.getItem('ebooks_comprados_db') || '[]');
+    }
+
+    function salvarEbookAdquirido(ebook) {
+      const lista = getEbooksComprados();
+      if (!lista.some(item => item.id === ebook.id)) {
+        lista.push(ebook);
+        localStorage.setItem('ebooks_comprados_db', JSON.stringify(lista));
       }
-      atualizarMeusEbooks();
+      atualizarBiblioteca();
       renderizarCatalogo();
     }
 
-    // --- RENDERIZAR "MEUS E-BOOKS" ---
-    function atualizarMeusEbooks() {
-      const comprados = getMeusEbooksComprados();
+    function atualizarBiblioteca() {
+      const comprados = getEbooksComprados();
       const grid = document.getElementById('grid-meus-ebooks');
       const vazio = document.getElementById('meus-ebooks-vazio');
       const badge = document.getElementById('badge-meus-ebooks');
@@ -442,143 +403,28 @@
 
       vazio.classList.add('hidden');
       grid.innerHTML = comprados.map(ebook => `
-        <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 flex flex-col">
-          <div class="h-40 overflow-hidden relative">
-            <img src="${ebook.capa}" alt="${ebook.titulo}" class="w-full h-full object-cover">
-            <span class="absolute top-3 right-3 bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
-              <i data-lucide="check-circle" class="w-3 h-3"></i> Liberado
-            </span>
+        <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow border border-gray-100 dark:border-gray-700 p-4 flex flex-col justify-between">
+          <div>
+            <span class="text-[10px] text-emerald-600 font-bold uppercase">Pago & Liberado</span>
+            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100 mt-1">${ebook.titulo}</h3>
+            <p class="text-xs text-gray-500">Por ${ebook.autor}</p>
           </div>
-
-          <div class="p-5 flex-1 flex flex-col justify-between">
-            <div>
-              <h3 class="text-base font-bold text-gray-800 dark:text-gray-100">${ebook.titulo}</h3>
-              <p class="text-xs text-gray-500 mt-1">Por ${ebook.autor}</p>
-            </div>
-
-            <div class="mt-5 space-y-2">
-              <button onclick="abrirLeitor('${ebook.id}')" class="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg transition flex items-center justify-center gap-2">
-                <i data-lucide="book-open" class="w-4 h-4"></i> Ler no Navegador
-              </button>
-              <button onclick="simularDownloadPDF('${ebook.titulo}')" class="w-full py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-700 dark:text-gray-200 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-2">
-                <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF
-              </button>
-            </div>
-          </div>
+          <button onclick="abrirLeitor('${ebook.id}')" class="mt-4 py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-2">
+            <i data-lucide="book-open" class="w-4 h-4"></i> Ler E-book
+          </button>
         </div>
       `).join('');
-
       lucide.createIcons();
     }
 
-    // --- FLUXO DE PAGAMENTO VIA PIX ---
-    function abrirModalPix(ebookId) {
-      ebookSelecionado = EBOOKS_CATALOGO.find(e => e.id === ebookId);
-      if (!ebookSelecionado) return;
-
-      // Renderiza o resumo do produto no modal
-      document.getElementById('resumo-compra-ebook').innerHTML = `
-        <img src="${ebookSelecionado.capa}" class="w-12 h-12 object-cover rounded-lg">
-        <div class="flex-1">
-          <h4 class="text-xs font-bold text-gray-800 dark:text-gray-200">${ebookSelecionado.titulo}</h4>
-          <span class="text-xs text-emerald-600 font-extrabold">R$ ${ebookSelecionado.preco.toFixed(2).replace('.', ',')}</span>
-        </div>
-      `;
-
-      // Reseta passos
-      document.getElementById('pix-passo-1').classList.remove('hidden');
-      document.getElementById('pix-passo-2').classList.add('hidden');
-      document.getElementById('pix-passo-3').classList.add('hidden');
-
-      document.getElementById('modal-pix').classList.remove('hidden');
-    }
-
-    function fecharModalPix() {
-      document.getElementById('modal-pix').classList.add('hidden');
-      if (timerPixInterval) clearInterval(timerPixInterval);
-      if (pollingPixTimeout) clearTimeout(pollingPixTimeout);
-    }
-
-    function processarFormularioPix(e) {
-      e.preventDefault();
-
-      // Transiciona para o passo 2 (Exibição do QR Code)
-      document.getElementById('pix-passo-1').classList.add('hidden');
-      document.getElementById('pix-passo-2').classList.remove('hidden');
-
-      // Gera código Copia e Cola Pix simulado
-      const payloadPix = `00020126580014BR.GOV.BCB.PIX0136${Math.random().toString(36).substring(2, 15)}5204000053039865405${ebookSelecionado.preco.toFixed(2)}5802BR5910EbookStore6009SAO PAULO62070503***6304ABCD`;
-      
-      document.getElementById('pix-copia-cola-input').value = payloadPix;
-
-      // Gera QR Code via API pública externa de QR Codes
-      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payloadPix)}`;
-      document.getElementById('pix-img-qrcode').src = qrCodeUrl;
-
-      iniciarTimerPix();
-
-      // Simulação de polling / confirmação automática do banco em 12 segundos
-      pollingPixTimeout = setTimeout(() => {
-        simularPagamentoAprovado();
-      }, 12000);
-    }
-
-    function copiarPix() {
-      const input = document.getElementById('pix-copia-cola-input');
-      input.select();
-      navigator.clipboard.writeText(input.value);
-      notificar('Código Pix copiado para a área de transferência!');
-    }
-
-    function iniciarTimerPix() {
-      let segundos = 900; // 15 minutos
-      const display = document.getElementById('pix-timer');
-
-      if (timerPixInterval) clearInterval(timerPixInterval);
-
-      timerPixInterval = setInterval(() => {
-        segundos--;
-        const mins = Math.floor(segundos / 60);
-        const secs = segundos % 60;
-        display.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-
-        if (segundos <= 0) {
-          clearInterval(timerPixInterval);
-          notificar('O código Pix expirou. Gere uma nova cobrança.');
-          fecharModalPix();
-        }
-      }, 1000);
-    }
-
-    // SIMULA A CONFIRMAÇÃO DO WEBHOOK DO BANCO
-    function simularPagamentoAprovado() {
-      if (timerPixInterval) clearInterval(timerPixInterval);
-      if (pollingPixTimeout) clearTimeout(pollingPixTimeout);
-
-      // Salva o e-book na biblioteca do usuário
-      salvarEbookNaBiblioteca(ebookSelecionado);
-
-      // Exibe tela de sucesso
-      document.getElementById('pix-passo-2').classList.add('hidden');
-      document.getElementById('pix-passo-3').classList.remove('hidden');
-
-      notificar('Pagamento Pix confirmado com sucesso!');
-    }
-
-    function irParaMeusEbooksAposCompra() {
-      fecharModalPix();
-      trocarAba('meus-ebooks');
-    }
-
-    // --- LEITOR INTEGRADO DE E-BOOKS ---
-    function abrirLeitor(ebookId) {
-      const ebook = EBOOKS_CATALOGO.find(e => e.id === ebookId);
+    // --- LEITOR DE E-BOOK ---
+    function abrirLeitor(id) {
+      const ebook = CATALAGO_EBOOKS.find(e => e.id === id);
       if (!ebook) return;
 
       document.getElementById('leitor-titulo').innerText = ebook.titulo;
-      document.getElementById('leitor-autor').innerText = `Por ${ebook.autor}`;
+      document.getElementById('leitor-autor').innerText = `Autor: ${ebook.autor}`;
       document.getElementById('leitor-conteudo').innerHTML = ebook.conteudo;
-
       document.getElementById('modal-leitor').classList.remove('hidden');
     }
 
@@ -586,25 +432,16 @@
       document.getElementById('modal-leitor').classList.add('hidden');
     }
 
-    function simularDownloadPDF(titulo) {
-      notificar(`Iniciando download do e-book "${titulo}.pdf"...`);
-    }
-
-    // --- UTILITÁRIOS: TOAST & DARK MODE ---
+    // --- UTILS ---
     function toggleDarkMode() {
       document.documentElement.classList.toggle('dark');
     }
 
-    function notificar(mensagem) {
+    function notificar(msg) {
       const toast = document.getElementById('toast');
-      const msgSpan = document.getElementById('toast-msg');
-
-      msgSpan.innerText = mensagem;
+      document.getElementById('toast-msg').innerText = msg;
       toast.classList.remove('translate-y-20', 'opacity-0');
-
-      setTimeout(() => {
-        toast.classList.add('translate-y-20', 'opacity-0');
-      }, 3500);
+      setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
     }
   </script>
 </body>
