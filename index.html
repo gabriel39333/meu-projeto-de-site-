@@ -1,1404 +1,611 @@
 <!DOCTYPE html>
 <html lang="pt-BR" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EbookHunter & Resell Hub - Busca, Comparação e Revenda de Ebooks</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            800: '#065f46',
-                            900: '#064e3b',
-                        },
-                        accent: {
-                            500: '#6366f1',
-                            600: '#4f46e5',
-                            700: '#4338ca',
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EbookVerse - Livraria Digital & Pagamento Pix</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f5f3ff',
+              100: '#ede9fe',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
             }
+          }
         }
-    </script>
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 9999px; }
-        .light .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; }
-        .glass-panel {
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-        }
-    </style>
+      }
+    }
+  </script>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col transition-colors duration-300 light:bg-slate-50 light:text-slate-800" id="app-body">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 min-h-screen flex flex-col font-sans transition-colors duration-200">
 
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 max-w-sm w-full pointer-events-none"></div>
-
-    <header class="sticky top-0 z-40 bg-slate-950/80 border-b border-slate-800/80 glass-panel light:bg-white/90 light:border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-            
-            <!-- Logo -->
-            <div class="flex items-center gap-3 cursor-pointer" onclick="switchSection('marketplace')">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-accent-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
-                    <i data-lucide="book-open-check" class="w-6 h-6 text-white"></i>
-                </div>
-                <div>
-                    <span class="text-lg font-extrabold tracking-tight text-white light:text-slate-900">Ebook<span class="text-brand-500">Hunter</span></span>
-                    <span class="hidden sm:inline-block text-[10px] uppercase tracking-wider px-2 py-0.5 ml-2 rounded-full bg-slate-800 text-slate-300 border border-slate-700 light:bg-slate-100 light:text-slate-700 light:border-slate-300">Resell Hub</span>
-                </div>
-            </div>
-
-            <!-- Global Search Input -->
-            <div class="flex-1 max-w-md hidden md:block">
-                <div class="relative">
-                    <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-slate-400"></i>
-                    <input type="text" id="global-search-input" oninput="handleGlobalSearch(event)" placeholder="Buscar ebook, autor, licenças PLR ou temas..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition light:bg-slate-100 light:border-slate-200 light:text-slate-900">
-                </div>
-            </div>
-
-            <!-- Navigation Links & Action Buttons -->
-            <div class="flex items-center gap-2 sm:gap-3">
-                <nav class="hidden lg:flex items-center gap-1 text-sm font-medium">
-                    <button onclick="switchSection('marketplace')" id="nav-btn-marketplace" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition light:text-slate-600 light:hover:text-slate-900">Catálogo</button>
-                    <button onclick="switchSection('comparison')" id="nav-btn-comparison" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition light:text-slate-600 light:hover:text-slate-900">Comparador</button>
-                    <button onclick="switchSection('calculator')" id="nav-btn-calculator" class="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition light:text-slate-600 light:hover:text-slate-900">Calculadora de Lucro</button>
-                </nav>
-
-                <!-- Sell / List Ebook Button -->
-                <button onclick="openSellModal()" class="hidden sm:flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium text-xs transition light:bg-slate-100 light:hover:bg-slate-200 light:text-slate-800 light:border-slate-300">
-                    <i data-lucide="plus-circle" class="w-4 h-4 text-brand-500"></i>
-                    <span>Anunciar Ebook</span>
-                </button>
-
-                <!-- Favorites Toggle -->
-                <button onclick="toggleFavoritesFilter()" id="favorites-badge-btn" class="relative p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition light:bg-slate-100 light:border-slate-200 light:text-slate-700" title="Favoritos">
-                    <i data-lucide="heart" class="w-5 h-5"></i>
-                    <span id="favorites-count" class="hidden absolute -top-1 -right-1 w-4 h-4 rounded-full bg-rose-500 text-white text-[10px] font-bold items-center justify-center">0</span>
-                </button>
-
-                <!-- Cart Trigger Button -->
-                <button onclick="toggleCartDrawer()" class="relative p-2 rounded-xl bg-brand-600/10 border border-brand-500/30 text-brand-400 hover:bg-brand-600 hover:text-white transition" title="Carrinho">
-                    <i data-lucide="shopping-bag" class="w-5 h-5"></i>
-                    <span id="cart-badge-count" class="hidden absolute -top-1 -right-1 w-5 h-5 rounded-full bg-brand-500 text-white text-[10px] font-bold items-center justify-center shadow-lg">0</span>
-                </button>
-
-                <!-- Theme Toggle -->
-                <button onclick="toggleTheme()" class="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-300 hover:text-white hover:bg-slate-800 transition light:bg-slate-100 light:border-slate-200 light:text-slate-700" title="Alternar Tema">
-                    <i data-lucide="sun" id="theme-icon-sun" class="w-5 h-5 hidden"></i>
-                    <i data-lucide="moon" id="theme-icon-moon" class="w-5 h-5"></i>
-                </button>
-            </div>
+  <!-- TOP HEADER / NAVBAR -->
+  <header class="sticky top-0 z-30 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md border-b border-gray-200 dark:border-gray-700">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- LOGO -->
+      <div class="flex items-center gap-2 cursor-pointer" onclick="trocarAba('catalogo')">
+        <div class="p-2 bg-brand-600 text-white rounded-lg shadow-lg">
+          <i data-lucide="book-open" class="w-6 h-6"></i>
         </div>
+        <span class="text-xl font-bold bg-gradient-to-r from-brand-600 to-indigo-400 bg-clip-text text-transparent">
+          EbookVerse
+        </span>
+      </div>
 
-        <!-- Mobile Search Bar Subheader -->
-        <div class="px-4 pb-3 md:hidden">
-            <div class="relative">
-                <i data-lucide="search" class="w-4 h-4 absolute left-3.5 top-3 text-slate-400"></i>
-                <input type="text" oninput="handleGlobalSearch(event)" placeholder="Buscar ebook, autor, licenças PLR..." class="w-full bg-slate-900 border border-slate-800 rounded-xl pl-10 pr-4 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-200 light:text-slate-900">
-            </div>
+      <!-- NAV TABS -->
+      <nav class="flex items-center gap-1 sm:gap-4">
+        <button onclick="trocarAba('catalogo')" id="tab-catalogo" class="px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition bg-brand-50 dark:bg-gray-700 text-brand-600 dark:text-white">
+          <i data-lucide="store" class="w-4 h-4"></i> Catálogo
+        </button>
+        <button onclick="trocarAba('meus-ebooks')" id="tab-meus-ebooks" class="px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i data-lucide="library" class="w-4 h-4"></i> Meus E-books 
+          <span id="badge-meus-ebooks" class="px-2 py-0.5 text-xs font-bold bg-brand-600 text-white rounded-full">0</span>
+        </button>
+      </nav>
+
+      <!-- DARK MODE TOGGLE & USER -->
+      <div class="flex items-center gap-3">
+        <button onclick="toggleDarkMode()" class="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700">
+          <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+          <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+        </button>
+        <div class="flex items-center gap-2 pl-3 border-l border-gray-200 dark:border-gray-700">
+          <div class="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center font-bold text-sm">
+            U
+          </div>
+          <span class="text-sm font-medium hidden sm:inline">Usuário</span>
         </div>
-    </header>
-
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
-
-        <section class="relative rounded-3xl bg-gradient-to-r from-slate-900 via-slate-900/90 to-brand-950/40 border border-slate-800/80 p-8 sm:p-12 overflow-hidden shadow-2xl light:from-white light:via-slate-50 light:to-brand-50 light:border-slate-200">
-            <div class="absolute -right-12 -bottom-12 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -left-12 -top-12 w-80 h-80 bg-accent-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            
-            <div class="relative z-10 max-w-3xl space-y-6">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-400 text-xs font-semibold">
-                    <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
-                    <span>Hub nº 1 em Comparação de Preços & Revenda PLR</span>
-                </div>
-                
-                <h1 class="text-3xl sm:text-5xl font-black tracking-tight text-white leading-tight light:text-slate-900">
-                    Encontre os Melhores Ebooks pelo <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-400">Menor Preço</span> ou para Revender.
-                </h1>
-                
-                <p class="text-sm sm:text-base text-slate-400 leading-relaxed light:text-slate-600">
-                    Compare ofertas em plataformas como Amazon Kindle, Kiwify, Hotmart e Eduzz. Adquira ebooks com licenças **PLR (Direito de Revenda)** para criar novos negócios ou leia seus livros favoritos pagando menos.
-                </p>
-
-                <!-- Key Metrics Grid -->
-                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 pt-4 border-t border-slate-800/80 light:border-slate-200">
-                    <div>
-                        <span class="block text-2xl font-extrabold text-white light:text-slate-900">+15.000</span>
-                        <span class="text-xs text-slate-400">Ebooks Indexados</span>
-                    </div>
-                    <div>
-                        <span class="block text-2xl font-extrabold text-white light:text-slate-900">+12</span>
-                        <span class="text-xs text-slate-400">Plataformas Comparadas</span>
-                    </div>
-                    <div>
-                        <span class="block text-2xl font-extrabold text-brand-400">85% Média</span>
-                        <span class="text-xs text-slate-400">Margem Lucro em PLR</span>
-                    </div>
-                </div>
-
-                <!-- Quick Category Buttons -->
-                <div class="flex flex-wrap items-center gap-2 pt-2">
-                    <span class="text-xs text-slate-400 font-medium mr-2">Navegue por:</span>
-                    <button onclick="setCategoryFilter('all')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition light:bg-slate-200 light:text-slate-800">Todos</button>
-                    <button onclick="setCategoryFilter('negocios')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition light:bg-slate-200 light:text-slate-800">Negócios & MKT</button>
-                    <button onclick="setCategoryFilter('tecnologia')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition light:bg-slate-200 light:text-slate-800">Tecnologia & IA</button>
-                    <button onclick="setCategoryFilter('financas')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs text-slate-300 transition light:bg-slate-200 light:text-slate-800">Finanças</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="section-marketplace" class="space-y-6">
-            
-            <!-- Controls Header: Title & Filters -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800/80 light:border-slate-200">
-                <div>
-                    <h2 class="text-2xl font-bold text-white light:text-slate-900">Catálogo de Ebooks & Livros</h2>
-                    <p class="text-xs text-slate-400 mt-1">Explore livros físicos, digitais e licenças de revenda exclusiva.</p>
-                </div>
-
-                <!-- Filter Controls -->
-                <div class="flex flex-wrap items-center gap-3">
-                    <!-- Category Selector -->
-                    <select id="filter-category" onchange="applyFilters()" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500 light:bg-white light:border-slate-200 light:text-slate-800">
-                        <option value="all">Todas as Categorias</option>
-                        <option value="negocios">Negócios & Marketing</option>
-                        <option value="tecnologia">Tecnologia & IA</option>
-                        <option value="desenvolvimento">Desenvolvimento Pessoal</option>
-                        <option value="financas">Finanças & Investimentos</option>
-                        <option value="saude">Saúde & Longevidade</option>
-                    </select>
-
-                    <!-- License Selector -->
-                    <select id="filter-license" onchange="applyFilters()" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500 light:bg-white light:border-slate-200 light:text-slate-800">
-                        <option value="all">Todas as Licenças</option>
-                        <option value="plr">Direito de Revenda (PLR)</option>
-                        <option value="personal">Uso Pessoal</option>
-                        <option value="physical">Livro Físico</option>
-                    </select>
-
-                    <!-- Sort Selector -->
-                    <select id="filter-sort" onchange="applyFilters()" class="bg-slate-900 border border-slate-800 rounded-xl px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500 light:bg-white light:border-slate-200 light:text-slate-800">
-                        <option value="featured">Destaques</option>
-                        <option value="price-asc">Menor Preço</option>
-                        <option value="price-desc">Maior Preço</option>
-                        <option value="rating">Melhor Avaliados</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Ebooks Grid -->
-            <div id="books-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                <!-- Book Cards populated dynamically via JS -->
-            </div>
-
-            <!-- Empty State Container -->
-            <div id="books-empty-state" class="hidden p-12 text-center border border-dashed border-slate-800 rounded-2xl light:border-slate-300">
-                <i data-lucide="search-x" class="w-12 h-12 text-slate-500 mx-auto mb-3"></i>
-                <h3 class="text-base font-semibold text-slate-200 light:text-slate-800">Nenhum livro encontrado</h3>
-                <p class="text-xs text-slate-400 mt-1">Tente mudar os filtros de busca ou limpe a palavra-chave pesquisada.</p>
-                <button onclick="resetFilters()" class="mt-4 px-4 py-2 rounded-xl bg-brand-600 text-white text-xs font-medium hover:bg-brand-500 transition">Limpar Filtros</button>
-            </div>
-        </section>
-
-        <section id="section-comparison" class="space-y-6 pt-6">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800/80 light:border-slate-200">
-                <div>
-                    <div class="flex items-center gap-2">
-                        <h2 class="text-2xl font-bold text-white light:text-slate-900">Comparador & Oportunidades de Revenda</h2>
-                        <span class="px-2.5 py-0.5 rounded-full bg-accent-500/10 border border-accent-500/30 text-accent-400 text-xs font-semibold">Live Monitor</span>
-                    </div>
-                    <p class="text-xs text-slate-400 mt-1">Veja onde comprar mais barato para leitura ou onde obter licenças PLR com as maiores margens do mercado.</p>
-                </div>
-            </div>
-
-            <div class="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden shadow-xl light:bg-white light:border-slate-200">
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-900 border-b border-slate-800 text-slate-400 text-xs uppercase font-semibold light:bg-slate-100 light:border-slate-200 light:text-slate-600">
-                                <th class="p-4">Ebook / Título</th>
-                                <th class="p-4">Menor Preço Leitura</th>
-                                <th class="p-4">Oportunidade de Revenda (PLR)</th>
-                                <th class="p-4">Plataformas Comparadas</th>
-                                <th class="p-4 text-right">Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="comparison-table-body" class="divide-y divide-slate-800/60 light:divide-slate-200">
-                            <!-- Comparison table rows dynamic render -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <section id="section-calculator" class="space-y-6 pt-6">
-            <div class="pb-4 border-b border-slate-800/80 light:border-slate-200">
-                <h2 class="text-2xl font-bold text-white light:text-slate-900">Calculadora Interativa de Lucro para Revendedores</h2>
-                <p class="text-xs text-slate-400 mt-1">Simule o retorno de investimento (ROI) e o lucro líquido ao revender ebooks com licença PLR.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                
-                <!-- Calculator Controls Form -->
-                <div class="lg:col-span-5 bg-slate-900/80 border border-slate-800 p-6 rounded-2xl space-y-5 light:bg-white light:border-slate-200">
-                    <h3 class="font-bold text-white text-base light:text-slate-900 flex items-center gap-2">
-                        <i data-lucide="sliders" class="w-5 h-5 text-brand-500"></i>
-                        <span>Parâmetros de Venda</span>
-                    </h3>
-
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1.5 light:text-slate-700">Preço de Custo / Aquisição PLR (R$)</label>
-                        <input type="number" id="calc-cost" value="29.90" step="0.10" oninput="calculateProfit()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1.5 light:text-slate-700">Preço Desejado de Venda (R$)</label>
-                        <input type="number" id="calc-price" value="67.00" step="0.10" oninput="calculateProfit()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1.5 light:text-slate-700">Taxa Média da Plataforma de Vendas (%)</label>
-                        <input type="number" id="calc-fee" value="9.90" step="0.10" oninput="calculateProfit()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                        <p class="text-[11px] text-slate-500 mt-1">Ex: Kiwify (8.9% + R$ 2,49), Hotmart (~9.9%), Monetizze (9.9%).</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1.5 light:text-slate-700">Estimativa de Vendas por Mês (Unidades)</label>
-                        <input type="number" id="calc-sales" value="50" step="1" oninput="calculateProfit()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                    </div>
-                </div>
-
-                <!-- Live Results Dashboard -->
-                <div class="lg:col-span-7 bg-slate-900/80 border border-slate-800 p-6 rounded-2xl space-y-6 light:bg-white light:border-slate-200">
-                    <h3 class="font-bold text-white text-base light:text-slate-900 flex items-center gap-2">
-                        <i data-lucide="trending-up" class="w-5 h-5 text-accent-500"></i>
-                        <span>Projeção Financeira Real-Time</span>
-                    </h3>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-700/60 light:bg-slate-50 light:border-slate-200">
-                            <span class="text-xs text-slate-400">Faturamento Bruto Mensal</span>
-                            <span id="calc-res-revenue" class="block text-2xl font-black text-white mt-1 light:text-slate-900">R$ 3.350,00</span>
-                        </div>
-
-                        <div class="p-4 rounded-xl bg-brand-500/10 border border-brand-500/30">
-                            <span class="text-xs text-brand-400 font-medium">Lucro Líquido Mensal</span>
-                            <span id="calc-res-netprofit" class="block text-2xl font-black text-brand-400 mt-1">R$ 2.988,85</span>
-                        </div>
-
-                        <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-700/60 light:bg-slate-50 light:border-slate-200">
-                            <span class="text-xs text-slate-400">Margem de Lucro por Venda</span>
-                            <span id="calc-res-margin" class="block text-2xl font-black text-emerald-400 mt-1">89.2%</span>
-                        </div>
-
-                        <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-700/60 light:bg-slate-50 light:border-slate-200">
-                            <span class="text-xs text-slate-400">ROI (Retorno do Investimento)</span>
-                            <span id="calc-res-roi" class="block text-2xl font-black text-accent-400 mt-1">9.996%</span>
-                        </div>
-                    </div>
-
-                    <div class="p-4 rounded-xl bg-slate-800/30 border border-slate-800 text-xs text-slate-400 space-y-2 light:bg-slate-100 light:border-slate-200 light:text-slate-600">
-                        <p class="font-medium text-slate-300 light:text-slate-800">💡 Como interpretar este resultado:</p>
-                        <p>Como a licença **PLR é paga apenas uma vez**, todo o volume de vendas subsequente atua diretamente com custo zero de mercadoria vendida (COGS), pagando apenas as taxas de transação do checkout.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <div id="cart-drawer" class="fixed inset-0 z-50 pointer-events-none">
-        <!-- Backdrop -->
-        <div id="cart-backdrop" onclick="toggleCartDrawer()" class="absolute inset-0 bg-slate-950/80 opacity-0 transition-opacity duration-300 ease-in-out pointer-events-none"></div>
-
-        <!-- Panel -->
-        <div id="cart-panel" class="absolute top-0 right-0 bottom-0 w-full max-w-md bg-slate-900 border-l border-slate-800 shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out pointer-events-auto flex flex-col light:bg-white light:border-slate-200">
-            <!-- Header -->
-            <div class="p-5 border-b border-slate-800 flex items-center justify-between light:border-slate-200">
-                <div class="flex items-center gap-2">
-                    <i data-lucide="shopping-bag" class="w-5 h-5 text-brand-500"></i>
-                    <h3 class="font-bold text-lg text-white light:text-slate-900">Seu Carrinho</h3>
-                </div>
-                <button onclick="toggleCartDrawer()" class="p-2 rounded-xl text-slate-400 hover:text-white transition">
-                    <i data-lucide="x" class="w-5 h-5"></i>
-                </button>
-            </div>
-
-            <!-- Cart Items List -->
-            <div id="cart-items-container" class="flex-1 overflow-y-auto p-5 space-y-4 custom-scrollbar">
-                <!-- Items populated via JS -->
-            </div>
-
-            <!-- Footer & Checkout Controls -->
-            <div class="p-5 border-t border-slate-800 bg-slate-950/50 space-y-4 light:bg-slate-50 light:border-slate-200">
-                <!-- Coupon Input -->
-                <div class="flex gap-2">
-                    <input type="text" id="coupon-input" placeholder="Cupom (LIVRO10 ou REVENDA20)" class="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-brand-500 uppercase light:bg-white light:border-slate-300 light:text-slate-900">
-                    <button onclick="applyCoupon()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition border border-slate-700 light:bg-slate-200 light:text-slate-800 light:border-slate-300">Aplicar</button>
-                </div>
-
-                <!-- Price Summary -->
-                <div class="space-y-1.5 text-xs text-slate-400">
-                    <div class="flex justify-between">
-                        <span>Subtotal:</span>
-                        <span id="cart-subtotal" class="font-medium text-slate-200 light:text-slate-800">R$ 0,00</span>
-                    </div>
-                    <div id="cart-discount-row" class="flex justify-between text-emerald-400 hidden">
-                        <span>Desconto Aplicado:</span>
-                        <span id="cart-discount">-R$ 0,00</span>
-                    </div>
-                    <div class="flex justify-between text-base font-bold text-white pt-2 border-t border-slate-800 light:text-slate-900 light:border-slate-200">
-                        <span>Total:</span>
-                        <span id="cart-total" class="text-brand-400">R$ 0,00</span>
-                    </div>
-                </div>
-
-                <!-- Checkout Button -->
-                <button onclick="openCheckoutModal()" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm transition shadow-lg shadow-brand-600/30 flex items-center justify-center gap-2">
-                    <span>Finalizar Compra</span>
-                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                </button>
-            </div>
-        </div>
+      </div>
     </div>
+  </header>
 
-    <div id="details-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 space-y-6 relative max-h-[90vh] overflow-y-auto custom-scrollbar light:bg-white light:border-slate-200">
-            <button onclick="closeDetailsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
+  <!-- CONTAINER PRINCIPAL -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
-            <div id="details-modal-content">
-                <!-- Content dynamically built in JS -->
-            </div>
+    <!-- SEÇÃO: CATÁLOGO DE E-BOOKS -->
+    <section id="sec-catalogo" class="space-y-8">
+      <!-- HERO BANNER -->
+      <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-brand-700 via-brand-600 to-indigo-800 p-8 text-white shadow-xl">
+        <div class="relative z-10 max-w-2xl">
+          <span class="px-3 py-1 bg-white/20 text-xs font-semibold rounded-full backdrop-blur-md uppercase tracking-wider">Acesso Imediato</span>
+          <h1 class="text-3xl sm:text-4xl font-extrabold mt-3 leading-tight">Aprenda Programação com E-books Práticos</h1>
+          <p class="mt-2 text-indigo-100">Pagamento instantâneo via Pix com liberação automática da sua leitura.</p>
         </div>
+        <i data-lucide="sparkles" class="absolute right-4 -bottom-4 w-48 h-48 opacity-10 pointer-events-none"></i>
+      </div>
+
+      <!-- GRID DE E-BOOKS -->
+      <div>
+        <h2 class="text-2xl font-bold mb-6 flex items-center gap-2">
+          <i data-lucide="book-marked" class="text-brand-600"></i> E-books Disponíveis
+        </h2>
+        <div id="grid-ebooks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- Os e-books serão inseridos via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO: MEUS E-BOOKS (BIBLIOTECA) -->
+    <section id="sec-meus-ebooks" class="hidden space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-2xl font-bold flex items-center gap-2">
+            <i data-lucide="library" class="text-brand-600"></i> Minha Biblioteca Digital
+          </h2>
+          <p class="text-sm text-gray-500 dark:text-gray-400">Todos os e-books adquiridos e prontos para leitura.</p>
+        </div>
+      </div>
+
+      <div id="grid-meus-ebooks" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- E-books comprados serão exibidos aqui -->
+      </div>
+
+      <!-- ESTADO VAZIO -->
+      <div id="meus-ebooks-vazio" class="text-center py-16 bg-white dark:bg-gray-800 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
+        <i data-lucide="book-open-check" class="w-16 h-16 mx-auto text-gray-400 mb-4"></i>
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200">Você ainda não possui e-books</h3>
+        <p class="text-sm text-gray-500 mt-1 mb-4">Escolha um e-book em nosso catálogo e pague via Pix para liberar a leitura na hora.</p>
+        <button onclick="trocarAba('catalogo')" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-lg shadow-md transition">
+          Explorar Catálogo
+        </button>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DE CHECKOUT / PAGAMENTO PIX -->
+  <div id="modal-pix" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative border border-gray-100 dark:border-gray-700">
+      
+      <!-- BOTÃO FECHAR -->
+      <button onclick="fecharModalPix()" class="absolute top-4 right-4 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded-lg">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- PASSO 1: FORMULÁRIO DE DADOS DO CLIENTE -->
+      <div id="pix-passo-1" class="space-y-4">
+        <div class="flex items-center gap-3 border-b border-gray-100 dark:border-gray-700 pb-3">
+          <div class="p-2 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 rounded-lg">
+            <i data-lucide="qr-code" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <h3 class="text-lg font-bold">Comprar com Pix</h3>
+            <p class="text-xs text-gray-500 dark:text-gray-400">Preencha seus dados para gerar o código Pix</p>
+          </div>
+        </div>
+
+        <!-- RESUMO DO LIVRO -->
+        <div id="resumo-compra-ebook" class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-xl flex items-center gap-3">
+          <!-- Dados dinâmicos do e-book -->
+        </div>
+
+        <form id="form-pix" onsubmit="processarFormularioPix(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-medium mb-1">Nome Completo</label>
+            <input type="text" id="pix-nome" required placeholder="Digite seu nome" class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand-500 outline-none">
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-medium mb-1">E-mail para Envio</label>
+              <input type="email" id="pix-email" required placeholder="seu@email.com" class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+            <div>
+              <label class="block text-xs font-medium mb-1">CPF</label>
+              <input type="text" id="pix-cpf" required placeholder="000.000.000-00" class="w-full px-3 py-2 text-sm rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 focus:ring-2 focus:ring-brand-500 outline-none">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2 mt-4">
+            <i data-lucide="qr-code" class="w-5 h-5"></i> Gerar QR Code Pix
+          </button>
+        </form>
+      </div>
+
+      <!-- PASSO 2: QR CODE E CÓDIGO PIX COPIA E COLA -->
+      <div id="pix-passo-2" class="hidden space-y-4 text-center">
+        <div class="border-b border-gray-100 dark:border-gray-700 pb-2">
+          <h3 class="text-lg font-bold text-emerald-600 dark:text-emerald-400 flex items-center justify-center gap-2">
+            <i data-lucide="check-circle-2" class="w-5 h-5"></i> Pix Gerado com Sucesso
+          </h3>
+          <p class="text-xs text-gray-500">Escaneie o QR Code ou copie o código abaixo</p>
+        </div>
+
+        <!-- EXIBIÇÃO DO QR CODE -->
+        <div class="flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 rounded-2xl border border-gray-200 dark:border-gray-700">
+          <img id="pix-img-qrcode" src="" alt="QR Code Pix" class="w-48 h-48 rounded-lg shadow-md border bg-white p-2">
+          
+          <div class="mt-3 text-xs text-gray-500 flex items-center gap-1">
+            <i data-lucide="clock" class="w-4 h-4 text-amber-500"></i> Expira em: <span id="pix-timer" class="font-bold text-gray-700 dark:text-gray-200">15:00</span>
+          </div>
+        </div>
+
+        <!-- COPIA E COLA -->
+        <div class="text-left space-y-1">
+          <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Código Pix Copia e Cola:</label>
+          <div class="flex gap-2">
+            <input type="text" id="pix-copia-cola-input" readonly class="flex-1 px-3 py-2 text-xs font-mono bg-gray-100 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg text-gray-600 dark:text-gray-300 overflow-hidden text-ellipsis">
+            <button onclick="copiarPix()" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold transition flex items-center gap-1 shadow">
+              <i data-lucide="copy" class="w-4 h-4"></i> Copiar
+            </button>
+          </div>
+        </div>
+
+        <!-- STATUS DE PROCESSAMENTO -->
+        <div class="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-xl flex items-center justify-center gap-2 text-xs text-amber-700 dark:text-amber-300">
+          <div class="animate-spin rounded-full h-4 w-4 border-2 border-amber-600 border-t-transparent"></div>
+          Aguardando confirmação do banco em tempo real...
+        </div>
+
+        <!-- BOTÃO DE SIMULAÇÃO (PARA TESTES DO USUÁRIO) -->
+        <button onclick="simularPagamentoAprovado()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition shadow">
+          [Modo Teste] Simular Confirmação do Banco
+        </button>
+      </div>
+
+      <!-- PASSO 3: SUCESSO E LIBERAÇÃO -->
+      <div id="pix-passo-3" class="hidden text-center space-y-4 py-4">
+        <div class="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 rounded-full flex items-center justify-center mx-auto shadow-lg animate-bounce">
+          <i data-lucide="check" class="w-10 h-10"></i>
+        </div>
+        <h3 class="text-2xl font-extrabold text-gray-800 dark:text-white">Pagamento Confirmado!</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-300">O seu Pix foi processado com sucesso e o e-book já está disponível na sua biblioteca.</p>
+        
+        <button onclick="irParaMeusEbooksAposCompra()" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+          <i data-lucide="book-open" class="w-5 h-5"></i> Acessar Minha Biblioteca
+        </button>
+      </div>
+
     </div>
+  </div>
 
-    <div id="sell-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-4 relative max-h-[90vh] overflow-y-auto custom-scrollbar light:bg-white light:border-slate-200">
-            <button onclick="closeSellModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
-
-            <div class="space-y-1">
-                <h3 class="text-xl font-bold text-white light:text-slate-900">Anunciar / Cadastrar Ebook</h3>
-                <p class="text-xs text-slate-400">Cadastre seu livro para venda direta ou licença de revenda PLR.</p>
-            </div>
-
-            <form onsubmit="handleSellFormSubmit(event)" class="space-y-4 pt-2">
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1 light:text-slate-700">Título do Ebook *</label>
-                    <input type="text" id="sell-title" required placeholder="Ex: Guia de IA para Marketing" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1 light:text-slate-700">Autor *</label>
-                        <input type="text" id="sell-author" required placeholder="Nome do Autor" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1 light:text-slate-700">Categoria *</label>
-                        <select id="sell-category" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                            <option value="negocios">Negócios & MKT</option>
-                            <option value="tecnologia">Tecnologia & IA</option>
-                            <option value="desenvolvimento">Desenvolvimento</option>
-                            <option value="financas">Finanças</option>
-                            <option value="saude">Saúde</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1 light:text-slate-700">Preço de Venda (R$) *</label>
-                        <input type="number" id="sell-price" step="0.01" required placeholder="29.90" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-slate-300 mb-1 light:text-slate-700">Tipo de Licença *</label>
-                        <select id="sell-license" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                            <option value="plr">Direito de Revenda (PLR)</option>
-                            <option value="personal">Uso Pessoal</option>
-                            <option value="physical">Livro Físico</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1 light:text-slate-700">URL da Imagem de Capa</label>
-                    <input type="url" id="sell-cover" placeholder="https://images.unsplash.com/..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-medium text-slate-300 mb-1 light:text-slate-700">Descrição / Resumo</label>
-                    <textarea id="sell-desc" rows="3" placeholder="Resumo do conteúdo do livro..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-brand-500 light:bg-slate-100 light:border-slate-300 light:text-slate-900"></textarea>
-                </div>
-
-                <div class="flex justify-end gap-3 pt-2">
-                    <button type="button" onclick="closeSellModal()" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-medium hover:bg-slate-700 transition">Cancelar</button>
-                    <button type="submit" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white text-xs font-bold transition shadow-lg shadow-brand-600/30">Cadastrar Ebook</button>
-                </div>
-            </form>
+  <!-- MODAL LEITOR DE E-BOOK -->
+  <div id="modal-leitor" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-2 sm:p-6 hidden">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-4xl w-full h-[85vh] flex flex-col shadow-2xl overflow-hidden border border-gray-700">
+      
+      <!-- CABEÇALHO DO LEITOR -->
+      <div class="p-4 bg-gray-100 dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <i data-lucide="book-open-check" class="text-brand-600 w-6 h-6"></i>
+          <div>
+            <h3 id="leitor-titulo" class="font-bold text-sm sm:text-base leading-tight">Título do Livro</h3>
+            <span id="leitor-autor" class="text-xs text-gray-500">Autor</span>
+          </div>
         </div>
+        <button onclick="fecharLeitor()" class="p-2 text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
+      </div>
+
+      <!-- CORPO DE LEITURA -->
+      <div class="flex-1 overflow-y-auto p-6 sm:p-10 text-gray-800 dark:text-gray-200 leading-relaxed space-y-6 max-w-2xl mx-auto">
+        <div class="border-b border-gray-200 dark:border-gray-700 pb-4 text-center">
+          <span class="text-xs font-semibold text-brand-600 tracking-wider uppercase">Capítulo 1</span>
+          <h1 id="leitor-capitulo-titulo" class="text-2xl font-extrabold mt-1">Introdução Prática e Boas Práticas</h1>
+        </div>
+        <div id="leitor-conteudo" class="space-y-4 text-sm sm:text-base">
+          <!-- Conteúdo do e-book -->
+        </div>
+      </div>
+
+      <!-- RODAPÉ DO LEITOR -->
+      <div class="p-3 bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between text-xs text-gray-500">
+        <span>Página 1 de 120 (Amostra)</span>
+        <button onclick="notificar('Leitura salva automaticamente!')" class="text-brand-600 hover:underline">Salvar Progresso</button>
+      </div>
     </div>
+  </div>
 
-    <div id="checkout-modal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm hidden flex items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 space-y-6 relative light:bg-white light:border-slate-200">
-            <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white">
-                <i data-lucide="x" class="w-5 h-5"></i>
-            </button>
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 translate-y-20 opacity-0 transition-all duration-300 bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 border border-gray-700">
+    <i data-lucide="info" id="toast-icon" class="w-5 h-5 text-brand-500"></i>
+    <span id="toast-msg" class="text-sm font-medium">Mensagem de aviso</span>
+  </div>
 
-            <div class="text-center space-y-1">
-                <div class="w-12 h-12 rounded-2xl bg-brand-500/10 text-brand-500 mx-auto flex items-center justify-center mb-2">
-                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+  <!-- JAVASCRIPT PRINCIPAL -->
+  <script>
+    // --- DADOS DOS E-BOOKS ---
+    const EBOOKS_CATALOGO = [
+      {
+        id: 'eb-1',
+        titulo: 'Código Limpo e Moderno',
+        autor: 'Carlos Eduardo',
+        preco: 29.90,
+        capa: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=500&q=80',
+        descricao: 'Aprenda a escrever código legível, testável e escalável em JavaScript e Python.',
+        conteudo: `
+          <p>O desenvolvimento de software moderno exige mais do que apenas fazer o código funcionar. É fundamental criar estruturas sustentáveis.</p>
+          <p>Neste livro, abordamos padrões de projeto, princípios SOLID aplicados e refatoração de código legado sem medo.</p>
+          <blockquote class="p-4 my-4 border-l-4 border-brand-600 bg-brand-50 dark:bg-gray-700 italic">
+            "Qualquer tolo pode escrever código que um computador entenda. Bons programadores escrevem código que humanos podem entender." - Martin Fowler
+          </blockquote>
+          <p>Aprenda a identificar 'smells' no código e aplicar testes automatizados para garantir a qualidade contínua.</p>
+        `
+      },
+      {
+        id: 'eb-2',
+        titulo: 'Dominando Node.js & APIs REST',
+        autor: 'Mariana Silva',
+        preco: 34.90,
+        capa: 'https://images.unsplash.com/photo-1627398242454-45a1465c2479?auto=format&fit=crop&w=500&q=80',
+        descricao: 'Construa microsserviços rápidos, autenticação JWT e integrações de pagamentos.',
+        conteudo: `
+          <p>Node.js transformou o JavaScript no ecossistema de servidor mais popular do mundo.</p>
+          <p>Aprenda a configurar rotas assíncronas, conectar bancos de dados MongoDB e PostgreSQL, além de implementar webhooks para pagamentos como Pix e cartão.</p>
+          <p>Construa APIs escaláveis prontas para produção na nuvem.</p>
+        `
+      },
+      {
+        id: 'eb-3',
+        titulo: 'Guia do Front-End Incrível',
+        autor: 'Lucas Mendes',
+        preco: 24.90,
+        capa: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?auto=format&fit=crop&w=500&q=80',
+        descricao: 'Crie interfaces reativas, responsivas e elegantes utilizando HTML, Tailwind CSS e JS.',
+        conteudo: `
+          <p>O design e a usabilidade definem o sucesso de uma aplicação web.</p>
+          <p>Descubra truques do Tailwind CSS, animações suaves e técnicas de manipulação do DOM em tempo real.</p>
+          <p>Crie dashboards e lojas virtuais totalmente adaptadas para dispositivos móveis.</p>
+        `
+      },
+      {
+        id: 'eb-4',
+        titulo: 'Inteligência Artificial na Prática',
+        autor: 'Ana Paula Rocha',
+        preco: 39.90,
+        capa: 'https://images.unsplash.com/photo-1677442136019-21780efad99a?auto=format&fit=crop&w=500&q=80',
+        descricao: 'Aprenda a integrar modelos de IA generativa e APIs de LLM nas suas aplicações.',
+        conteudo: `
+          <p>A inteligência artificial está redefinindo o desenvolvimento de software.</p>
+          <p>Aprenda a construir chatbots inteligentes, geradores de conteúdo automático e análise preditiva de dados.</p>
+        `
+      }
+    ];
+
+    // --- ESTADO DA APLICAÇÃO ---
+    let ebookSelecionado = null;
+    let timerPixInterval = null;
+    let pollingPixTimeout = null;
+
+    // --- INICIALIZAÇÃO DA PÁGINA ---
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      renderizarCatalogo();
+      atualizarMeusEbooks();
+    });
+
+    // --- TROCA DE ABAS ---
+    function trocarAba(aba) {
+      const secCatalogo = document.getElementById('sec-catalogo');
+      const secMeusEbooks = document.getElementById('sec-meus-ebooks');
+      const tabCatalogo = document.getElementById('tab-catalogo');
+      const tabMeusEbooks = document.getElementById('tab-meus-ebooks');
+
+      if (aba === 'catalogo') {
+        secCatalogo.classList.remove('hidden');
+        secMeusEbooks.classList.add('hidden');
+        tabCatalogo.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition bg-brand-50 dark:bg-gray-700 text-brand-600 dark:text-white";
+        tabMeusEbooks.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700";
+      } else {
+        secCatalogo.classList.add('hidden');
+        secMeusEbooks.classList.remove('hidden');
+        tabMeusEbooks.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition bg-brand-50 dark:bg-gray-700 text-brand-600 dark:text-white";
+        tabCatalogo.className = "px-3 py-2 rounded-lg font-medium text-sm flex items-center gap-2 transition text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700";
+      }
+    }
+
+    // --- RENDERIZAR CATÁLOGO DE E-BOOKS ---
+    function renderizarCatalogo() {
+      const container = document.getElementById('grid-ebooks');
+      const meusEbooksIds = getMeusEbooksComprados().map(e => e.id);
+
+      container.innerHTML = EBOOKS_CATALOGO.map(ebook => {
+        const jaComprado = meusEbooksIds.includes(ebook.id);
+
+        return `
+          <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 flex flex-col hover:shadow-xl transition duration-300">
+            <div class="h-48 overflow-hidden relative">
+              <img src="${ebook.capa}" alt="${ebook.titulo}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+              <span class="absolute top-3 right-3 bg-black/60 backdrop-blur-md text-white text-xs font-bold px-2.5 py-1 rounded-full">E-book PDF</span>
+            </div>
+            
+            <div class="p-5 flex-1 flex flex-col justify-between">
+              <div>
+                <span class="text-xs text-brand-600 dark:text-brand-400 font-semibold uppercase tracking-wider">${ebook.autor}</span>
+                <h3 class="text-lg font-bold mt-1 text-gray-800 dark:text-gray-100">${ebook.titulo}</h3>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-2 line-clamp-2">${ebook.descricao}</p>
+              </div>
+
+              <div class="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between">
+                <div>
+                  <span class="text-xs text-gray-400 block">Preço</span>
+                  <span class="text-xl font-extrabold text-gray-900 dark:text-white">R$ ${ebook.preco.toFixed(2).replace('.', ',')}</span>
                 </div>
-                <h3 class="text-xl font-bold text-white light:text-slate-900">Checkout Seguro</h3>
-                <p class="text-xs text-slate-400">Escolha a forma de pagamento simulada para concluir seu pedido.</p>
+
+                ${jaComprado ? `
+                  <button onclick="trocarAba('meus-ebooks')" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold flex items-center gap-1 shadow">
+                    <i data-lucide="check" class="w-4 h-4"></i> Adquirido
+                  </button>
+                ` : `
+                  <button onclick="abrirModalPix('${ebook.id}')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 shadow transition">
+                    <i data-lucide="qr-code" class="w-4 h-4"></i> Comprar Pix
+                  </button>
+                `}
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      lucide.createIcons();
+    }
+
+    // --- GERENCIAMENTO DE LOCALSTORAGE (BIBLIOTECA) ---
+    function getMeusEbooksComprados() {
+      return JSON.parse(localStorage.getItem('meus_ebooks_db') || '[]');
+    }
+
+    function salvarEbookNaBiblioteca(ebook) {
+      const comprados = getMeusEbooksComprados();
+      if (!comprados.some(e => e.id === ebook.id)) {
+        comprados.push(ebook);
+        localStorage.setItem('meus_ebooks_db', JSON.stringify(comprados));
+      }
+      atualizarMeusEbooks();
+      renderizarCatalogo();
+    }
+
+    // --- RENDERIZAR "MEUS E-BOOKS" ---
+    function atualizarMeusEbooks() {
+      const comprados = getMeusEbooksComprados();
+      const grid = document.getElementById('grid-meus-ebooks');
+      const vazio = document.getElementById('meus-ebooks-vazio');
+      const badge = document.getElementById('badge-meus-ebooks');
+
+      badge.innerText = comprados.length;
+
+      if (comprados.length === 0) {
+        grid.innerHTML = '';
+        vazio.classList.remove('hidden');
+        return;
+      }
+
+      vazio.classList.add('hidden');
+      grid.innerHTML = comprados.map(ebook => `
+        <div class="bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-md border border-gray-100 dark:border-gray-700 flex flex-col">
+          <div class="h-40 overflow-hidden relative">
+            <img src="${ebook.capa}" alt="${ebook.titulo}" class="w-full h-full object-cover">
+            <span class="absolute top-3 right-3 bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1">
+              <i data-lucide="check-circle" class="w-3 h-3"></i> Liberado
+            </span>
+          </div>
+
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="text-base font-bold text-gray-800 dark:text-gray-100">${ebook.titulo}</h3>
+              <p class="text-xs text-gray-500 mt-1">Por ${ebook.autor}</p>
             </div>
 
-            <!-- Payment Methods Selector -->
-            <div class="grid grid-cols-3 gap-3">
-                <button type="button" onclick="setPaymentMethod('pix')" id="pay-btn-pix" class="p-3 rounded-xl border border-brand-500 bg-brand-500/10 text-brand-400 flex flex-col items-center gap-1 text-xs font-medium">
-                    <i data-lucide="qr-code" class="w-5 h-5"></i>
-                    <span>PIX Instantâneo</span>
-                </button>
-                <button type="button" onclick="setPaymentMethod('card')" id="pay-btn-card" class="p-3 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-400 flex flex-col items-center gap-1 text-xs font-medium light:border-slate-200 light:bg-slate-100">
-                    <i data-lucide="credit-card" class="w-5 h-5"></i>
-                    <span>Cartão Crédito</span>
-                </button>
-                <button type="button" onclick="setPaymentMethod('crypto')" id="pay-btn-crypto" class="p-3 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-400 flex flex-col items-center gap-1 text-xs font-medium light:border-slate-200 light:bg-slate-100">
-                    <i data-lucide="bitcoin" class="w-5 h-5"></i>
-                    <span>Cripto / USDT</span>
-                </button>
+            <div class="mt-5 space-y-2">
+              <button onclick="abrirLeitor('${ebook.id}')" class="w-full py-2 bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold rounded-lg transition flex items-center justify-center gap-2">
+                <i data-lucide="book-open" class="w-4 h-4"></i> Ler no Navegador
+              </button>
+              <button onclick="simularDownloadPDF('${ebook.titulo}')" class="w-full py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 text-gray-700 dark:text-gray-200 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-2">
+                <i data-lucide="download" class="w-4 h-4"></i> Baixar PDF
+              </button>
             </div>
-
-            <!-- Dynamic Payment Content -->
-            <div id="payment-method-container" class="space-y-4 pt-2">
-                <!-- PIX Container default -->
-                <div id="pay-content-pix" class="space-y-3 text-center">
-                    <div class="p-4 rounded-2xl bg-white w-40 h-40 mx-auto flex items-center justify-center shadow-inner">
-                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126580014BR.GOV.BCB.PIX0136EBOOKHUNTER-DEMO-PIX-PAYMENT-KEY" alt="QR Code PIX" class="w-full h-full">
-                    </div>
-                    <p class="text-xs text-slate-400">Escaneie o QR Code acima com o app do seu banco ou copie a chave:</p>
-                    <div class="flex gap-2">
-                        <input type="text" readonly value="00020126580014BR.GOV.BCB.PIX0136EBOOKHUNTER-DEMO-PIX" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-300 light:bg-slate-100 light:border-slate-300 light:text-slate-800">
-                        <button onclick="copyPixKey()" class="px-3 py-2 rounded-xl bg-slate-800 text-slate-200 text-xs font-medium hover:bg-slate-700 transition">Copiar</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="pt-2 border-t border-slate-800 flex justify-between items-center text-sm font-bold text-white light:border-slate-200 light:text-slate-900">
-                <span>Total a Pagar:</span>
-                <span id="checkout-total-val" class="text-brand-400 text-lg">R$ 0,00</span>
-            </div>
-
-            <button onclick="confirmOrder()" class="w-full py-3 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-sm transition shadow-lg shadow-brand-600/30">
-                Confirmar Pagamento Simulado
-            </button>
+          </div>
         </div>
-    </div>
+      `).join('');
 
-    <footer class="border-t border-slate-800 bg-slate-950 py-8 mt-12 light:bg-white light:border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
-            <div class="flex items-center gap-2">
-                <i data-lucide="book-open-check" class="w-4 h-4 text-brand-500"></i>
-                <span class="font-bold text-slate-200 light:text-slate-800">EbookHunter & Resell Hub</span>
-                <span>— Plataforma de Busca & Comparação de Preços</span>
-            </div>
-            <div class="flex items-center gap-4">
-                <span>Plataformas comparadas: Amazon, Kiwify, Hotmart, Eduzz, Monetizze</span>
-            </div>
+      lucide.createIcons();
+    }
+
+    // --- FLUXO DE PAGAMENTO VIA PIX ---
+    function abrirModalPix(ebookId) {
+      ebookSelecionado = EBOOKS_CATALOGO.find(e => e.id === ebookId);
+      if (!ebookSelecionado) return;
+
+      // Renderiza o resumo do produto no modal
+      document.getElementById('resumo-compra-ebook').innerHTML = `
+        <img src="${ebookSelecionado.capa}" class="w-12 h-12 object-cover rounded-lg">
+        <div class="flex-1">
+          <h4 class="text-xs font-bold text-gray-800 dark:text-gray-200">${ebookSelecionado.titulo}</h4>
+          <span class="text-xs text-emerald-600 font-extrabold">R$ ${ebookSelecionado.preco.toFixed(2).replace('.', ',')}</span>
         </div>
-    </footer>
+      `;
 
-    <script>
-        /* ==========================================================================
-           MOCK DATABASE & INITIAL STATE
-           ========================================================================== */
-        const STORAGE_KEY_BOOKS = 'ebookhunter_books_v1';
-        const STORAGE_KEY_CART = 'ebookhunter_cart_v1';
-        const STORAGE_KEY_FAVS = 'ebookhunter_favs_v1';
-        const STORAGE_KEY_THEME = 'ebookhunter_theme_v1';
+      // Reseta passos
+      document.getElementById('pix-passo-1').classList.remove('hidden');
+      document.getElementById('pix-passo-2').classList.add('hidden');
+      document.getElementById('pix-passo-3').classList.add('hidden');
 
-        const defaultBooks = [
-            {
-                id: '1',
-                title: 'IA Generativa para Negócios & MKT 2026',
-                author: 'Dr. Lucas Silveira',
-                category: 'tecnologia',
-                license: 'plr',
-                format: 'PDF + EPUB + Canva',
-                price: 29.90,
-                rating: 4.9,
-                reviewsCount: 142,
-                cover: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=600&q=80',
-                description: 'Aprenda a aplicar ChatGPT, Midjourney e Agentes IA para automatizar vendas, criar conteúdos em massa e acelerar negócios.',
-                indexPreview: ['Capítulo 1: Fundamentos de IA', 'Capítulo 2: Prompts de Alta Conversão', 'Capítulo 3: Automação com Make & N8N', 'Capítulo 4: Direitos PLR e Rebranding'],
-                plrMargin: '89%',
-                comparisons: [
-                    { platform: 'Nossa Loja (Comprar ou PLR)', price: 29.90, badge: 'Maior Margem PLR', type: 'resell' },
-                    { platform: 'Kiwify (Direito de Revenda)', price: 47.00, badge: 'Licença Estendida', type: 'resell' },
-                    { platform: 'Amazon Kindle (Apenas Leitura)', price: 34.90, badge: 'Leitura Digital', type: 'read' },
-                    { platform: 'Eduzz (Versão Físico)', price: 79.90, badge: 'Livro Físico', type: 'read' }
-                ]
-            },
-            {
-                id: '2',
-                title: 'A Psicologia da Produtividade Extrema',
-                author: 'Beatriz Mendez',
-                category: 'desenvolvimento',
-                license: 'personal',
-                format: 'EPUB + PDF',
-                price: 19.90,
-                rating: 4.8,
-                reviewsCount: 98,
-                cover: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=600&q=80',
-                description: 'Um guia prático baseado em neurociência para eliminar a procrastinação e gerenciar seu foco em um mundo cheio de distrações.',
-                indexPreview: ['Capítulo 1: O Cérebro Focado', 'Capítulo 2: Rotinas de Alto Desempenho', 'Capítulo 3: Gestão de Energia x Tempo'],
-                plrMargin: 'N/A (Uso Pessoal)',
-                comparisons: [
-                    { platform: 'Nossa Loja (Digital)', price: 19.90, badge: 'Menor Preço Leitura', type: 'read' },
-                    { platform: 'Amazon Kindle', price: 24.90, badge: 'Ebook Kindle', type: 'read' },
-                    { platform: 'Livraria Física (Impresso)', price: 49.90, badge: 'Capa Dura', type: 'read' }
-                ]
-            },
-            {
-                id: '3',
-                title: 'Manual Definitivo de Tráfego Pago & Funis',
-                author: 'Gabriel Santos (MKT Pro)',
-                category: 'negocios',
-                license: 'plr',
-                format: 'PDF + VSL Templates',
-                price: 39.90,
-                rating: 5.0,
-                reviewsCount: 210,
-                cover: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=600&q=80',
-                description: 'Aprenda a escalar campanhas no Meta Ads, Google Ads e TikTok Ads criando funis diretos de alta conversão.',
-                indexPreview: ['Capítulo 1: Estrutura de Campanhas', 'Capítulo 2: Métricas Rápidas (CAC, ROAS)', 'Capítulo 3: Criativos Vendedores'],
-                plrMargin: '85%',
-                comparisons: [
-                    { platform: 'Nossa Loja (Comprar PLR)', price: 39.90, badge: 'Licença Direta PLR', type: 'resell' },
-                    { platform: 'Hotmart (Afiliados)', price: 67.00, badge: 'Comissão 60%', type: 'resell' },
-                    { platform: 'Monetizze', price: 59.90, badge: 'Oferta Especial', type: 'resell' }
-                ]
-            },
-            {
-                id: '4',
-                title: 'Mindset Financeiro e Investimentos',
-                author: 'Carlos Eduardo Fontes',
-                category: 'financas',
-                license: 'physical',
-                format: 'Livro Físico',
-                price: 49.90,
-                rating: 4.7,
-                reviewsCount: 64,
-                cover: 'https://images.unsplash.com/photo-1553729459-efe14ef6055d?auto=format&fit=crop&w=600&q=80',
-                description: 'Construa uma carteira de investimentos sólida combinando Renda Fixa, Ações e FIIs com visão de longo prazo.',
-                indexPreview: ['Capítulo 1: Reserva de Emergência', 'Capítulo 2: Renda Fixa Inteligente', 'Capítulo 3: Dividendos Mensais'],
-                plrMargin: 'N/A (Físico)',
-                comparisons: [
-                    { platform: 'Nossa Loja (Frete Grátis)', price: 49.90, badge: 'Melhor Oferta Físico', type: 'read' },
-                    { platform: 'Amazon Brasil', price: 59.90, badge: 'Capa Comum', type: 'read' }
-                ]
-            },
-            {
-                id: '5',
-                title: 'Ebook PLR: Biohacking & Longevidade',
-                author: 'Dra. Camila Nogueira',
-                category: 'saude',
-                license: 'plr',
-                format: 'PDF + HQ Covers',
-                price: 24.90,
-                rating: 4.9,
-                reviewsCount: 88,
-                cover: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=600&q=80',
-                description: 'Ebook completo na área de saúde e bem-estar pronto para você colocar seu nome e revender como autor nas redes sociais.',
-                indexPreview: ['Capítulo 1: Otimização do Sono', 'Capítulo 2: Nutrição Funcional', 'Capítulo 3: Suplementação Essencial'],
-                plrMargin: '92%',
-                comparisons: [
-                    { platform: 'Nossa Loja (Pacote PLR)', price: 24.90, badge: 'Menor Preço PLR', type: 'resell' },
-                    { platform: 'Kiwify Marketplace', price: 39.90, badge: 'Comprar Ebook', type: 'read' }
-                ]
-            },
-            {
-                id: '6',
-                title: 'Arquitetura de Software e Microsserviços',
-                author: 'Eng. Renato Prado',
-                category: 'tecnologia',
-                license: 'personal',
-                format: 'PDF',
-                price: 34.90,
-                rating: 4.8,
-                reviewsCount: 75,
-                cover: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80',
-                description: 'Aprenda os padrões de projeto (Design Patterns), mensageria com RabbitMQ/Kafka e implantação em Docker/K8s.',
-                indexPreview: ['Capítulo 1: Monolito vs Microsserviços', 'Capítulo 2: Event-Driven Architecture', 'Capítulo 3: Resiliência em Sistemas'],
-                plrMargin: 'N/A',
-                comparisons: [
-                    { platform: 'Nossa Loja (PDF Técnico)', price: 34.90, badge: 'Download Imediato', type: 'read' },
-                    { platform: 'Amazon Kindle Edition', price: 44.90, badge: 'Kindle Store', type: 'read' }
-                ]
-            },
-            {
-                id: '7',
-                title: 'Guia de Copywriting de Alta Conversão',
-                author: 'Juliana Rossi',
-                category: 'negocios',
-                license: 'plr',
-                format: 'EPUB + PDF',
-                price: 27.90,
-                rating: 4.9,
-                reviewsCount: 130,
-                cover: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=600&q=80',
-                description: 'Descubra os gatilhos mentais e modelos de textos persuasivos usados pelos maiores copywriters do mercado.',
-                indexPreview: ['Capítulo 1: Anatomia da Headline', 'Capítulo 2: O Método AIDA na Prática', 'Capítulo 3: Histórias que Vendem'],
-                plrMargin: '88%',
-                comparisons: [
-                    { platform: 'Nossa Loja (PLR Liberado)', price: 27.90, badge: 'Maior Desconto PLR', type: 'resell' },
-                    { platform: 'Eduzz', price: 49.90, badge: 'Licença Única', type: 'resell' }
-                ]
-            },
-            {
-                id: '8',
-                title: 'Criptoativos & DeFi do Zero ao Avançado',
-                author: 'Marcos Vinicius',
-                category: 'financas',
-                license: 'personal',
-                format: 'PDF + Planilhas',
-                price: 22.90,
-                rating: 4.6,
-                reviewsCount: 52,
-                cover: 'https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=600&q=80',
-                description: 'Entenda o funcionamento da tecnologia Blockchain, Finanças Descentralizadas (DeFi), Staking e NFTs.',
-                indexPreview: ['Capítulo 1: O que é Bitcoin & Ethereum', 'Capítulo 2: Carteiras Físicas e Segurança', 'Capítulo 3: Pools de Liquidez'],
-                plrMargin: 'N/A',
-                comparisons: [
-                    { platform: 'Nossa Loja', price: 22.90, badge: 'Oferta Especial', type: 'read' },
-                    { platform: 'Hotmart', price: 37.00, badge: 'Curso + Ebook', type: 'read' }
-                ]
-            }
-        ];
+      document.getElementById('modal-pix').classList.remove('hidden');
+    }
 
-        let state = {
-            books: [],
-            cart: [],
-            favorites: [],
-            theme: 'dark',
-            activeSection: 'marketplace',
-            filters: {
-                search: '',
-                category: 'all',
-                license: 'all',
-                sort: 'featured',
-                onlyFavorites: false
-            },
-            couponDiscount: 0,
-            appliedCouponCode: ''
-        };
+    function fecharModalPix() {
+      document.getElementById('modal-pix').classList.add('hidden');
+      if (timerPixInterval) clearInterval(timerPixInterval);
+      if (pollingPixTimeout) clearTimeout(pollingPixTimeout);
+    }
 
-        /* ==========================================================================
-           STREAMING_CHUNK:Initializing application data and event bindings...
-           ========================================================================== */
-        window.addEventListener('DOMContentLoaded', () => {
-            initApp();
-        });
+    function processarFormularioPix(e) {
+      e.preventDefault();
 
-        function initApp() {
-            // Load Books from storage or fallback to defaults
-            const savedBooks = localStorage.getItem(STORAGE_KEY_BOOKS);
-            if (savedBooks) {
-                try { state.books = JSON.parse(savedBooks); } catch(e) { state.books = defaultBooks; }
-            } else {
-                state.books = defaultBooks;
-                localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(defaultBooks));
-            }
+      // Transiciona para o passo 2 (Exibição do QR Code)
+      document.getElementById('pix-passo-1').classList.add('hidden');
+      document.getElementById('pix-passo-2').classList.remove('hidden');
 
-            // Load Cart
-            const savedCart = localStorage.getItem(STORAGE_KEY_CART);
-            if (savedCart) {
-                try { state.cart = JSON.parse(savedCart); } catch(e) { state.cart = []; }
-            }
+      // Gera código Copia e Cola Pix simulado
+      const payloadPix = `00020126580014BR.GOV.BCB.PIX0136${Math.random().toString(36).substring(2, 15)}5204000053039865405${ebookSelecionado.preco.toFixed(2)}5802BR5910EbookStore6009SAO PAULO62070503***6304ABCD`;
+      
+      document.getElementById('pix-copia-cola-input').value = payloadPix;
 
-            // Load Favorites
-            const savedFavs = localStorage.getItem(STORAGE_KEY_FAVS);
-            if (savedFavs) {
-                try { state.favorites = JSON.parse(savedFavs); } catch(e) { state.favorites = []; }
-            }
+      // Gera QR Code via API pública externa de QR Codes
+      const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(payloadPix)}`;
+      document.getElementById('pix-img-qrcode').src = qrCodeUrl;
 
-            // Load Theme
-            const savedTheme = localStorage.getItem(STORAGE_KEY_THEME);
-            if (savedTheme) {
-                state.theme = savedTheme;
-            }
+      iniciarTimerPix();
 
-            applyTheme();
-            renderBooksGrid();
-            renderComparisonTable();
-            calculateProfit();
-            updateCartUI();
-            updateFavoritesCount();
-            lucide.createIcons();
+      // Simulação de polling / confirmação automática do banco em 12 segundos
+      pollingPixTimeout = setTimeout(() => {
+        simularPagamentoAprovado();
+      }, 12000);
+    }
+
+    function copiarPix() {
+      const input = document.getElementById('pix-copia-cola-input');
+      input.select();
+      navigator.clipboard.writeText(input.value);
+      notificar('Código Pix copiado para a área de transferência!');
+    }
+
+    function iniciarTimerPix() {
+      let segundos = 900; // 15 minutos
+      const display = document.getElementById('pix-timer');
+
+      if (timerPixInterval) clearInterval(timerPixInterval);
+
+      timerPixInterval = setInterval(() => {
+        segundos--;
+        const mins = Math.floor(segundos / 60);
+        const secs = segundos % 60;
+        display.innerText = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+        if (segundos <= 0) {
+          clearInterval(timerPixInterval);
+          notificar('O código Pix expirou. Gere uma nova cobrança.');
+          fecharModalPix();
         }
-
-        /* ==========================================================================
-           STREAMING_CHUNK:Handling Toast Notifications and Modals...
-           ========================================================================== */
-        function showToast(message, type = 'info') {
-            const container = document.getElementById('toast-container');
-            const toast = document.createElement('div');
-            
-            const styles = {
-                success: 'bg-emerald-600 text-white',
-                error: 'bg-rose-600 text-white',
-                info: 'bg-brand-600 text-white'
-            };
-
-            const icons = {
-                success: 'check-circle-2',
-                error: 'alert-circle',
-                info: 'info'
-            };
-
-            toast.className = `p-4 rounded-xl shadow-2xl flex items-center gap-3 transform transition-all duration-300 translate-y-2 opacity-0 pointer-events-auto ${styles[type] || styles.info}`;
-            toast.innerHTML = `
-                <i data-lucide="${icons[type] || 'info'}" class="w-5 h-5 flex-shrink-0"></i>
-                <span class="text-xs font-semibold">${message}</span>
-            `;
-
-            container.appendChild(toast);
-            lucide.createIcons();
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-2', 'opacity-0');
-            }, 10);
-
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => toast.remove(), 300);
-            }, 3500);
-        }
-
-        /* ==========================================================================
-           STREAMING_CHUNK:Theme & Navigation Management...
-           ========================================================================== */
-        function toggleTheme() {
-            state.theme = state.theme === 'dark' ? 'light' : 'dark';
-            localStorage.setItem(STORAGE_KEY_THEME, state.theme);
-            applyTheme();
-        }
-
-        function applyTheme() {
-            const body = document.getElementById('app-body');
-            const sunIcon = document.getElementById('theme-icon-sun');
-            const moonIcon = document.getElementById('theme-icon-moon');
-
-            if (state.theme === 'dark') {
-                document.documentElement.classList.add('dark');
-                document.documentElement.classList.remove('light');
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
-            } else {
-                document.documentElement.classList.remove('dark');
-                document.documentElement.classList.add('light');
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
-            }
-        }
-
-        function switchSection(sectionId) {
-            state.activeSection = sectionId;
-            const sections = ['marketplace', 'comparison', 'calculator'];
-            
-            sections.forEach(sec => {
-                const navBtn = document.getElementById(`nav-btn-${sec}`);
-                if (navBtn) {
-                    if (sec === sectionId) {
-                        navBtn.classList.add('text-brand-400', 'font-bold');
-                        navBtn.classList.remove('text-slate-300', 'text-slate-600');
-                    } else {
-                        navBtn.classList.remove('text-brand-400', 'font-bold');
-                        navBtn.classList.add('text-slate-300');
-                    }
-                }
-            });
-
-            // Smooth scroll to section
-            const el = document.getElementById(`section-${sectionId}`);
-            if (el) {
-                el.scrollIntoView({ behavior: 'smooth' });
-            }
-        }
-
-        /* ==========================================================================
-           STREAMING_CHUNK:Marketplace Catalog Filtering and Rendering...
-           ========================================================================== */
-        function handleGlobalSearch(e) {
-            state.filters.search = e.target.value.toLowerCase();
-            renderBooksGrid();
-        }
-
-        function setCategoryFilter(cat) {
-            document.getElementById('filter-category').value = cat;
-            applyFilters();
-        }
-
-        function applyFilters() {
-            state.filters.category = document.getElementById('filter-category').value;
-            state.filters.license = document.getElementById('filter-license').value;
-            state.filters.sort = document.getElementById('filter-sort').value;
-            renderBooksGrid();
-        }
-
-        function toggleFavoritesFilter() {
-            state.filters.onlyFavorites = !state.filters.onlyFavorites;
-            const btn = document.getElementById('favorites-badge-btn');
-            
-            if (state.filters.onlyFavorites) {
-                btn.classList.add('border-rose-500', 'text-rose-400', 'bg-rose-500/10');
-                showToast('Exibindo apenas seus favoritos salvos.', 'info');
-            } else {
-                btn.classList.remove('border-rose-500', 'text-rose-400', 'bg-rose-500/10');
-            }
-            renderBooksGrid();
-        }
-
-        function resetFilters() {
-            state.filters = { search: '', category: 'all', license: 'all', sort: 'featured', onlyFavorites: false };
-            document.getElementById('filter-category').value = 'all';
-            document.getElementById('filter-license').value = 'all';
-            document.getElementById('filter-sort').value = 'featured';
-            document.getElementById('global-search-input').value = '';
-            renderBooksGrid();
-        }
-
-        function renderBooksGrid() {
-            const grid = document.getElementById('books-grid');
-            const emptyState = document.getElementById('books-empty-state');
-
-            let filtered = state.books.filter(book => {
-                const matchesSearch = book.title.toLowerCase().includes(state.filters.search) || 
-                                      book.author.toLowerCase().includes(state.filters.search) ||
-                                      book.description.toLowerCase().includes(state.filters.search);
-                const matchesCategory = state.filters.category === 'all' || book.category === state.filters.category;
-                const matchesLicense = state.filters.license === 'all' || book.license === state.filters.license;
-                const matchesFav = !state.filters.onlyFavorites || state.favorites.includes(book.id);
-
-                return matchesSearch && matchesCategory && matchesLicense && matchesFav;
-            });
-
-            // Sorting
-            if (state.filters.sort === 'price-asc') {
-                filtered.sort((a, b) => a.price - b.price);
-            } else if (state.filters.sort === 'price-desc') {
-                filtered.sort((a, b) => b.price - a.price);
-            } else if (state.filters.sort === 'rating') {
-                filtered.sort((a, b) => b.rating - a.rating);
-            }
-
-            grid.innerHTML = '';
-
-            if (filtered.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            } else {
-                emptyState.classList.add('hidden');
-            }
-
-            const licenseBadges = {
-                plr: { label: 'Direito de Revenda (PLR)', bg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' },
-                personal: { label: 'Uso Pessoal', bg: 'bg-indigo-500/10 border-indigo-500/30 text-indigo-400' },
-                physical: { label: 'Livro Físico', bg: 'bg-amber-500/10 border-amber-500/30 text-amber-400' }
-            };
-
-            filtered.forEach(book => {
-                const isFav = state.favorites.includes(book.id);
-                const lic = licenseBadges[book.license] || licenseBadges.personal;
-
-                const card = document.createElement('div');
-                card.className = 'bg-slate-900/80 border border-slate-800 rounded-2xl overflow-hidden flex flex-col justify-between hover:border-slate-700 transition duration-300 shadow-xl group light:bg-white light:border-slate-200';
-                
-                card.innerHTML = `
-                    <div class="relative overflow-hidden aspect-[4/3] bg-slate-950">
-                        <img src="${book.cover}" alt="${book.title}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80"></div>
-                        
-                        <!-- Top Badges -->
-                        <div class="absolute top-3 left-3 right-3 flex justify-between items-center">
-                            <span class="px-2.5 py-1 rounded-lg text-[10px] font-bold border ${lic.bg} backdrop-blur-md">
-                                ${lic.label}
-                            </span>
-                            <button onclick="toggleFavorite('${book.id}')" class="p-2 rounded-xl bg-slate-950/60 border border-slate-800 text-slate-300 hover:text-rose-500 transition">
-                                <i data-lucide="heart" class="w-4 h-4 ${isFav ? 'fill-rose-500 text-rose-500' : ''}"></i>
-                            </button>
-                        </div>
-
-                        <!-- Rating Badge -->
-                        <div class="absolute bottom-3 left-3 flex items-center gap-1 text-amber-400 text-xs font-bold">
-                            <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i>
-                            <span>${book.rating}</span>
-                            <span class="text-slate-400 text-[10px]">(${book.reviewsCount})</span>
-                        </div>
-                    </div>
-
-                    <div class="p-5 flex-1 flex flex-col justify-between space-y-4">
-                        <div class="space-y-1.5">
-                            <span class="text-[10px] font-mono uppercase tracking-wider text-slate-400">${book.category}</span>
-                            <h3 class="font-bold text-white text-base leading-snug line-clamp-2 light:text-slate-900">${book.title}</h3>
-                            <p class="text-xs text-slate-400">por ${book.author}</p>
-                        </div>
-
-                        <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between light:border-slate-200">
-                            <div>
-                                <span class="text-[10px] text-slate-400 block">Preço Recomendado</span>
-                                <span class="text-lg font-black text-brand-400">R$ ${book.price.toFixed(2).replace('.', ',')}</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="openDetailsModal('${book.id}')" class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition light:bg-slate-100 light:text-slate-800" title="Ver Comparativo">
-                                    <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-                                </button>
-                                <button onclick="addToCart('${book.id}')" class="px-3 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-lg shadow-brand-600/20">
-                                    <i data-lucide="shopping-cart" class="w-4 h-4"></i>
-                                    <span>Comprar</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
-
-            lucide.createIcons();
-        }
-
-        /* ==========================================================================
-           STREAMING_CHUNK:Rendering Comparison Hub Table...
-           ========================================================================== */
-        function renderComparisonTable() {
-            const tbody = document.getElementById('comparison-table-body');
-            tbody.innerHTML = '';
-
-            state.books.forEach(book => {
-                const tr = document.createElement('tr');
-                tr.className = 'hover:bg-slate-800/30 transition light:hover:bg-slate-50';
-
-                // Find lowest read price and highest margin PLR option
-                const lowestRead = book.comparisons.filter(c => c.type === 'read').sort((a,b) => a.price - b.price)[0];
-                const bestResell = book.comparisons.filter(c => c.type === 'resell')[0];
-
-                tr.innerHTML = `
-                    <td class="p-4 flex items-center gap-3">
-                        <img src="${book.cover}" class="w-10 h-12 object-cover rounded-lg">
-                        <div>
-                            <span class="font-bold text-white block light:text-slate-900">${book.title}</span>
-                            <span class="text-xs text-slate-400">${book.author}</span>
-                        </div>
-                    </td>
-                    <td class="p-4">
-                        ${lowestRead ? `
-                            <span class="font-bold text-emerald-400 block">R$ ${lowestRead.price.toFixed(2).replace('.', ',')}</span>
-                            <span class="text-[11px] text-slate-400">${lowestRead.platform}</span>
-                        ` : '<span class="text-xs text-slate-500">N/A</span>'}
-                    </td>
-                    <td class="p-4">
-                        ${bestResell ? `
-                            <span class="font-bold text-brand-400 block">R$ ${bestResell.price.toFixed(2).replace('.', ',')}</span>
-                            <span class="text-[11px] text-brand-500/80 font-medium">${bestResell.badge} (${book.plrMargin} margem)</span>
-                        ` : '<span class="text-xs text-slate-500">Apenas Leitura</span>'}
-                    </td>
-                    <td class="p-4">
-                        <div class="flex flex-wrap gap-1">
-                            ${book.comparisons.map(c => `<span class="px-2 py-0.5 rounded text-[10px] bg-slate-800 text-slate-300 light:bg-slate-200 light:text-slate-700">${c.platform}</span>`).join('')}
-                        </div>
-                    </td>
-                    <td class="p-4 text-right">
-                        <button onclick="openDetailsModal('${book.id}')" class="px-3 py-1.5 rounded-lg bg-brand-600/10 border border-brand-500/30 text-brand-400 text-xs font-semibold hover:bg-brand-600 hover:text-white transition">
-                            Comparar Tudo
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        /* ==========================================================================
-           STREAMING_CHUNK:Profit Calculator Logic...
-           ========================================================================== */
-        function calculateProfit() {
-            const cost = parseFloat(document.getElementById('calc-cost').value) || 0;
-            const price = parseFloat(document.getElementById('calc-price').value) || 0;
-            const feePercent = parseFloat(document.getElementById('calc-fee').value) || 0;
-            const sales = parseInt(document.getElementById('calc-sales').value) || 0;
-
-            const revenue = price * sales;
-            const feePerSale = price * (feePercent / 100);
-            const netPerSale = price - feePerSale;
-            const totalNetProfit = (netPerSale * sales) - cost;
-
-            const marginPercent = price > 0 ? ((netPerSale / price) * 100) : 0;
-            const roiPercent = cost > 0 ? ((totalNetProfit / cost) * 100) : 0;
-
-            document.getElementById('calc-res-revenue').textContent = `R$ ${revenue.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-            document.getElementById('calc-res-netprofit').textContent = `R$ ${totalNetProfit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-            document.getElementById('calc-res-margin').textContent = `${marginPercent.toFixed(1)}%`;
-            document.getElementById('calc-res-roi').textContent = `${roiPercent.toFixed(0)}%`;
-        }
-
-        /* ==========================================================================
-           STREAMING_CHUNK:Shopping Cart & Coupon System...
-           ========================================================================== */
-        function toggleCartDrawer() {
-            const panel = document.getElementById('cart-panel');
-            const backdrop = document.getElementById('cart-backdrop');
-            const drawer = document.getElementById('cart-drawer');
-
-            const isOpen = !panel.classList.contains('translate-x-full');
-
-            if (isOpen) {
-                panel.classList.add('translate-x-full');
-                backdrop.classList.add('opacity-0');
-                setTimeout(() => drawer.classList.add('pointer-events-none'), 300);
-            } else {
-                drawer.classList.remove('pointer-events-none');
-                panel.classList.remove('translate-x-full');
-                backdrop.classList.remove('opacity-0');
-            }
-        }
-
-        function addToCart(bookId) {
-            const existing = state.cart.find(item => item.bookId === bookId);
-            if (existing) {
-                existing.quantity += 1;
-            } else {
-                state.cart.push({ bookId, quantity: 1 });
-            }
-            localStorage.setItem(STORAGE_KEY_CART, JSON.stringify(state.cart));
-            updateCartUI();
-            showToast('Ebook adicionado ao carrinho!', 'success');
-        }
-
-        function updateQuantity(bookId, delta) {
-            const item = state.cart.find(i => i.bookId === bookId);
-            if (item) {
-                item.quantity += delta;
-                if (item.quantity <= 0) {
-                    state.cart = state.cart.filter(i => i.bookId !== bookId);
-                }
-            }
-            localStorage.setItem(STORAGE_KEY_CART, JSON.stringify(state.cart));
-            updateCartUI();
-        }
-
-        function applyCoupon() {
-            const code = document.getElementById('coupon-input').value.trim().toUpperCase();
-            if (code === 'LIVRO10') {
-                state.couponDiscount = 0.10;
-                state.appliedCouponCode = 'LIVRO10';
-                showToast('Cupom LIVRO10 aplicado (10% OFF)!', 'success');
-            } else if (code === 'REVENDA20') {
-                state.couponDiscount = 0.20;
-                state.appliedCouponCode = 'REVENDA20';
-                showToast('Cupom REVENDA20 aplicado (20% OFF)!', 'success');
-            } else {
-                showToast('Cupom inválido. Tente LIVRO10 ou REVENDA20.', 'error');
-            }
-            updateCartUI();
-        }
-
-        function updateCartUI() {
-            const container = document.getElementById('cart-items-container');
-            const badgeCount = document.getElementById('cart-badge-count');
-            
-            const totalItems = state.cart.reduce((acc, i) => acc + i.quantity, 0);
-            
-            if (totalItems > 0) {
-                badgeCount.textContent = totalItems;
-                badgeCount.classList.remove('hidden');
-                badgeCount.classList.add('flex');
-            } else {
-                badgeCount.classList.add('hidden');
-                badgeCount.classList.remove('flex');
-            }
-
-            container.innerHTML = '';
-
-            if (state.cart.length === 0) {
-                container.innerHTML = `
-                    <div class="text-center py-12 text-slate-500">
-                        <i data-lucide="shopping-bag" class="w-12 h-12 mx-auto mb-2 text-slate-600"></i>
-                        <p class="text-sm font-medium">Seu carrinho está vazio.</p>
-                    </div>
-                `;
-            } else {
-                state.cart.forEach(item => {
-                    const book = state.books.find(b => b.id === item.bookId);
-                    if (!book) return;
-
-                    const div = document.createElement('div');
-                    div.className = 'p-3 rounded-xl bg-slate-800/50 border border-slate-700/60 flex gap-3 items-center light:bg-slate-100 light:border-slate-200';
-                    div.innerHTML = `
-                        <img src="${book.cover}" class="w-12 h-16 object-cover rounded-lg">
-                        <div class="flex-1">
-                            <h4 class="font-bold text-xs text-white line-clamp-1 light:text-slate-900">${book.title}</h4>
-                            <span class="text-xs text-brand-400 font-bold">R$ ${book.price.toFixed(2).replace('.', ',')}</span>
-                            <div class="flex items-center gap-2 mt-2">
-                                <button onclick="updateQuantity('${book.id}', -1)" class="w-6 h-6 rounded bg-slate-700 text-white flex items-center justify-center text-xs font-bold hover:bg-slate-600">-</button>
-                                <span class="text-xs font-bold text-white light:text-slate-900">${item.quantity}</span>
-                                <button onclick="updateQuantity('${book.id}', 1)" class="w-6 h-6 rounded bg-slate-700 text-white flex items-center justify-center text-xs font-bold hover:bg-slate-600">+</button>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-            }
-
-            // Calculation
-            const subtotal = state.cart.reduce((acc, item) => {
-                const book = state.books.find(b => b.id === item.bookId);
-                return acc + (book ? book.price * item.quantity : 0);
-            }, 0);
-
-            const discountVal = subtotal * state.couponDiscount;
-            const total = subtotal - discountVal;
-
-            document.getElementById('cart-subtotal').textContent = `R$ ${subtotal.toFixed(2).replace('.', ',')}`;
-            
-            const discountRow = document.getElementById('cart-discount-row');
-            if (discountVal > 0) {
-                discountRow.classList.remove('hidden');
-                document.getElementById('cart-discount').textContent = `-R$ ${discountVal.toFixed(2).replace('.', ',')}`;
-            } else {
-                discountRow.classList.add('hidden');
-            }
-
-            document.getElementById('cart-total').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-            document.getElementById('checkout-total-val').textContent = `R$ ${total.toFixed(2).replace('.', ',')}`;
-
-            lucide.createIcons();
-        }
-
-        /* ==========================================================================
-           STREAMING_CHUNK:Favorites & Modal Controls...
-           ========================================================================== */
-        function toggleFavorite(bookId) {
-            if (state.favorites.includes(bookId)) {
-                state.favorites = state.favorites.filter(id => id !== bookId);
-                showToast('Removido dos favoritos.', 'info');
-            } else {
-                state.favorites.push(bookId);
-                showToast('Adicionado aos favoritos!', 'success');
-            }
-            localStorage.setItem(STORAGE_KEY_FAVS, JSON.stringify(state.favorites));
-            updateFavoritesCount();
-            renderBooksGrid();
-        }
-
-        function updateFavoritesCount() {
-            const badge = document.getElementById('favorites-count');
-            if (state.favorites.length > 0) {
-                badge.textContent = state.favorites.length;
-                badge.classList.remove('hidden');
-                badge.classList.add('flex');
-            } else {
-                badge.classList.add('hidden');
-            }
-        }
-
-        function openDetailsModal(bookId) {
-            const book = state.books.find(b => b.id === bookId);
-            if (!book) return;
-
-            const modal = document.getElementById('details-modal');
-            const content = document.getElementById('details-modal-content');
-
-            content.innerHTML = `
-                <div class="flex flex-col md:flex-row gap-6">
-                    <img src="${book.cover}" class="w-full md:w-48 h-64 object-cover rounded-2xl shadow-xl">
-                    <div class="space-y-3 flex-1">
-                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-brand-500/10 text-brand-400 border border-brand-500/30">
-                            ${book.category.toUpperCase()} • ${book.license.toUpperCase()}
-                        </span>
-                        <h3 class="text-2xl font-black text-white light:text-slate-900">${book.title}</h3>
-                        <p class="text-xs text-slate-400">por ${book.author}</p>
-                        <p class="text-xs text-slate-300 leading-relaxed light:text-slate-700">${book.description}</p>
-                        
-                        <div class="pt-2">
-                            <h4 class="text-xs font-bold text-slate-200 mb-1 light:text-slate-900">Prévia do Índice / Sumário:</h4>
-                            <ul class="text-xs text-slate-400 space-y-1 list-disc list-inside">
-                                ${book.indexPreview ? book.indexPreview.map(i => `<li>${i}</li>`).join('') : '<li>Capítulos inclusos completos.</li>'}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-slate-800 space-y-3 light:border-slate-200">
-                    <h4 class="text-sm font-bold text-white light:text-slate-900">Comparativo de Preços por Plataforma:</h4>
-                    <div class="space-y-2">
-                        ${book.comparisons.map(c => `
-                            <div class="p-3 rounded-xl bg-slate-800/50 border border-slate-700/60 flex items-center justify-between text-xs light:bg-slate-100 light:border-slate-200">
-                                <div>
-                                    <span class="font-bold text-white block light:text-slate-900">${c.platform}</span>
-                                    <span class="text-[10px] text-brand-400 font-medium">${c.badge}</span>
-                                </div>
-                                <span class="font-black text-white text-sm light:text-slate-900">R$ ${c.price.toFixed(2).replace('.', ',')}</span>
-                            </div>
-                        `).join('')}
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-3 pt-2">
-                    <button onclick="addToCart('${book.id}')" class="px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition shadow-lg shadow-brand-600/30">
-                        Adicionar ao Carrinho (R$ ${book.price.toFixed(2).replace('.', ',')})
-                    </button>
-                </div>
-            `;
-
-            modal.classList.remove('hidden');
-            lucide.createIcons();
-        }
-
-        function closeDetailsModal() {
-            document.getElementById('details-modal').classList.add('hidden');
-        }
-
-        /* ==========================================================================
-           STREAMING_CHUNK:Selling/Listing New Ebook logic...
-           ========================================================================== */
-        function openSellModal() {
-            document.getElementById('sell-modal').classList.remove('hidden');
-        }
-
-        function closeSellModal() {
-            document.getElementById('sell-modal').classList.add('hidden');
-        }
-
-        function handleSellFormSubmit(e) {
-            e.preventDefault();
-            
-            const newBook = {
-                id: Date.now().toString(),
-                title: document.getElementById('sell-title').value.trim(),
-                author: document.getElementById('sell-author').value.trim(),
-                category: document.getElementById('sell-category').value,
-                license: document.getElementById('sell-license').value,
-                format: 'PDF / Digital',
-                price: parseFloat(document.getElementById('sell-price').value),
-                rating: 5.0,
-                reviewsCount: 1,
-                cover: document.getElementById('sell-cover').value.trim() || 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600&q=80',
-                description: document.getElementById('sell-desc').value.trim() || 'Ebook cadastrado pelo usuário.',
-                indexPreview: ['Capítulo 1: Introdução ao Tema', 'Capítulo 2: Conteúdo Prático'],
-                plrMargin: '85%',
-                comparisons: [
-                    { platform: 'Nossa Loja (Anúncio Direto)', price: parseFloat(document.getElementById('sell-price').value), badge: 'Oferta do Criador', type: 'resell' }
-                ]
-            };
-
-            state.books.unshift(newBook);
-            localStorage.setItem(STORAGE_KEY_BOOKS, JSON.stringify(state.books));
-            
-            closeSellModal();
-            renderBooksGrid();
-            renderComparisonTable();
-            showToast('Seu ebook foi anunciado com sucesso!', 'success');
-        }
-
-        /* ==========================================================================
-           STREAMING_CHUNK:Checkout & Order Confirmation logic...
-           ========================================================================== */
-        function openCheckoutModal() {
-            if (state.cart.length === 0) {
-                showToast('Adicione pelo menos um item ao carrinho.', 'error');
-                return;
-            }
-            toggleCartDrawer();
-            document.getElementById('checkout-modal').classList.remove('hidden');
-        }
-
-        function closeCheckoutModal() {
-            document.getElementById('checkout-modal').classList.add('hidden');
-        }
-
-        function setPaymentMethod(method) {
-            const pixBtn = document.getElementById('pay-btn-pix');
-            const cardBtn = document.getElementById('pay-btn-card');
-            const cryptoBtn = document.getElementById('pay-btn-crypto');
-            const container = document.getElementById('payment-method-container');
-
-            [pixBtn, cardBtn, cryptoBtn].forEach(b => {
-                b.className = 'p-3 rounded-xl border border-slate-800 bg-slate-800/40 text-slate-400 flex flex-col items-center gap-1 text-xs font-medium light:border-slate-200 light:bg-slate-100';
-            });
-
-            if (method === 'pix') {
-                pixBtn.className = 'p-3 rounded-xl border border-brand-500 bg-brand-500/10 text-brand-400 flex flex-col items-center gap-1 text-xs font-medium';
-                container.innerHTML = `
-                    <div class="space-y-3 text-center">
-                        <div class="p-4 rounded-2xl bg-white w-40 h-40 mx-auto flex items-center justify-center shadow-inner">
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=00020126580014BR.GOV.BCB.PIX0136EBOOKHUNTER-DEMO-PIX-PAYMENT-KEY" alt="QR Code PIX" class="w-full h-full">
-                        </div>
-                        <p class="text-xs text-slate-400">Escaneie o QR Code acima com o app do seu banco ou copie a chave:</p>
-                        <div class="flex gap-2">
-                            <input type="text" readonly value="00020126580014BR.GOV.BCB.PIX0136EBOOKHUNTER-DEMO-PIX" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono text-slate-300 light:bg-slate-100 light:border-slate-300 light:text-slate-800">
-                            <button onclick="copyPixKey()" class="px-3 py-2 rounded-xl bg-slate-800 text-slate-200 text-xs font-medium hover:bg-slate-700 transition">Copiar</button>
-                        </div>
-                    </div>
-                `;
-            } else if (method === 'card') {
-                cardBtn.className = 'p-3 rounded-xl border border-brand-500 bg-brand-500/10 text-brand-400 flex flex-col items-center gap-1 text-xs font-medium';
-                container.innerHTML = `
-                    <div class="space-y-3">
-                        <input type="text" placeholder="Número do Cartão" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="text" placeholder="MM/AA" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                            <input type="text" placeholder="CVV" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                        </div>
-                        <input type="text" placeholder="Nome Impresso no Cartão" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-100 light:bg-slate-100 light:border-slate-300 light:text-slate-900">
-                    </div>
-                `;
-            } else if (method === 'crypto') {
-                cryptoBtn.className = 'p-3 rounded-xl border border-brand-500 bg-brand-500/10 text-brand-400 flex flex-col items-center gap-1 text-xs font-medium';
-                container.innerHTML = `
-                    <div class="p-4 rounded-xl bg-slate-800/50 border border-slate-700 text-center space-y-2 light:bg-slate-100 light:border-slate-200">
-                        <p class="text-xs text-slate-300 font-medium light:text-slate-800">Endereço de Transferência USDT (TRC-20):</p>
-                        <p class="text-xs font-mono text-brand-400 break-all">TX9zK8qLp3mV2n7R1sW4e5t6Y7u8I9o0P</p>
-                        <p class="text-[10px] text-slate-400">Aprovação automática após 3 confirmações na rede.</p>
-                    </div>
-                `;
-            }
-        }
-
-        function copyPixKey() {
-            navigator.clipboard.writeText('00020126580014BR.GOV.BCB.PIX0136EBOOKHUNTER-DEMO-PIX');
-            showToast('Chave PIX copiada para a área de transferência!', 'success');
-        }
-
-        function confirmOrder() {
-            state.cart = [];
-            state.couponDiscount = 0;
-            state.appliedCouponCode = '';
-            localStorage.removeItem(STORAGE_KEY_CART);
-            
-            closeCheckoutModal();
-            updateCartUI();
-            showToast('Pedido confirmado! Seus ebooks estão disponíveis para download.', 'success');
-        }
-    </script>
+      }, 1000);
+    }
+
+    // SIMULA A CONFIRMAÇÃO DO WEBHOOK DO BANCO
+    function simularPagamentoAprovado() {
+      if (timerPixInterval) clearInterval(timerPixInterval);
+      if (pollingPixTimeout) clearTimeout(pollingPixTimeout);
+
+      // Salva o e-book na biblioteca do usuário
+      salvarEbookNaBiblioteca(ebookSelecionado);
+
+      // Exibe tela de sucesso
+      document.getElementById('pix-passo-2').classList.add('hidden');
+      document.getElementById('pix-passo-3').classList.remove('hidden');
+
+      notificar('Pagamento Pix confirmado com sucesso!');
+    }
+
+    function irParaMeusEbooksAposCompra() {
+      fecharModalPix();
+      trocarAba('meus-ebooks');
+    }
+
+    // --- LEITOR INTEGRADO DE E-BOOKS ---
+    function abrirLeitor(ebookId) {
+      const ebook = EBOOKS_CATALOGO.find(e => e.id === ebookId);
+      if (!ebook) return;
+
+      document.getElementById('leitor-titulo').innerText = ebook.titulo;
+      document.getElementById('leitor-autor').innerText = `Por ${ebook.autor}`;
+      document.getElementById('leitor-conteudo').innerHTML = ebook.conteudo;
+
+      document.getElementById('modal-leitor').classList.remove('hidden');
+    }
+
+    function fecharLeitor() {
+      document.getElementById('modal-leitor').classList.add('hidden');
+    }
+
+    function simularDownloadPDF(titulo) {
+      notificar(`Iniciando download do e-book "${titulo}.pdf"...`);
+    }
+
+    // --- UTILITÁRIOS: TOAST & DARK MODE ---
+    function toggleDarkMode() {
+      document.documentElement.classList.toggle('dark');
+    }
+
+    function notificar(mensagem) {
+      const toast = document.getElementById('toast');
+      const msgSpan = document.getElementById('toast-msg');
+
+      msgSpan.innerText = mensagem;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+      }, 3500);
+    }
+  </script>
 </body>
 </html>
